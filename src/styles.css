@@ -1,0 +1,186 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Poppins", system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-teal: var(--teal);
+  --color-teal-dark: var(--teal-dark);
+  --color-gold: var(--gold);
+  --color-navy: var(--navy);
+  --color-bg-soft: var(--bg-soft);
+  --color-text-slate: var(--text-slate);
+  --color-muted-grey: var(--muted-grey);
+  --color-border-silver: var(--border-silver);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+}
+
+:root {
+  --radius: 0.5rem;
+
+  --teal: oklch(0.72 0.12 210);
+  --teal-dark: oklch(0.62 0.12 210);
+  --gold: oklch(0.74 0.08 80);
+  --navy: oklch(0.22 0.04 250);
+  --bg-soft: oklch(0.97 0.005 230);
+  --text-slate: oklch(0.25 0.03 245);
+  --muted-grey: oklch(0.55 0.02 240);
+  --border-silver: oklch(0.88 0.005 240);
+  --success: oklch(0.72 0.18 145);
+  --warning: oklch(0.78 0.15 70);
+
+  --background: oklch(1 0 0);
+  --foreground: var(--text-slate);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--text-slate);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--text-slate);
+  --primary: var(--teal);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: var(--bg-soft);
+  --secondary-foreground: var(--text-slate);
+  --muted: var(--bg-soft);
+  --muted-foreground: var(--muted-grey);
+  --accent: var(--bg-soft);
+  --accent-foreground: var(--text-slate);
+  --destructive: oklch(0.6 0.22 27);
+  --destructive-foreground: oklch(1 0 0);
+  --border: var(--border-silver);
+  --input: var(--border-silver);
+  --ring: var(--teal);
+}
+
+.dark {
+  --background: var(--navy);
+  --foreground: oklch(0.98 0 0);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    font-family: "Poppins", system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-slate);
+    font-family: "Poppins", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.01em; }
+}
+
+@layer components {
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-teal);
+  }
+  .btn-teal {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+    background: var(--color-teal); color: #fff;
+    padding: .8rem 1.4rem; border-radius: .5rem;
+    font-weight: 600; transition: all .2s ease;
+  }
+  .btn-teal:hover { background: var(--color-teal-dark); transform: scale(1.02); }
+  .btn-gold {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+    background: var(--color-gold); color: var(--color-navy);
+    padding: .8rem 1.4rem; border-radius: .5rem;
+    font-weight: 600; transition: all .2s ease;
+    position: relative; overflow: hidden;
+  }
+  .btn-gold:hover { filter: brightness(1.08); }
+  .btn-outline-teal {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+    border: 1.5px solid var(--color-teal); color: var(--color-teal);
+    padding: .75rem 1.4rem; border-radius: .5rem; font-weight: 600; transition: .2s;
+  }
+  .btn-outline-teal:hover { background: var(--color-teal); color: #fff; }
+  .btn-outline-white {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+    border: 1.5px solid rgba(255,255,255,.5); color: #fff;
+    padding: .75rem 1.4rem; border-radius: .5rem; font-weight: 600; transition: .2s;
+  }
+  .btn-outline-white:hover { background: #fff; color: var(--color-teal); border-color: #fff; }
+
+  .card-service {
+    background: #fff; border-radius: .75rem; padding: 1.75rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    border-top: 4px solid var(--color-teal);
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .card-service:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,.12); }
+
+  .card-tech {
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+    border-radius: .75rem; padding: 1.5rem; transition: all .25s ease;
+  }
+  .card-tech:hover { box-shadow: 0 0 24px rgba(10,171,189,.35); border-color: var(--color-teal); transform: translateY(-3px); }
+
+  .placeholder-img {
+    background: linear-gradient(135deg, #0D1E2C 0%, #1a3548 100%);
+    color: rgba(255,255,255,.55);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .75rem; letter-spacing: .15em; text-transform: uppercase;
+    font-weight: 500; border-radius: .5rem;
+  }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track { animation: marquee 35s linear infinite; }
+
+@keyframes shimmer {
+  0% { transform: translateX(-120%) skewX(-20deg); }
+  100% { transform: translateX(220%) skewX(-20deg); }
+}
+.btn-gold::after {
+  content: ""; position: absolute; top: 0; left: 0; height: 100%; width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent);
+  transform: translateX(-120%) skewX(-20deg);
+}
+.btn-gold:hover::after { animation: shimmer .9s ease forwards; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
