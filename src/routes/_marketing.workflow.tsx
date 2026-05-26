@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/Reveal";
 import { CheckCircle2, Truck, ArrowRight } from "lucide-react";
-import { Placeholder } from "@/components/site/Placeholder";
 
 export const Route = createFileRoute("/_marketing/workflow")({
   head: () => ({
@@ -64,7 +63,14 @@ function WorkflowPage() {
             </div>
           </Reveal>
           <Reveal delay={0.1}>
-            <Placeholder label="Digital Prescription Screenshot" className="aspect-4/3" />
+            <div className="rounded-2xl overflow-hidden shadow-[0_4px_32px_rgba(0,0,0,0.1)] aspect-4/3">
+              <img
+                src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80&auto=format&fit=crop"
+                alt="Digital prescription workflow"
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
           </Reveal>
         </div>
       </section>

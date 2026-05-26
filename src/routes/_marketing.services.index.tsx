@@ -32,19 +32,41 @@ const SERVICES = [
   { slug: "digital-design", icon: PencilRuler, title: "Digital Design Support", desc: "STL design, smile design and treatment planning collaboration with your clinic." },
 ];
 
+const MATERIAL_TILES = [
+  { label: "Zircon",          sub: "Achieve High Level Of Aesthetic\nWithout Sacrificing Durability",  img: "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=600&q=80&auto=format&fit=crop", text: true  },
+  { label: "",                sub: "", img: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?w=600&q=80&auto=format&fit=crop", text: false },
+  { label: "Porcelain",       sub: "Aesthetic And Function Are Together",                               img: "https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=600&q=80&auto=format&fit=crop", text: true  },
+  { label: "",                sub: "", img: "https://images.unsplash.com/photo-1581595219315-a187dd40c322?w=600&q=80&auto=format&fit=crop", text: false },
+  { label: "Implants",        sub: "Long Lasting Dentures",                                             img: "https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=600&q=80&auto=format&fit=crop", text: true  },
+  { label: "",                sub: "", img: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=80&auto=format&fit=crop", text: false },
+  { label: "Inlays / Onlays", sub: "Perfect Match At The Most Precision Points",                        img: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&q=80&auto=format&fit=crop", text: true  },
+  { label: "",                sub: "", img: "https://images.unsplash.com/photo-1590736969955-71cc94901144?w=600&q=80&auto=format&fit=crop", text: false },
+];
+
 function ServicesPage() {
   return (
     <div>
-      <section className="bg-white py-20">
-        <div className="max-w-7xl mx-auto px-5 lg:px-8">
+      {/* Hero */}
+      <section className="relative bg-navy text-white overflow-hidden">
+        <div className="absolute inset-0">
+          <img src="https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=1600&q=80&auto=format&fit=crop" alt="Dental lab" className="w-full h-full object-cover opacity-30" loading="lazy"/>
+          <div className="absolute inset-0 bg-linear-to-b from-navy/70 to-navy/90"/>
+        </div>
+        <div className="relative max-w-7xl mx-auto px-5 lg:px-8 py-24">
           <Reveal>
-            <span className="eyebrow">Our Services</span>
-            <h1 className="mt-3 text-4xl md:text-5xl font-bold inline-block border-b-4 border-teal pb-2">Comprehensive Lab Services</h1>
-            <p className="mt-6 text-muted-grey max-w-2xl">
+            <span className="eyebrow text-teal!">Our Services</span>
+            <h1 className="mt-3 text-4xl md:text-5xl font-bold max-w-3xl">Comprehensive Lab Services</h1>
+            <p className="mt-6 text-white/70 max-w-2xl text-lg">
               Every service is delivered through a digital prescription workflow with full traceability, multi-step QC and CE-certified materials.
             </p>
           </Reveal>
-          <Stagger className="mt-14 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        </div>
+      </section>
+
+      {/* Services grid */}
+      <section className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8">
+          <Stagger className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {SERVICES.map((s) => (
               <StaggerItem key={s.slug}>
                 <div className="card-service h-full flex flex-col">
@@ -56,6 +78,33 @@ function ServicesPage() {
               </StaggerItem>
             ))}
           </Stagger>
+        </div>
+      </section>
+
+      {/* Materials photo grid */}
+      <section className="bg-bg-soft py-16">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8">
+          <Reveal className="text-center mb-10">
+            <span className="eyebrow">Materials</span>
+            <h2 className="mt-3 text-3xl font-semibold">Our Core Restorations</h2>
+          </Reveal>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-0 rounded-2xl overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.12)]">
+            {MATERIAL_TILES.map((tile, i) => (
+              <div key={i} className="relative h-52 overflow-hidden group">
+                <img src={tile.img} alt={tile.label || "dental"} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy"/>
+                <div className="absolute inset-0 bg-navy/50 group-hover:bg-navy/60 transition-colors duration-300"/>
+                {tile.text && tile.label && (
+                  <div className="absolute inset-0 flex flex-col justify-center p-5">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-[2px] bg-teal"/>
+                      <span className="text-white font-bold text-sm md:text-base tracking-wide uppercase">{tile.label}</span>
+                    </div>
+                    <p className="text-white/80 text-xs leading-relaxed whitespace-pre-line">{tile.sub}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </div>

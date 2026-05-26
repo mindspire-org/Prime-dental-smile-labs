@@ -732,7 +732,7 @@ function PageEditor() {
   const selectedBlock = blocks.find(b => b.id === selected);
 
   return (
-    <div className="h-screen flex flex-col -mx-6 -mt-6">
+    <div className="h-screen flex flex-col -mx-7 -mt-7">
       {/* Enhanced Toolbar */}
       <div className="flex items-center gap-4 px-6 py-3 bg-white border-b border-slate-200 shrink-0">
         <Link to="/admin/pages" className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors">

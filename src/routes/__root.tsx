@@ -279,8 +279,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-      { rel: "shortcut icon", href: "/favicon.svg" },
+      { rel: "icon", type: "image/png", href: "/Primesmile logo.png" },
+      { rel: "shortcut icon", href: "/Primesmile logo.png" },
+      { rel: "apple-touch-icon", href: "/Primesmile logo.png" },
     ],
   }),
   shellComponent: RootShell,

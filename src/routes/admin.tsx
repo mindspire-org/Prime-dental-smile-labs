@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate, useRouterState } from "@tanstack/react-router";
+import { AdminMobileNav } from "@/components/site/MobileNav";
 import {
   LayoutDashboard, Users, Building2, Briefcase, FileText,
   Search, BarChart3, Activity, LogOut, ChevronRight, Settings, Shield,
@@ -44,7 +45,7 @@ const NAV_GROUPS = [
       { to: "/admin/pages",   label: "Page Editor",    icon: Layout,    exact: false },
       { to: "/admin/posts",   label: "Blog Posts",     icon: BookOpen,  exact: false },
       { to: "/admin/media",   label: "Media Library",  icon: Image,     exact: false },
-      { to: "/admin/content", label: "Content (Legacy)",icon: FileText,  exact: false },
+      { to: "/admin/content", label: "Content Keys",    icon: FileText,  exact: false },
       { to: "/admin/seo",     label: "SEO Manager",    icon: Search,    exact: false },
     ],
   },
@@ -76,7 +77,7 @@ function AdminLayout() {
   return (
     <div className="min-h-screen flex" style={{ background: "#f1f5f9" }}>
       {/* Sidebar */}
-      <aside className="w-[240px] shrink-0 sticky top-0 h-screen flex flex-col overflow-hidden"
+      <aside className="hidden lg:flex w-[240px] shrink-0 sticky top-0 h-screen flex-col overflow-hidden"
         style={{ background: "linear-gradient(175deg, #0f172a 0%, #1e293b 100%)" }}>
 
         {/* Glow */}
@@ -84,16 +85,10 @@ function AdminLayout() {
           style={{ background: "radial-gradient(circle, #6366f1 0%, transparent 70%)", transform: "translate(-50%, -50%)" }}/>
 
         {/* Logo */}
-        <div className="px-5 pt-6 pb-4 border-b border-white/8 relative">
+        <div className="px-5 pt-5 pb-4 border-b border-white/8 relative">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-              style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5)" }}>
-              <Shield size={14} color="white"/>
-            </div>
-            <div>
-              <div className="text-white font-bold text-[14px] leading-none">Prime<span className="text-indigo-400">Smile</span></div>
-              <div className="text-white/30 text-[9px] uppercase tracking-[0.15em] mt-0.5">Admin CMS</div>
-            </div>
+            <img src="/Primesmile logo.png" alt="Prime Smiles" className="h-9 w-auto object-contain brightness-0 invert" />
+            <div className="text-white/30 text-[9px] uppercase tracking-[0.15em] mt-0.5 self-end pb-0.5">Admin</div>
           </Link>
         </div>
 
@@ -151,9 +146,10 @@ function AdminLayout() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 min-w-0 overflow-x-hidden p-7">
+      <main className="flex-1 min-w-0 overflow-x-hidden p-4 lg:p-7 pb-24 lg:pb-7">
         <Outlet />
       </main>
+      <AdminMobileNav />
     </div>
   );
 }

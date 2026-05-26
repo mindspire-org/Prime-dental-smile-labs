@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Reveal } from "@/components/site/Reveal";
-import { Placeholder } from "@/components/site/Placeholder";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Reveal, Stagger, StaggerItem } from "@/components/site/Reveal";
+import { CheckCircle2, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/_marketing/about")({
   head: () => ({
@@ -20,32 +20,98 @@ export const Route = createFileRoute("/_marketing/about")({
   component: AboutPage,
 });
 
+const GALLERY = [
+  { src: "https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=800&q=80&auto=format&fit=crop", alt: "Lab facility", span: "col-span-2 row-span-2" },
+  { src: "https://images.unsplash.com/photo-1581595219315-a187dd40c322?w=600&q=80&auto=format&fit=crop", alt: "Digital equipment" },
+  { src: "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=600&q=80&auto=format&fit=crop", alt: "Zirconia crown" },
+  { src: "https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=600&q=80&auto=format&fit=crop", alt: "Implant work" },
+  { src: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=80&auto=format&fit=crop", alt: "Lab workflow" },
+];
+
 function AboutPage() {
   return (
-    <section className="bg-white py-20">
-      <div className="max-w-5xl mx-auto px-5 lg:px-8">
-        <Reveal>
-          <span className="eyebrow">Facility</span>
-          <h1 className="mt-3 text-4xl md:text-5xl font-bold inline-block border-b-4 border-teal pb-2">About Prime Smile</h1>
-          <p className="mt-6 text-lg text-muted-grey leading-relaxed">
-            Prime Smile is a fully digital dental laboratory operating across the UK and Cyprus. We partner with dental clinics
-            who demand precision, accountability and consistent results.
-          </p>
-        </Reveal>
-        <Placeholder label="Facility Photo" className="mt-12 aspect-16/8" />
-        <div className="grid md:grid-cols-3 gap-8 mt-12">
+    <div>
+      {/* Hero */}
+      <section className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8 grid lg:grid-cols-2 gap-14 items-center">
+          <Reveal>
+            <span className="eyebrow">Facility</span>
+            <h1 className="mt-3 text-4xl md:text-5xl font-bold leading-tight">
+              About <span className="text-teal">Prime Smile</span> Dental Laboratory
+            </h1>
+            <p className="mt-6 text-lg text-muted-grey leading-relaxed">
+              Prime Smile is a fully digital dental laboratory operating across the UK and Cyprus.
+              We partner with dental clinics who demand precision, accountability and consistent results — delivered every time.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link to="/contact" className="btn-teal">Contact Us <ArrowRight size={16}/></Link>
+              <Link to="/workflow" className="btn-outline-teal">Our Workflow <ArrowRight size={16}/></Link>
+            </div>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div className="grid grid-cols-3 grid-rows-2 gap-3 h-80">
+              {GALLERY.map((img, i) => (
+                <div key={i} className={`rounded-2xl overflow-hidden ${img.span ?? ""}`}>
+                  <img src={img.src} alt={img.alt} className="w-full h-full object-cover" loading="lazy"/>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Story / Mission / Standards */}
+      <section className="bg-bg-soft py-20">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8">
+          <Stagger className="grid md:grid-cols-3 gap-8">
+            {[
+              { t: "Our Story", d: "Founded by a team of master technicians who saw the future was digital. We invested early in CAD/CAM, SLM printing and validated workflows — long before it became industry standard.", accent: "border-teal" },
+              { t: "Our Mission", d: "To make precision dental restoration accessible to every dentist through fully traceable, digitally-managed lab work. No paper. No guessing. Every case accounted for.", accent: "border-gold" },
+              { t: "Our Standards", d: "ISO 9001 and ISO 13485 certified. CE-certified materials only. Six quality control checkpoints per case. Zero compromises on fit, aesthetics or traceability.", accent: "border-teal" },
+            ].map((b) => (
+              <StaggerItem key={b.t}>
+                <div className={`bg-white rounded-2xl p-7 shadow-[0_2px_16px_rgba(0,0,0,0.05)] border-l-4 ${b.accent} h-full`}>
+                  <h3 className="font-bold text-xl text-text-slate">{b.t}</h3>
+                  <p className="text-sm text-muted-grey mt-3 leading-relaxed">{b.d}</p>
+                </div>
+              </StaggerItem>
+            ))}
+          </Stagger>
+        </div>
+      </section>
+
+      {/* Certifications */}
+      <section className="bg-white py-16 border-t border-border-silver">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8 grid md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
           {[
-            { t: "Our Story", d: "Founded by a team of master technicians who saw the future was digital. We invested early in CAD/CAM, SLM printing and validated workflows." },
-            { t: "Our Mission", d: "To make precision dental restoration accessible to every dentist through fully traceable, digitally-managed lab work." },
-            { t: "Our Standards", d: "ISO 9001 and ISO 13485 certified. CE-certified materials only. Six checkpoints per case. Zero compromises." },
+            { t: "ISO 9001:2015", d: "Quality Management System" },
+            { t: "ISO 13485:2016", d: "Medical Devices Standard" },
+            { t: "CE-Certified Materials", d: "World-Renowned Suppliers" },
+            { t: "Digital Case Tracking", d: "Submission to Dispatch" },
           ].map((b) => (
             <div key={b.t}>
-              <h3 className="font-semibold text-lg text-teal">{b.t}</h3>
-              <p className="text-sm text-muted-grey mt-2 leading-relaxed">{b.d}</p>
+              <div className="w-14 h-14 rounded-full bg-teal/10 text-teal flex items-center justify-center mx-auto mb-3">
+                <CheckCircle2 size={26}/>
+              </div>
+              <div className="font-bold">{b.t}</div>
+              <div className="text-sm text-muted-grey mt-1">{b.d}</div>
             </div>
           ))}
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20" style={{ background: "linear-gradient(135deg, var(--teal), var(--teal-dark))" }}>
+        <div className="max-w-4xl mx-auto px-5 text-center text-white">
+          <h2 className="text-3xl md:text-4xl font-bold">Ready to partner with us?</h2>
+          <p className="mt-4 text-white/85 max-w-xl mx-auto">Create your dentist account and submit your first case today.</p>
+          <div className="mt-8">
+            <Link to="/portal" className="inline-flex items-center gap-2 bg-white text-teal font-semibold px-7 py-3 rounded-lg hover:scale-[1.02] transition">
+              Get Started <ArrowRight size={16}/>
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }

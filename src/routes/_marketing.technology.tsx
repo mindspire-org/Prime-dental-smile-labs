@@ -34,8 +34,12 @@ const TECH = [
 function TechPage() {
   return (
     <div>
-      <section className="bg-navy text-white py-20">
-        <div className="max-w-7xl mx-auto px-5 lg:px-8">
+      <section className="bg-navy text-white py-20 relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img src="https://images.unsplash.com/photo-1581595219315-a187dd40c322?w=1600&q=80&auto=format&fit=crop" alt="Digital dental technology" className="w-full h-full object-cover opacity-20" loading="lazy"/>
+          <div className="absolute inset-0 bg-linear-to-b from-navy/60 to-navy/95"/>
+        </div>
+        <div className="relative max-w-7xl mx-auto px-5 lg:px-8">
           <Reveal>
             <span className="eyebrow text-teal!">Technology</span>
             <h1 className="mt-3 text-4xl md:text-5xl font-bold max-w-3xl">A Complete Digital Production Environment</h1>

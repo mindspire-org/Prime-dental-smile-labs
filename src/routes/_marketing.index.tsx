@@ -186,6 +186,45 @@ function HomePage() {
         </div>
       </section>
 
+      {/* DENTAL SERVICES PHOTO GRID */}
+      <section className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8">
+          <Reveal className="text-center mb-12">
+            <span className="eyebrow">Specialisations</span>
+            <h2 className="mt-3 text-3xl md:text-4xl font-semibold">Our Core Restorations</h2>
+            <p className="mt-4 text-muted-grey max-w-2xl mx-auto">
+              Every restoration is crafted using industry-leading materials and digital precision workflow.
+            </p>
+          </Reveal>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-0 rounded-2xl overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.12)]">
+            {[
+              { label: "Zircon",         sub: "Achieve High Level Of Aesthetic\nWithout Sacrificing Durability",  img: "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=600&q=80&auto=format&fit=crop", text: true  },
+              { label: "",               sub: "",  img: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?w=600&q=80&auto=format&fit=crop", text: false },
+              { label: "Porcelain",      sub: "Aesthetic And Function Are\nTogether",                              img: "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=600&q=80&auto=format&fit=crop", text: true  },
+              { label: "",               sub: "",  img: "https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=600&q=80&auto=format&fit=crop", text: false },
+              { label: "Implants",       sub: "Long Lasting Dentures",                                             img: "https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=600&q=80&auto=format&fit=crop", text: true  },
+              { label: "",               sub: "",  img: "https://images.unsplash.com/photo-1581595219315-a187dd40c322?w=600&q=80&auto=format&fit=crop", text: false },
+              { label: "Inlays / Onlays",sub: "Perfect Match At The Most\nPrecision Points",                      img: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&q=80&auto=format&fit=crop", text: true  },
+              { label: "",               sub: "",  img: "https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=600&q=80&auto=format&fit=crop", text: false },
+            ].map((tile, i) => (
+              <div key={i} className="relative h-52 md:h-64 overflow-hidden group">
+                <img src={tile.img} alt={tile.label || "dental"} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                <div className="absolute inset-0 bg-navy/50 group-hover:bg-navy/60 transition-colors duration-300" />
+                {tile.text && tile.label && (
+                  <div className="absolute inset-0 flex flex-col justify-center p-5">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-[2px] bg-teal"/>
+                      <span className="text-white font-bold text-base md:text-lg tracking-wide uppercase">{tile.label}</span>
+                    </div>
+                    <p className="text-white/80 text-xs md:text-sm leading-relaxed whitespace-pre-line">{tile.sub}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* TECHNOLOGY */}
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-5 lg:px-8">

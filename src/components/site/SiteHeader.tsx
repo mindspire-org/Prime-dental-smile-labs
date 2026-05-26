@@ -54,16 +54,8 @@ export function SiteHeader() {
         }`}
       />
       <div className="max-w-7xl mx-auto px-5 lg:px-8 h-[72px] flex items-center justify-between">
-        <Link to="/" className="font-bold tracking-tight flex items-center gap-2">
-          <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-linear-to-br from-teal/25 to-gold/20 ring-1 ring-white/25">
-            <span className="w-2.5 h-2.5 rounded-full bg-teal" />
-          </span>
-          <span className="leading-tight">
-            <span className={`block text-[15px] ${scrolled ? "text-text-slate" : "text-text-slate"}`}>Prime Smile</span>
-            <span className={`block text-[11px] uppercase tracking-[0.14em] ${scrolled ? "text-muted-grey" : "text-muted-grey"}`}>
-              Dental Laboratory
-            </span>
-          </span>
+        <Link to="/" className="flex items-center gap-2.5">
+          <img src="/Primesmile logo.png" alt="Prime Smiles logo" className="h-10 w-auto object-contain" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1">
@@ -157,10 +149,8 @@ export function SiteHeader() {
           />
           <div className="absolute right-0 top-0 h-full w-[86%] max-w-[380px] bg-white shadow-[0_18px_60px_rgba(2,8,23,.25)] overflow-y-auto">
             <div className="p-5 border-b border-border-silver flex items-center justify-between">
-              <Link to="/" onClick={() => setMobileOpen(false)} className="font-bold tracking-tight">
-                <span className="text-text-slate">Prime Smile</span>
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-teal ml-1 align-middle" />
-                <div className="text-[10px] uppercase tracking-[0.16em] text-muted-grey mt-1">Menu</div>
+              <Link to="/" onClick={() => setMobileOpen(false)}>
+                <img src="/Primesmile logo.png" alt="Prime Smiles logo" className="h-9 w-auto object-contain" />
               </Link>
               <button
                 className="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-bg-soft text-text-slate"

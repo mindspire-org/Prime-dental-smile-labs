@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate, useRouterState } from "@tanstack/react-router";
+import { PortalMobileNav } from "@/components/site/MobileNav";
 import { LayoutDashboard, FilePlus, Folder, MessageSquare, FileText, User, LogOut, Bell, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { clearSession, getCurrentUser, type AuthUser } from "@/lib/api";
@@ -60,7 +61,7 @@ function PortalLayout() {
   return (
     <div className="min-h-screen flex bg-[#f0f4f8]">
       {/* Sidebar */}
-      <aside className="w-[260px] shrink-0 sticky top-0 h-screen flex flex-col overflow-hidden"
+      <aside className="hidden lg:flex w-[260px] shrink-0 sticky top-0 h-screen flex-col overflow-hidden"
         style={{ background: "linear-gradient(175deg, #0d1e2c 0%, #0d2535 55%, #0a1e2e 100%)" }}>
 
         {/* Glow orbs */}
@@ -70,18 +71,9 @@ function PortalLayout() {
           style={{ background: "radial-gradient(circle, #c9a227 0%, transparent 70%)", transform: "translate(40%, 0)" }}/>
 
         {/* Logo */}
-        <div className="relative px-6 pt-7 pb-5 border-b border-white/8">
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-              style={{ background: "linear-gradient(135deg, #0aabbd, #078a99)" }}>
-              <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4" stroke="white" strokeWidth="2" strokeLinecap="round">
-                <path d="M12 2C7 2 4 5 4 9c0 3 1.5 5 3 7s2 4 2 6h6c0-2 .5-4 2-6s3-4 3-7c0-4-3-7-8-7z"/>
-              </svg>
-            </div>
-            <div>
-              <div className="text-white font-bold text-[15px] leading-none">Prime<span className="text-teal">Smile</span></div>
-              <div className="text-white/35 text-[9px] uppercase tracking-[0.15em] mt-0.5">Dental Lab</div>
-            </div>
+        <div className="relative px-6 pt-5 pb-4 border-b border-white/8">
+          <Link to="/">
+            <img src="/Primesmile logo.png" alt="Prime Smiles" className="h-10 w-auto object-contain brightness-0 invert" />
           </Link>
         </div>
 
@@ -146,10 +138,11 @@ function PortalLayout() {
 
       {/* Main */}
       <main className="flex-1 min-w-0 overflow-x-hidden">
-        <div className="p-6 lg:p-9 max-w-6xl">
+        <div className="p-4 lg:p-9 pb-24 lg:pb-9 max-w-6xl">
           <Outlet />
         </div>
       </main>
+      <PortalMobileNav />
     </div>
   );
 }

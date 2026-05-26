@@ -61,8 +61,8 @@ function AdminContent() {
       <div className="flex items-center justify-between">
         <div>
           <div className="text-[10px] uppercase tracking-wider text-indigo-500 font-semibold mb-1">Content & SEO</div>
-          <h1 className="text-2xl font-bold text-slate-800">Page Content</h1>
-          <p className="text-sm text-slate-400 mt-1">Edit text, images, and content blocks for each page.</p>
+          <h1 className="text-2xl font-bold text-slate-800">Content Keys</h1>
+          <p className="text-sm text-slate-400 mt-1">Manage raw key-value content entries used by the site renderer. For visual page layout, use <a href="/admin/pages" className="text-indigo-500 hover:underline font-medium">Page Editor</a>.</p>
         </div>
         <button onClick={()=>setModal(true)}
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white"
