@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, Building2, Briefcase, FileText,
   Search, BarChart3, Activity, LogOut, ChevronRight, Settings, Shield,
   Image, Globe, Bell, Star, Wrench, BarChart2, Layout, BookOpen, Mail,
-  ShieldCheck,
+  ShieldCheck, MessageSquare,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { clearSession, getCurrentUser, type AuthUser } from "@/lib/api";
@@ -31,10 +31,11 @@ const NAV_GROUPS = [
   {
     label: "Operations",
     items: [
-      { to: "/admin/cases",   label: "Cases",            icon: Briefcase,   exact: false },
-      { to: "/admin/users",   label: "Users & Dentists", icon: Users,       exact: false },
-      { to: "/admin/clinics", label: "Clinics",          icon: Building2,   exact: false },
-      { to: "/admin/finance", label: "Finance Reports",  icon: BarChart3,   exact: false },
+      { to: "/admin/cases",    label: "Cases",            icon: Briefcase,      exact: false },
+      { to: "/admin/messages", label: "Messages",         icon: MessageSquare,  exact: false },
+      { to: "/admin/users",   label: "Users & Dentists", icon: Users,          exact: false },
+      { to: "/admin/clinics", label: "Clinics",          icon: Building2,      exact: false },
+      { to: "/admin/finance", label: "Finance Reports",  icon: BarChart3,      exact: false },
     ],
   },
   {

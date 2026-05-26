@@ -1,10 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { apiFetch, getCurrentUser, openRealtimeConnection, type AuthUser } from "@/lib/api";
-import { Send, CheckCheck, MessageSquare, Search, Circle } from "lucide-react";
+import { Send, CheckCheck, MessageSquare, Search, Circle, Users } from "lucide-react";
 
-export const Route = createFileRoute("/portal/messages")({
-  component: PortalMessages,
+export const Route = createFileRoute("/admin/messages")({
+  component: AdminMessages,
 });
 
 function formatTime(iso: string) {
@@ -15,17 +15,20 @@ function formatTime(iso: string) {
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
-function Avatar({ name, size = 9 }: { name: string; size?: number }) {
-  const initials = name?.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase() || "?";
+function Avatar({ name, color = "indigo", size = 36 }: { name: string; color?: string; size?: number }) {
+  const initials = name?.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase() || "?";
+  const bg = color === "teal"
+    ? "linear-gradient(135deg,#0aabbd,#078a99)"
+    : "linear-gradient(135deg,#6366f1,#4f46e5)";
   return (
-    <div className={`w-${size} h-${size} rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0`}
-      style={{ background: "linear-gradient(135deg,#0aabbd,#078a99)", width: `${size * 4}px`, height: `${size * 4}px`, fontSize: size < 8 ? "10px" : "12px" }}>
+    <div className="rounded-full flex items-center justify-center font-bold text-white shrink-0"
+      style={{ background: bg, width: `${size}px`, height: `${size}px`, fontSize: size < 32 ? "10px" : "13px" }}>
       {initials}
     </div>
   );
 }
 
-function PortalMessages() {
+function AdminMessages() {
   const [cases, setCases] = useState<any[]>([]);
   const [selected, setSelected] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -43,7 +46,7 @@ function PortalMessages() {
   useEffect(() => { setCurrentUser(getCurrentUser()); }, []);
 
   useEffect(() => {
-    apiFetch<any>("/api/cases?limit=100").then(r => setCases(r.items || []));
+    apiFetch<any>("/api/cases?limit=200").then(r => setCases(r.items || []));
   }, []);
 
   useEffect(() => {
@@ -55,7 +58,7 @@ function PortalMessages() {
           setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 80);
         } else {
           setUnread(prev => ({ ...prev, [event.caseId]: (prev[event.caseId] || 0) + 1 }));
-          setCases(prev => prev.map(c => c._id === event.caseId ? { ...c, _lastMsg: msg } : c));
+          setCases(prev => prev.map((c: any) => c._id === event.caseId ? { ...c, _lastMsg: msg } : c));
         }
       }
     });
@@ -93,41 +96,52 @@ function PortalMessages() {
         method: "POST",
         body: JSON.stringify({ body }),
       });
-      setMessages(prev => prev.map(m => m._id === optimistic._id ? r.message : m));
-      setCases(prev => prev.map(c => c._id === selected._id ? { ...c, _lastMsg: r.message } : c));
+      setMessages(prev => prev.map((m: any) => m._id === optimistic._id ? r.message : m));
+      setCases(prev => prev.map((c: any) => c._id === selected._id ? { ...c, _lastMsg: r.message } : c));
     } catch {
-      setMessages(prev => prev.filter(m => m._id !== optimistic._id));
+      setMessages(prev => prev.filter((m: any) => m._id !== optimistic._id));
       setText(body);
     } finally { setSending(false); }
   }
 
-  const filtered = cases.filter(c =>
-    !search || c.caseNumber?.toLowerCase().includes(search.toLowerCase()) || c.patientRef?.toLowerCase().includes(search.toLowerCase())
+  const totalUnread = Object.values(unread).reduce((a, b) => a + b, 0);
+
+  const filtered = cases.filter((c: any) =>
+    !search ||
+    c.caseNumber?.toLowerCase().includes(search.toLowerCase()) ||
+    c.patientRef?.toLowerCase().includes(search.toLowerCase()) ||
+    c.dentist?.name?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="flex flex-col" style={{ height: "calc(100vh - 80px)" }}>
-      <div className="mb-4">
-        <div className="text-[10px] uppercase tracking-wider font-semibold mb-1" style={{ color: "#0aabbd" }}>Portal</div>
-        <h1 className="text-2xl font-bold text-slate-800">Messages</h1>
-        <p className="text-sm text-slate-400 mt-1">Chat with the Prime Smile lab team about your cases.</p>
+    <div className="flex flex-col" style={{ height: "calc(100vh - 56px)" }}>
+      {/* Header */}
+      <div className="mb-4 flex items-center justify-between shrink-0">
+        <div>
+          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <Users size={20} className="text-indigo-400" />
+            Messages
+            {totalUnread > 0 && (
+              <span className="ml-1 px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-600 text-xs font-bold">{totalUnread} new</span>
+            )}
+          </h1>
+          <p className="text-xs text-slate-400 mt-0.5">All dentist conversations — reply on behalf of the lab team</p>
+        </div>
       </div>
 
       <div className="flex flex-1 min-h-0 rounded-2xl overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.08)] bg-white border border-slate-100">
 
         {/* ── Sidebar ── */}
-        <aside className="w-72 shrink-0 flex flex-col border-r border-slate-100">
-          {/* Search */}
+        <aside className="w-80 shrink-0 flex flex-col border-r border-slate-100">
           <div className="p-3 border-b border-slate-100">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 focus-within:border-teal transition-colors">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 focus-within:border-indigo-400 transition-colors">
               <Search size={13} className="text-slate-400 shrink-0" />
               <input value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Search cases…"
+                placeholder="Search by case, patient, dentist…"
                 className="flex-1 bg-transparent outline-none text-xs text-slate-700 placeholder:text-slate-400" />
             </div>
           </div>
 
-          {/* Case list */}
           <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 && (
               <div className="p-8 text-center">
@@ -135,28 +149,33 @@ function PortalMessages() {
                 <p className="text-xs text-slate-400">No cases found</p>
               </div>
             )}
-            {filtered.map(c => {
+            {filtered.map((c: any) => {
               const isActive = selected?._id === c._id;
               const hasUnread = (unread[c._id] || 0) > 0;
               const lastMsg = c._lastMsg;
+              const dentistName = c.dentist?.name || "Unknown Dentist";
               return (
                 <button key={c._id} onClick={() => selectCase(c)}
-                  className={`w-full text-left px-4 py-3.5 transition-colors border-b border-slate-50 ${isActive ? "bg-teal/8" : "hover:bg-slate-50"}`}
-                  style={isActive ? { background: "rgba(10,171,189,0.06)", borderLeft: "3px solid #0aabbd" } : { borderLeft: "3px solid transparent" }}>
+                  className={`w-full text-left px-4 py-3.5 transition-colors border-b border-slate-50`}
+                  style={isActive
+                    ? { background: "rgba(99,102,241,0.06)", borderLeft: "3px solid #6366f1" }
+                    : { borderLeft: "3px solid transparent" }}>
                   <div className="flex items-start gap-3">
-                    <Avatar name={c.dentist?.name || "Me"} size={9} />
+                    <Avatar name={dentistName} color="teal" size={36} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className={`font-mono text-xs font-bold truncate ${isActive ? "text-teal" : "text-slate-800"}`}>{c.caseNumber}</span>
+                        <span className={`text-xs font-bold truncate ${isActive ? "text-indigo-600" : "text-slate-800"}`}>{dentistName}</span>
                         {hasUnread && (
-                          <span className="ml-auto shrink-0 w-4 h-4 rounded-full bg-teal text-white text-[9px] font-bold flex items-center justify-center">
+                          <span className="ml-auto shrink-0 w-4 h-4 rounded-full bg-indigo-500 text-white text-[9px] font-bold flex items-center justify-center">
                             {unread[c._id]}
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] text-slate-500 truncate mt-0.5">{c.patientRef}</div>
+                      <div className="text-[10px] text-slate-400 font-mono mt-0.5">{c.caseNumber} · {c.patientRef}</div>
                       {lastMsg ? (
-                        <div className="text-[10px] text-slate-400 truncate mt-0.5">{lastMsg.body}</div>
+                        <div className={`text-[10px] truncate mt-0.5 ${hasUnread ? "text-slate-700 font-semibold" : "text-slate-400"}`}>
+                          {lastMsg.sender?.role !== "dentist" ? "You: " : ""}{lastMsg.body}
+                        </div>
                       ) : (
                         <div className="text-[10px] text-slate-300 mt-0.5 italic">No messages yet</div>
                       )}
@@ -174,31 +193,33 @@ function PortalMessages() {
         {/* ── Chat area ── */}
         <div className="flex-1 flex flex-col min-w-0" style={{ background: "#f8fafc" }}>
           {!selected ? (
-            <div className="flex-1 flex flex-col items-center justify-center gap-4 text-slate-300">
-              <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg,rgba(10,171,189,0.08),rgba(10,171,189,0.04))" }}>
-                <MessageSquare size={36} strokeWidth={1.2} className="text-teal/30" />
+            <div className="flex-1 flex flex-col items-center justify-center gap-4">
+              <div className="w-20 h-20 rounded-full flex items-center justify-center"
+                style={{ background: "rgba(99,102,241,0.06)" }}>
+                <MessageSquare size={36} strokeWidth={1.2} className="text-indigo-300" />
               </div>
               <div className="text-center">
-                <p className="font-semibold text-slate-400 text-sm">Select a case</p>
-                <p className="text-xs text-slate-300 mt-1">Choose a case from the left to chat with the lab team</p>
+                <p className="font-semibold text-slate-400 text-sm">Select a conversation</p>
+                <p className="text-xs text-slate-300 mt-1">Choose a case thread from the left to respond</p>
               </div>
             </div>
           ) : (
             <>
               {/* Chat header */}
               <div className="px-5 py-3.5 bg-white border-b border-slate-100 flex items-center gap-3">
-                <Avatar name={selected.dentist?.name || currentUser?.name || "Me"} size={9} />
+                <Avatar name={selected.dentist?.name || "Dentist"} color="teal" size={36} />
                 <div className="flex-1 min-w-0">
-                  <div className="font-bold text-slate-800 text-sm font-mono">{selected.caseNumber}</div>
-                  <div className="flex items-center gap-1.5 mt-0.5">
+                  <div className="font-bold text-slate-800 text-sm">{selected.dentist?.name || "Unknown Dentist"}</div>
+                  <div className="flex items-center gap-2 mt-0.5">
                     <Circle size={7} className="text-emerald-400 fill-emerald-400" />
-                    <span className="text-[10px] text-slate-400">{selected.patientRef} · {selected.status}</span>
+                    <span className="text-[10px] text-slate-400 font-mono">{selected.caseNumber}</span>
+                    <span className="text-[10px] text-slate-400">· {selected.patientRef} · {selected.status}</span>
                   </div>
                 </div>
-                <Link to="/portal/cases/$id" params={{ id: selected._id }}
-                  className="text-xs text-teal font-semibold hover:underline px-3 py-1.5 rounded-lg bg-teal/5 hover:bg-teal/10 transition-colors">
-                  View Case
-                </Link>
+                <a href={`/admin/cases`}
+                  className="text-xs text-indigo-500 font-semibold hover:underline px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-colors">
+                  View Cases
+                </a>
               </div>
 
               {/* Messages */}
@@ -206,7 +227,7 @@ function PortalMessages() {
                 {loadingMsgs ? (
                   <div className="space-y-3 pt-4">
                     {[...Array(5)].map((_, i) => (
-                      <div key={i} className={`flex ${i % 2 === 0 ? "justify-end" : "justify-start"}`}>
+                      <div key={i} className={`flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}>
                         <div className={`h-9 rounded-2xl bg-slate-200 animate-pulse ${i % 2 === 0 ? "w-48" : "w-36"}`} />
                       </div>
                     ))}
@@ -215,33 +236,35 @@ function PortalMessages() {
                   <div className="flex flex-col items-center justify-center h-full gap-2 pt-8">
                     <MessageSquare size={32} strokeWidth={1} className="text-slate-200" />
                     <p className="text-sm text-slate-400">No messages yet</p>
-                    <p className="text-xs text-slate-300">Send a message to start the conversation with our lab team</p>
+                    <p className="text-xs text-slate-300">The dentist hasn't sent any messages on this case</p>
                   </div>
                 ) : (
                   <>
-                    {messages.map((m, i) => {
-                      const isMine = m.sender?._id === currentUser?.id || m.sender?._id === currentUser?._id;
-                      const showAvatar = !isMine && (i === 0 || messages[i - 1]?.sender?._id !== m.sender?._id);
-                      const showName = !isMine && showAvatar;
+                    {messages.map((m: any, i: number) => {
+                      const isDentist = m.sender?.role === "dentist";
+                      const isMine = !isDentist;
+                      const showAvatar = isDentist && (i === 0 || messages[i - 1]?.sender?._id !== m.sender?._id);
+                      const showName = isDentist && showAvatar;
                       const isLastInGroup = isMine && (i === messages.length - 1 || messages[i + 1]?.sender?._id !== m.sender?._id);
 
                       return (
-                        <div key={m._id} className={`flex items-end gap-2 ${isMine ? "justify-end" : "justify-start"} ${i > 0 && messages[i - 1]?.sender?._id === m.sender?._id ? "mt-0.5" : "mt-3"}`}>
-                          {!isMine && (
-                            <div className="w-7 h-7 shrink-0">
-                              {showAvatar && <Avatar name={m.sender?.name || "Lab"} size={7} />}
+                        <div key={m._id}
+                          className={`flex items-end gap-2 ${isMine ? "justify-end" : "justify-start"} ${i > 0 && messages[i - 1]?.sender?._id === m.sender?._id ? "mt-0.5" : "mt-3"}`}>
+                          {isDentist && (
+                            <div style={{ width: "28px", height: "28px", flexShrink: 0 }}>
+                              {showAvatar && <Avatar name={m.sender?.name || "Dentist"} color="teal" size={28} />}
                             </div>
                           )}
                           <div className={`flex flex-col max-w-[68%] ${isMine ? "items-end" : "items-start"}`}>
                             {showName && (
-                              <span className="text-[10px] text-slate-400 font-medium mb-1 px-1">{m.sender?.name || "Lab Team"}</span>
+                              <span className="text-[10px] text-slate-400 font-medium mb-1 px-1">{m.sender?.name}</span>
                             )}
                             <div className={`px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap wrap-break-word ${
                               isMine
                                 ? `text-white rounded-2xl rounded-br-sm ${m._optimistic ? "opacity-60" : ""}`
                                 : "bg-white text-slate-700 rounded-2xl rounded-bl-sm shadow-[0_1px_4px_rgba(0,0,0,0.06)]"
                             }`}
-                              style={isMine ? { background: "linear-gradient(135deg,#0aabbd,#078a99)" } : {}}>
+                              style={isMine ? { background: "linear-gradient(135deg,#6366f1,#4f46e5)" } : {}}>
                               {m.body}
                             </div>
                             <div className={`flex items-center gap-1 mt-1 px-1 ${isMine ? "flex-row-reverse" : ""}`}>
@@ -249,7 +272,7 @@ function PortalMessages() {
                                 {new Date(m.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
                               </span>
                               {isMine && isLastInGroup && (
-                                <CheckCheck size={11} className={m._optimistic ? "text-slate-300" : "text-teal"} />
+                                <CheckCheck size={11} className={m._optimistic ? "text-slate-300" : "text-indigo-400"} />
                               )}
                             </div>
                           </div>
@@ -263,7 +286,7 @@ function PortalMessages() {
 
               {/* Input */}
               <div className="px-4 pb-4 pt-2 bg-white border-t border-slate-100">
-                <div className="flex gap-2 items-end rounded-2xl border border-slate-200 bg-slate-50 p-2 focus-within:border-teal focus-within:bg-white transition-all">
+                <div className="flex gap-2 items-end rounded-2xl border border-slate-200 bg-slate-50 p-2 focus-within:border-indigo-400 focus-within:bg-white transition-all">
                   <textarea
                     ref={textareaRef}
                     value={text}
@@ -274,17 +297,17 @@ function PortalMessages() {
                     }}
                     onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                     rows={1}
-                    placeholder="Message the lab team… (Enter to send)"
+                    placeholder={`Reply to ${selected.dentist?.name || "dentist"}… (Enter to send)`}
                     className="flex-1 bg-transparent outline-none text-sm text-slate-700 placeholder:text-slate-400 resize-none py-1.5 px-2 leading-relaxed"
                     style={{ maxHeight: "120px" }}
                   />
                   <button onClick={sendMessage} disabled={!text.trim() || sending}
                     className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-white transition-all disabled:opacity-35 hover:scale-105 active:scale-95"
-                    style={{ background: "linear-gradient(135deg,#0aabbd,#078a99)" }}>
+                    style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)" }}>
                     <Send size={15} />
                   </button>
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1.5 px-1">Shift+Enter for new line · Messages are sent to the Prime Smile lab team</p>
+                <p className="text-[10px] text-slate-400 mt-1.5 px-1">Replying as <strong>{currentUser?.name}</strong> · Dentist will be notified instantly</p>
               </div>
             </>
           )}

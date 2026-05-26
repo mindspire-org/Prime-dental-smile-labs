@@ -3,7 +3,7 @@ import { Case, Message } from "../models/index.js";
 import { requireAuth } from "../middleware/auth.js";
 import { logActivity } from "../services/activity.js";
 import { sendNewMessageEmail } from "../services/email.js";
-import { notifyUser } from "../services/realtime.js";
+import { notifyUser, broadcastToAdmins } from "../services/realtime.js";
 
 export const messagesRouter = express.Router();
 
@@ -31,7 +31,11 @@ messagesRouter.post("/case/:caseId", async (req, res) => {
   const populated = await message.populate("sender", "name role");
   await logActivity({ actor: req.user._id, action: "message.created", entityType: "Message", entityId: message._id, metadata: { case: dentalCase._id } });
 
-  if (req.user.role !== "dentist") {
+  if (req.user.role === "dentist") {
+    // Notify all online admins/lab_staff of a new dentist message
+    broadcastToAdmins({ type: "case:new_message", caseId: dentalCase._id, message: populated, dentistId: dentalCase.dentist._id });
+  } else {
+    // Notify the dentist that admin/lab replied
     notifyUser(dentalCase.dentist._id, { type: "case:new_message", caseId: dentalCase._id, message: populated });
     await sendNewMessageEmail({ to: dentalCase.dentist.email, name: dentalCase.dentist.name, caseNumber: dentalCase.caseNumber, senderName: req.user.name });
   }

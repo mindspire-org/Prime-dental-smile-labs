@@ -14,7 +14,7 @@ export const Route = createFileRoute("/portal")({
 
 const NAV = [
   { to: "/portal", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/submit", label: "New Case", icon: FilePlus, exact: false },
+  { to: "/portal/cases/new", label: "New Case", icon: FilePlus, exact: false },
   { to: "/portal/cases", label: "My Cases", icon: Folder, exact: false },
   { to: "/portal/messages", label: "Messages", icon: MessageSquare, exact: false },
   { to: "/portal/documents", label: "Documents", icon: FileText, exact: false },
@@ -107,7 +107,7 @@ function PortalLayout() {
         {/* Nav items */}
         <nav className="px-3 flex-1 space-y-0.5">
           {NAV.map((n) => {
-            const active = n.exact ? path === n.to : path.startsWith(n.to);
+            const active = n.exact ? path === n.to : path === n.to || (path.startsWith(n.to + "/") && !path.startsWith(n.to + "/new"));
             return (
               <a key={n.to} href={n.to}
                 className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative overflow-hidden

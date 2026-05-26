@@ -31,6 +31,7 @@ import { Route as AdminRolesRouteImport } from './routes/admin.roles'
 import { Route as AdminPostsRouteImport } from './routes/admin.posts'
 import { Route as AdminPagesRouteImport } from './routes/admin.pages'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
+import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
 import { Route as AdminEmailTemplatesRouteImport } from './routes/admin.email-templates'
@@ -46,6 +47,7 @@ import { Route as MarketingQualityRouteImport } from './routes/_marketing.qualit
 import { Route as MarketingContactRouteImport } from './routes/_marketing.contact'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing.about'
 import { Route as MarketingServicesIndexRouteImport } from './routes/_marketing.services.index'
+import { Route as PortalCasesNewRouteImport } from './routes/portal.cases.new'
 import { Route as PortalCasesIdRouteImport } from './routes/portal.cases.$id'
 import { Route as AdminPostEditorIdRouteImport } from './routes/admin.post-editor.$id'
 import { Route as AdminPageEditorSlugRouteImport } from './routes/admin.page-editor.$slug'
@@ -160,6 +162,11 @@ const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
   path: '/notifications',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMessagesRoute = AdminMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminMediaRoute = AdminMediaRouteImport.update({
   id: '/media',
   path: '/media',
@@ -235,6 +242,11 @@ const MarketingServicesIndexRoute = MarketingServicesIndexRouteImport.update({
   path: '/services/',
   getParentRoute: () => MarketingRoute,
 } as any)
+const PortalCasesNewRoute = PortalCasesNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => PortalCasesRoute,
+} as any)
 const PortalCasesIdRoute = PortalCasesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -277,6 +289,7 @@ export interface FileRoutesByFullPath {
   '/admin/email-templates': typeof AdminEmailTemplatesRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/media': typeof AdminMediaRoute
+  '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/pages': typeof AdminPagesRoute
   '/admin/posts': typeof AdminPostsRoute
@@ -296,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/admin/page-editor/$slug': typeof AdminPageEditorSlugRoute
   '/admin/post-editor/$id': typeof AdminPostEditorIdRoute
   '/portal/cases/$id': typeof PortalCasesIdRoute
+  '/portal/cases/new': typeof PortalCasesNewRoute
   '/services/': typeof MarketingServicesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -316,6 +330,7 @@ export interface FileRoutesByTo {
   '/admin/email-templates': typeof AdminEmailTemplatesRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/media': typeof AdminMediaRoute
+  '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/pages': typeof AdminPagesRoute
   '/admin/posts': typeof AdminPostsRoute
@@ -336,6 +351,7 @@ export interface FileRoutesByTo {
   '/admin/page-editor/$slug': typeof AdminPageEditorSlugRoute
   '/admin/post-editor/$id': typeof AdminPostEditorIdRoute
   '/portal/cases/$id': typeof PortalCasesIdRoute
+  '/portal/cases/new': typeof PortalCasesNewRoute
   '/services': typeof MarketingServicesIndexRoute
 }
 export interface FileRoutesById {
@@ -360,6 +376,7 @@ export interface FileRoutesById {
   '/admin/email-templates': typeof AdminEmailTemplatesRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/media': typeof AdminMediaRoute
+  '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/pages': typeof AdminPagesRoute
   '/admin/posts': typeof AdminPostsRoute
@@ -380,6 +397,7 @@ export interface FileRoutesById {
   '/admin/page-editor/$slug': typeof AdminPageEditorSlugRoute
   '/admin/post-editor/$id': typeof AdminPostEditorIdRoute
   '/portal/cases/$id': typeof PortalCasesIdRoute
+  '/portal/cases/new': typeof PortalCasesNewRoute
   '/_marketing/services/': typeof MarketingServicesIndexRoute
 }
 export interface FileRouteTypes {
@@ -405,6 +423,7 @@ export interface FileRouteTypes {
     | '/admin/email-templates'
     | '/admin/finance'
     | '/admin/media'
+    | '/admin/messages'
     | '/admin/notifications'
     | '/admin/pages'
     | '/admin/posts'
@@ -424,6 +443,7 @@ export interface FileRouteTypes {
     | '/admin/page-editor/$slug'
     | '/admin/post-editor/$id'
     | '/portal/cases/$id'
+    | '/portal/cases/new'
     | '/services/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -444,6 +464,7 @@ export interface FileRouteTypes {
     | '/admin/email-templates'
     | '/admin/finance'
     | '/admin/media'
+    | '/admin/messages'
     | '/admin/notifications'
     | '/admin/pages'
     | '/admin/posts'
@@ -464,6 +485,7 @@ export interface FileRouteTypes {
     | '/admin/page-editor/$slug'
     | '/admin/post-editor/$id'
     | '/portal/cases/$id'
+    | '/portal/cases/new'
     | '/services'
   id:
     | '__root__'
@@ -487,6 +509,7 @@ export interface FileRouteTypes {
     | '/admin/email-templates'
     | '/admin/finance'
     | '/admin/media'
+    | '/admin/messages'
     | '/admin/notifications'
     | '/admin/pages'
     | '/admin/posts'
@@ -507,6 +530,7 @@ export interface FileRouteTypes {
     | '/admin/page-editor/$slug'
     | '/admin/post-editor/$id'
     | '/portal/cases/$id'
+    | '/portal/cases/new'
     | '/_marketing/services/'
   fileRoutesById: FileRoutesById
 }
@@ -675,6 +699,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminNotificationsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/messages': {
+      id: '/admin/messages'
+      path: '/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AdminMessagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/media': {
       id: '/admin/media'
       path: '/media'
@@ -780,6 +811,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingServicesIndexRouteImport
       parentRoute: typeof MarketingRoute
     }
+    '/portal/cases/new': {
+      id: '/portal/cases/new'
+      path: '/new'
+      fullPath: '/portal/cases/new'
+      preLoaderRoute: typeof PortalCasesNewRouteImport
+      parentRoute: typeof PortalCasesRoute
+    }
     '/portal/cases/$id': {
       id: '/portal/cases/$id'
       path: '/$id'
@@ -848,6 +886,7 @@ interface AdminRouteChildren {
   AdminEmailTemplatesRoute: typeof AdminEmailTemplatesRoute
   AdminFinanceRoute: typeof AdminFinanceRoute
   AdminMediaRoute: typeof AdminMediaRoute
+  AdminMessagesRoute: typeof AdminMessagesRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminPagesRoute: typeof AdminPagesRoute
   AdminPostsRoute: typeof AdminPostsRoute
@@ -871,6 +910,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEmailTemplatesRoute: AdminEmailTemplatesRoute,
   AdminFinanceRoute: AdminFinanceRoute,
   AdminMediaRoute: AdminMediaRoute,
+  AdminMessagesRoute: AdminMessagesRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
   AdminPagesRoute: AdminPagesRoute,
   AdminPostsRoute: AdminPostsRoute,
@@ -889,10 +929,12 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface PortalCasesRouteChildren {
   PortalCasesIdRoute: typeof PortalCasesIdRoute
+  PortalCasesNewRoute: typeof PortalCasesNewRoute
 }
 
 const PortalCasesRouteChildren: PortalCasesRouteChildren = {
   PortalCasesIdRoute: PortalCasesIdRoute,
+  PortalCasesNewRoute: PortalCasesNewRoute,
 }
 
 const PortalCasesRouteWithChildren = PortalCasesRoute._addFileChildren(
