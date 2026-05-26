@@ -46,6 +46,7 @@ import { Route as MarketingSubmitRouteImport } from './routes/_marketing.submit'
 import { Route as MarketingQualityRouteImport } from './routes/_marketing.quality'
 import { Route as MarketingContactRouteImport } from './routes/_marketing.contact'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing.about'
+import { Route as PortalCasesIndexRouteImport } from './routes/portal.cases.index'
 import { Route as MarketingServicesIndexRouteImport } from './routes/_marketing.services.index'
 import { Route as PortalCasesNewRouteImport } from './routes/portal.cases.new'
 import { Route as PortalCasesIdRouteImport } from './routes/portal.cases.$id'
@@ -237,6 +238,11 @@ const MarketingAboutRoute = MarketingAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => MarketingRoute,
 } as any)
+const PortalCasesIndexRoute = PortalCasesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalCasesRoute,
+} as any)
 const MarketingServicesIndexRoute = MarketingServicesIndexRouteImport.update({
   id: '/services/',
   path: '/services/',
@@ -311,6 +317,7 @@ export interface FileRoutesByFullPath {
   '/portal/cases/$id': typeof PortalCasesIdRoute
   '/portal/cases/new': typeof PortalCasesNewRoute
   '/services/': typeof MarketingServicesIndexRoute
+  '/portal/cases/': typeof PortalCasesIndexRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
@@ -340,7 +347,6 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/users': typeof AdminUsersRoute
-  '/portal/cases': typeof PortalCasesRouteWithChildren
   '/portal/documents': typeof PortalDocumentsRoute
   '/portal/messages': typeof PortalMessagesRoute
   '/portal/profile': typeof PortalProfileRoute
@@ -353,6 +359,7 @@ export interface FileRoutesByTo {
   '/portal/cases/$id': typeof PortalCasesIdRoute
   '/portal/cases/new': typeof PortalCasesNewRoute
   '/services': typeof MarketingServicesIndexRoute
+  '/portal/cases': typeof PortalCasesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -399,6 +406,7 @@ export interface FileRoutesById {
   '/portal/cases/$id': typeof PortalCasesIdRoute
   '/portal/cases/new': typeof PortalCasesNewRoute
   '/_marketing/services/': typeof MarketingServicesIndexRoute
+  '/portal/cases/': typeof PortalCasesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -445,6 +453,7 @@ export interface FileRouteTypes {
     | '/portal/cases/$id'
     | '/portal/cases/new'
     | '/services/'
+    | '/portal/cases/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
@@ -474,7 +483,6 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/testimonials'
     | '/admin/users'
-    | '/portal/cases'
     | '/portal/documents'
     | '/portal/messages'
     | '/portal/profile'
@@ -487,6 +495,7 @@ export interface FileRouteTypes {
     | '/portal/cases/$id'
     | '/portal/cases/new'
     | '/services'
+    | '/portal/cases'
   id:
     | '__root__'
     | '/_marketing'
@@ -532,6 +541,7 @@ export interface FileRouteTypes {
     | '/portal/cases/$id'
     | '/portal/cases/new'
     | '/_marketing/services/'
+    | '/portal/cases/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -804,6 +814,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingAboutRouteImport
       parentRoute: typeof MarketingRoute
     }
+    '/portal/cases/': {
+      id: '/portal/cases/'
+      path: '/'
+      fullPath: '/portal/cases/'
+      preLoaderRoute: typeof PortalCasesIndexRouteImport
+      parentRoute: typeof PortalCasesRoute
+    }
     '/_marketing/services/': {
       id: '/_marketing/services/'
       path: '/services'
@@ -930,11 +947,13 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 interface PortalCasesRouteChildren {
   PortalCasesIdRoute: typeof PortalCasesIdRoute
   PortalCasesNewRoute: typeof PortalCasesNewRoute
+  PortalCasesIndexRoute: typeof PortalCasesIndexRoute
 }
 
 const PortalCasesRouteChildren: PortalCasesRouteChildren = {
   PortalCasesIdRoute: PortalCasesIdRoute,
   PortalCasesNewRoute: PortalCasesNewRoute,
+  PortalCasesIndexRoute: PortalCasesIndexRoute,
 }
 
 const PortalCasesRouteWithChildren = PortalCasesRoute._addFileChildren(

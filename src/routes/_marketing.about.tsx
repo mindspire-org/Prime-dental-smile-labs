@@ -21,11 +21,11 @@ export const Route = createFileRoute("/_marketing/about")({
 });
 
 const GALLERY = [
-  { src: "https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=800&q=80&auto=format&fit=crop", alt: "Lab facility", span: "col-span-2 row-span-2" },
-  { src: "https://images.unsplash.com/photo-1581595219315-a187dd40c322?w=600&q=80&auto=format&fit=crop", alt: "Digital equipment" },
-  { src: "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=600&q=80&auto=format&fit=crop", alt: "Zirconia crown" },
-  { src: "https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=600&q=80&auto=format&fit=crop", alt: "Implant work" },
-  { src: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=80&auto=format&fit=crop", alt: "Lab workflow" },
+  { src: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&q=80&auto=format&fit=crop", alt: "CAD/CAM milling lab", span: "col-span-2 row-span-2" },
+  { src: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=600&q=80&auto=format&fit=crop", alt: "Digital lab equipment" },
+  { src: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600&q=80&auto=format&fit=crop", alt: "Zirconia restoration" },
+  { src: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80&auto=format&fit=crop", alt: "Implant prosthetics" },
+  { src: "https://images.unsplash.com/photo-1581093806997-124204d9fa9d?w=600&q=80&auto=format&fit=crop", alt: "Lab technician workflow" },
 ];
 
 function AboutPage() {

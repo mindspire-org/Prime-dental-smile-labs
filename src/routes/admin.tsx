@@ -8,14 +8,31 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { clearSession, getCurrentUser, type AuthUser } from "@/lib/api";
+import { logoUrl } from "@/lib/logo";
 
 export const Route = createFileRoute("/admin")({
-  beforeLoad: () => {
-    if (typeof window !== "undefined") {
-      const user = getCurrentUser();
-      if (!user) throw redirect({ to: "/login" as any });
-      if (user.role !== "admin" && user.role !== "lab_staff") throw redirect({ to: "/portal" as any });
+  beforeLoad: async () => {
+    if (typeof window === "undefined") return;
+    let user = getCurrentUser();
+    if (!user) {
+      try {
+        const res = await fetch("/api/auth/refresh", {
+          method: "POST", credentials: "include",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({}),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.accessToken && data?.user) {
+            const { setSession } = await import("@/lib/api");
+            setSession({ accessToken: data.accessToken, user: data.user });
+            user = data.user;
+          }
+        }
+      } catch {}
     }
+    if (!user) throw redirect({ to: "/login" as any });
+    if (user.role !== "admin" && user.role !== "lab_staff") throw redirect({ to: "/portal" as any });
   },
   component: AdminLayout,
 });
@@ -87,7 +104,7 @@ function AdminLayout() {
         {/* Logo */}
         <div className="px-5 pt-5 pb-4 border-b border-white/8 relative">
           <Link to="/" className="flex items-center gap-2.5">
-            <img src="/Primesmile logo.png" alt="Prime Smiles" className="h-9 w-auto object-contain brightness-0 invert" />
+            <img src={logoUrl} alt="Prime Smiles" className="h-9 w-auto object-contain brightness-0 invert" />
             <div className="text-white/30 text-[9px] uppercase tracking-[0.15em] mt-0.5 self-end pb-0.5">Admin</div>
           </Link>
         </div>

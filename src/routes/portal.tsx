@@ -3,10 +3,27 @@ import { PortalMobileNav } from "@/components/site/MobileNav";
 import { LayoutDashboard, FilePlus, Folder, MessageSquare, FileText, User, LogOut, Bell, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { clearSession, getCurrentUser, type AuthUser } from "@/lib/api";
+import { logoUrl } from "@/lib/logo";
 
 export const Route = createFileRoute("/portal")({
-  beforeLoad: () => {
-    if (typeof window !== "undefined" && !getCurrentUser()) {
+  beforeLoad: async () => {
+    if (typeof window === "undefined") return;
+    if (!getCurrentUser()) {
+      try {
+        const res = await fetch("/api/auth/refresh", {
+          method: "POST", credentials: "include",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({}),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.accessToken && data?.user) {
+            const { setSession } = await import("@/lib/api");
+            setSession({ accessToken: data.accessToken, user: data.user });
+            return;
+          }
+        }
+      } catch {}
       throw redirect({ to: "/login" as any });
     }
   },
@@ -15,8 +32,8 @@ export const Route = createFileRoute("/portal")({
 
 const NAV = [
   { to: "/portal", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/portal/cases/new", label: "New Case", icon: FilePlus, exact: false },
-  { to: "/portal/cases", label: "My Cases", icon: Folder, exact: false },
+  { to: "/portal/cases/new", label: "New Case", icon: FilePlus, exact: true },
+  { to: "/portal/cases", label: "My Cases", icon: Folder, exact: false, exclude: "/portal/cases/new" },
   { to: "/portal/messages", label: "Messages", icon: MessageSquare, exact: false },
   { to: "/portal/documents", label: "Documents", icon: FileText, exact: false },
   { to: "/portal/profile", label: "Profile", icon: User, exact: false },
@@ -73,7 +90,7 @@ function PortalLayout() {
         {/* Logo */}
         <div className="relative px-6 pt-5 pb-4 border-b border-white/8">
           <Link to="/">
-            <img src="/Primesmile logo.png" alt="Prime Smiles" className="h-10 w-auto object-contain brightness-0 invert" />
+            <img src={logoUrl} alt="Prime Smiles" className="h-10 w-auto object-contain brightness-0 invert" />
           </Link>
         </div>
 
@@ -99,7 +116,9 @@ function PortalLayout() {
         {/* Nav items */}
         <nav className="px-3 flex-1 space-y-0.5">
           {NAV.map((n) => {
-            const active = n.exact ? path === n.to : path === n.to || (path.startsWith(n.to + "/") && !path.startsWith(n.to + "/new"));
+            const active = n.exact
+              ? path === n.to
+              : path === n.to || (path.startsWith(n.to + "/") && (!('exclude' in n) || !path.startsWith((n as any).exclude)));
             return (
               <a key={n.to} href={n.to}
                 className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative overflow-hidden

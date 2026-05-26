@@ -51,13 +51,12 @@ const caseSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-caseSchema.pre("validate", async function ensureCaseNumber(next) {
-  if (this.caseNumber) return next();
+caseSchema.pre("validate", async function ensureCaseNumber() {
+  if (this.caseNumber) return;
 
   const year = new Date().getFullYear();
   const count = await mongoose.models.Case.countDocuments({ createdAt: { $gte: new Date(`${year}-01-01`) } });
   this.caseNumber = `PSDL-UK-${year}-${String(count + 1).padStart(4, "0")}`;
-  next();
 });
 
 export const Case = mongoose.models.Case || mongoose.model("Case", caseSchema);

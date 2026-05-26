@@ -36,18 +36,23 @@ function setAuthCookies(res, accessToken, refreshToken) {
 }
 
 authRouter.post("/login", validate(loginSchema), async (req, res) => {
-  const { email, password } = req.validated.body;
-  const user = await User.findOne({ email: email.toLowerCase() });
-  if (!user || !user.active || !(await user.verifyPassword(password))) return res.status(401).json({ error: "Invalid credentials" });
+  try {
+    const { email, password } = req.validated.body;
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user || !user.active || !(await user.verifyPassword(password))) return res.status(401).json({ error: "Invalid credentials" });
 
-  const accessToken = signAccessToken(user);
-  const refreshToken = signRefreshToken(user);
-  user.refreshTokens.push({ token: refreshToken });
-  await user.save();
-  await logActivity({ actor: user._id, action: "auth.login", entityType: "User", entityId: user._id });
+    const accessToken = signAccessToken(user);
+    const refreshToken = signRefreshToken(user);
+    user.refreshTokens.push({ token: refreshToken });
+    await user.save();
+    await logActivity({ actor: user._id, action: "auth.login", entityType: "User", entityId: user._id }).catch(() => {});
 
-  setAuthCookies(res, accessToken, refreshToken);
-  res.json({ accessToken, refreshToken, user: { id: user._id, name: user.name, email: user.email, role: user.role, clinic: user.clinic } });
+    setAuthCookies(res, accessToken, refreshToken);
+    res.json({ accessToken, refreshToken, user: { id: user._id, name: user.name, email: user.email, role: user.role, clinic: user.clinic } });
+  } catch (err) {
+    console.error("[login error]", err);
+    res.status(500).json({ error: "Login failed. Please try again." });
+  }
 });
 
 authRouter.post("/refresh", async (req, res) => {
@@ -59,7 +64,7 @@ authRouter.post("/refresh", async (req, res) => {
     if (!user || !user.refreshTokens.some((item) => item.token === refreshToken)) return res.status(401).json({ error: "Invalid refresh token" });
     const accessToken = signAccessToken(user);
     res.cookie("access_token", accessToken, { ...COOKIE_OPTS, maxAge: 15 * 60 * 1000 });
-    res.json({ accessToken });
+    res.json({ accessToken, user: { id: user._id, name: user.name, email: user.email, role: user.role, clinic: user.clinic } });
   } catch {
     res.status(401).json({ error: "Invalid refresh token" });
   }
@@ -155,25 +160,30 @@ const registerSchema = z.object({
 });
 
 authRouter.post("/register", validate(registerSchema), async (req, res) => {
-  const { name, email, password, clinicName, phone, gdcNumber } = req.validated.body;
-  const existing = await User.findOne({ email: email.toLowerCase() });
-  if (existing) return res.status(409).json({ error: "An account with this email already exists" });
+  try {
+    const { name, email, password, clinicName, phone, gdcNumber } = req.validated.body;
+    const existing = await User.findOne({ email: email.toLowerCase() });
+    if (existing) return res.status(409).json({ error: "An account with this email already exists" });
 
-  const clinic = await Clinic.create({ name: clinicName, email, phone });
-  const user = await User.create({
-    name, email: email.toLowerCase(),
-    passwordHash: await User.hashPassword(password),
-    role: "dentist", clinic: clinic._id, phone, gdcNumber, active: true,
-  });
+    const clinic = await Clinic.create({ name: clinicName, email, phone });
+    const user = await User.create({
+      name, email: email.toLowerCase(),
+      passwordHash: await User.hashPassword(password),
+      role: "dentist", clinic: clinic._id, phone, gdcNumber, active: true,
+    });
 
-  const accessToken = signAccessToken(user);
-  const refreshToken = signRefreshToken(user);
-  user.refreshTokens.push({ token: refreshToken });
-  await user.save();
-  await logActivity({ actor: user._id, action: "auth.register", entityType: "User", entityId: user._id });
+    const accessToken = signAccessToken(user);
+    const refreshToken = signRefreshToken(user);
+    user.refreshTokens.push({ token: refreshToken });
+    await user.save();
+    await logActivity({ actor: user._id, action: "auth.register", entityType: "User", entityId: user._id }).catch(() => {});
 
-  setAuthCookies(res, accessToken, refreshToken);
-  res.status(201).json({ accessToken, refreshToken, user: { id: user._id, name: user.name, email: user.email, role: user.role, clinic: user.clinic } });
+    setAuthCookies(res, accessToken, refreshToken);
+    res.status(201).json({ accessToken, refreshToken, user: { id: user._id, name: user.name, email: user.email, role: user.role, clinic: user.clinic } });
+  } catch (err) {
+    console.error("[register error]", err);
+    res.status(500).json({ error: "Registration failed. Please try again." });
+  }
 });
 
 authRouter.post("/accounts", requireAuth, validate(createAccountSchema), async (req, res) => {

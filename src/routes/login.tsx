@@ -198,6 +198,7 @@ function LoginPage() {
     try {
       const res = await fetch("/api/auth/login", { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, password }) });
       const data = await res.json();
+      if (res.status === 503) throw new Error("The server is not connected to the database. Please ensure the backend is running and MongoDB is available.");
       if (!res.ok) throw new Error(data.error || "Login failed");
       setSession(data);
       const role = data.user?.role;
@@ -215,6 +216,7 @@ function LoginPage() {
         body: JSON.stringify({ name: rName, email: rEmail, password: rPassword, clinicName: rClinic, phone: rPhone, gdcNumber: rGdc }),
       });
       const data = await res.json();
+      if (res.status === 503) throw new Error("The server is not connected to the database. Please ensure the backend is running and MongoDB is available.");
       if (!res.ok) throw new Error(data.error || "Registration failed");
       setSession(data);
       navigate({ to: "/portal" });

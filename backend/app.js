@@ -3,7 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
-import { connectDatabase } from "./db.js";
+import { connectDatabase, isConnected } from "./db.js";
 import { authRouter } from "./routes/auth.js";
 import { casesRouter } from "./routes/cases.js";
 import { clinicsRouter } from "./routes/clinics.js";
@@ -34,7 +34,20 @@ export async function createApiApp() {
   app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 500 }));
   app.use(pageviewMiddleware);
 
-  app.get("/api/health", (req, res) => res.json({ ok: true }));
+  app.get("/api/health", (req, res) => res.json({ ok: true, db: isConnected() ? "connected" : "disconnected" }));
+
+  // Block all data API calls until DB is ready
+  app.use("/api", (req, res, next) => {
+    if (req.path === "/health") return next();
+    if (!isConnected()) {
+      return res.status(503).json({
+        error: "Database unavailable",
+        detail: "The server cannot reach MongoDB. Please ensure MongoDB is running or configure a valid MONGODB_URI in backend/.env",
+      });
+    }
+    next();
+  });
+
   app.use("/api/auth", authRouter);
   app.use("/api/users", usersRouter);
   app.use("/api/clinics", clinicsRouter);

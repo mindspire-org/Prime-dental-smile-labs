@@ -9,6 +9,43 @@ export const messagesRouter = express.Router();
 
 messagesRouter.use(requireAuth);
 
+// ── General (admin direct) thread ──────────────────────────
+messagesRouter.get("/general", async (req, res) => {
+  try {
+    const filter = req.user.role === "dentist"
+      ? { case: null, $or: [{ sender: req.user._id }, { recipientDentist: req.user._id }] }
+      : { case: null };
+    const messages = await Message.find(filter).populate("sender", "name role").sort({ createdAt: 1 });
+    res.json({ messages });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+messagesRouter.post("/general", async (req, res) => {
+  try {
+    if (!req.body.body?.trim()) return res.status(400).json({ error: "Message is required" });
+    const isAdmin = req.user.role !== "dentist";
+    const recipientDentist = isAdmin ? (req.body.recipientDentist || null) : req.user._id;
+    const msg = await Message.create({
+      case: null,
+      sender: req.user._id,
+      body: req.body.body.trim(),
+      recipientDentist,
+      readBy: [req.user._id],
+    });
+    const populated = await msg.populate("sender", "name role");
+    if (!isAdmin) {
+      broadcastToAdmins({ type: "general:new_message", message: populated, dentistId: req.user._id, dentistName: req.user.name });
+    } else if (recipientDentist) {
+      notifyUser(recipientDentist, { type: "general:new_message", message: populated });
+    }
+    res.status(201).json({ message: populated });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 async function findAccessibleCase(id, user) {
   const filter = user.role === "dentist" ? { _id: id, dentist: user._id } : { _id: id };
   return Case.findOne(filter).populate("dentist", "name email");

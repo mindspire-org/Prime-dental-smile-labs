@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { apiFetch, getCurrentUser, openRealtimeConnection, type AuthUser } from "@/lib/api";
-import { Send, CheckCheck, MessageSquare, Search, Circle, Users } from "lucide-react";
+import { Send, CheckCheck, MessageSquare, Search, Circle, Users, Paperclip, X, FileText } from "lucide-react";
 
 export const Route = createFileRoute("/admin/messages")({
   component: AdminMessages,
@@ -39,6 +39,8 @@ function AdminMessages() {
   const [unread, setUnread] = useState<Record<string, number>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [attachment, setAttachment] = useState<File | null>(null);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const selectedRef = useRef<any>(null);
   selectedRef.current = selected;
@@ -61,12 +63,39 @@ function AdminMessages() {
           setCases(prev => prev.map((c: any) => c._id === event.caseId ? { ...c, _lastMsg: msg } : c));
         }
       }
+      if (event.type === "general:new_message") {
+        const msg = event.message;
+        const dentistId = event.dentistId;
+        if (selectedRef.current?._isGeneral && selectedRef.current?.dentistId === String(dentistId)) {
+          setMessages(prev => prev.find((m: any) => m._id === msg._id) ? prev : [...prev, msg]);
+          setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 80);
+        } else {
+          setUnread(prev => ({ ...prev, [`general_${dentistId}`]: (prev[`general_${dentistId}`] || 0) + 1 }));
+        }
+      }
     });
     return () => ws?.close?.();
   }, []);
 
+  const [generalDentists, setGeneralDentists] = useState<any[]>([]);
+
+  useEffect(() => {
+    apiFetch<any>("/api/messages/general").then(r => {
+      const msgs: any[] = r.messages || [];
+      const map = new Map<string, any>();
+      msgs.forEach(m => {
+        const dId = m.sender?.role === "dentist" ? m.sender._id : m.recipientDentist;
+        const dName = m.sender?.role === "dentist" ? m.sender.name : null;
+        if (dId && !map.has(String(dId))) map.set(String(dId), { id: String(dId), name: dName, lastMsg: m });
+        else if (dId) { const e = map.get(String(dId)); if (e) { e.lastMsg = m; if (!e.name && dName) e.name = dName; } }
+      });
+      setGeneralDentists(Array.from(map.values()));
+    }).catch(() => {});
+  }, []);
+
   async function selectCase(c: any) {
     setSelected(c);
+    setAttachment(null);
     setUnread(prev => { const n = { ...prev }; delete n[c._id]; return n; });
     setLoadingMsgs(true);
     try {
@@ -76,28 +105,49 @@ function AdminMessages() {
     } finally { setLoadingMsgs(false); }
   }
 
+  async function selectGeneral(dentist: any) {
+    const thread = { _isGeneral: true, dentistId: dentist.id, dentist: { name: dentist.name || "Dentist" }, _id: `general_${dentist.id}` };
+    setSelected(thread);
+    setAttachment(null);
+    setUnread(prev => { const n = { ...prev }; delete n[`general_${dentist.id}`]; return n; });
+    setLoadingMsgs(true);
+    try {
+      const r = await apiFetch<any>("/api/messages/general");
+      const msgs: any[] = (r.messages || []).filter((m: any) => {
+        const dId = m.sender?.role === "dentist" ? String(m.sender._id) : String(m.recipientDentist);
+        return dId === dentist.id;
+      });
+      setMessages(msgs);
+      setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "auto" }), 80);
+    } finally { setLoadingMsgs(false); }
+  }
+
   async function sendMessage() {
-    if (!text.trim() || !selected || sending) return;
+    if ((!text.trim() && !attachment) || !selected || sending) return;
     setSending(true);
-    const body = text.trim();
+    const body = text.trim() || (attachment ? attachment.name : "");
     const optimistic = {
       _id: `temp-${Date.now()}`,
       body,
       sender: { _id: currentUser?.id, name: currentUser?.name, role: currentUser?.role },
       createdAt: new Date().toISOString(),
       _optimistic: true,
+      attachmentName: attachment?.name || null,
     };
     setMessages(prev => [...prev, optimistic]);
     setText("");
+    setAttachment(null);
     if (textareaRef.current) textareaRef.current.style.height = "auto";
     setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 80);
     try {
-      const r = await apiFetch<any>(`/api/messages/case/${selected._id}`, {
-        method: "POST",
-        body: JSON.stringify({ body }),
-      });
+      const endpoint = selected._isGeneral
+        ? "/api/messages/general"
+        : `/api/messages/case/${selected._id}`;
+      const payload: any = { body };
+      if (selected._isGeneral) payload.recipientDentist = selected.dentistId;
+      const r = await apiFetch<any>(endpoint, { method: "POST", body: JSON.stringify(payload) });
       setMessages(prev => prev.map((m: any) => m._id === optimistic._id ? r.message : m));
-      setCases(prev => prev.map((c: any) => c._id === selected._id ? { ...c, _lastMsg: r.message } : c));
+      if (!selected._isGeneral) setCases(prev => prev.map((c: any) => c._id === selected._id ? { ...c, _lastMsg: r.message } : c));
     } catch {
       setMessages(prev => prev.filter((m: any) => m._id !== optimistic._id));
       setText(body);
@@ -143,6 +193,39 @@ function AdminMessages() {
           </div>
 
           <div className="flex-1 overflow-y-auto">
+            {/* ── Direct / General messages ── */}
+            {generalDentists.length > 0 && (
+              <>
+                <div className="px-4 py-2 bg-slate-50 border-b border-slate-100">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Direct Messages</span>
+                </div>
+                {generalDentists.map(d => {
+                  const key = `general_${d.id}`;
+                  const isActive = selected?._id === key;
+                  const hasUnread = (unread[key] || 0) > 0;
+                  return (
+                    <button key={key} onClick={() => selectGeneral(d)}
+                      className="w-full text-left px-4 py-3.5 transition-colors border-b border-slate-50"
+                      style={isActive ? { background: "rgba(99,102,241,0.06)", borderLeft: "3px solid #6366f1" } : { borderLeft: "3px solid transparent" }}>
+                      <div className="flex items-center gap-3">
+                        <Avatar name={d.name || "Dentist"} color="indigo" size={36} />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className={`text-xs font-bold truncate ${isActive ? "text-indigo-600" : "text-slate-800"}`}>{d.name || "Dentist"}</span>
+                            {hasUnread && <span className="ml-auto shrink-0 w-4 h-4 rounded-full bg-indigo-500 text-white text-[9px] font-bold flex items-center justify-center">{unread[key]}</span>}
+                          </div>
+                          <div className="text-[10px] text-slate-400 mt-0.5 truncate">{d.lastMsg?.body || "Direct message"}</div>
+                        </div>
+                        <div className="text-[9px] text-slate-400 shrink-0">{d.lastMsg ? formatTime(d.lastMsg.createdAt) : ""}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </>
+            )}
+            <div className="px-4 py-2 bg-slate-50 border-b border-slate-100">
+              <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Case Threads</span>
+            </div>
             {filtered.length === 0 && (
               <div className="p-8 text-center">
                 <MessageSquare size={28} className="mx-auto text-slate-200 mb-2" />
@@ -286,7 +369,21 @@ function AdminMessages() {
 
               {/* Input */}
               <div className="px-4 pb-4 pt-2 bg-white border-t border-slate-100">
+                {attachment && (
+                  <div className="mb-2 flex items-center gap-2 px-3 py-2 bg-indigo-50 border border-indigo-100 rounded-xl">
+                    <FileText size={13} className="text-indigo-500 shrink-0" />
+                    <span className="text-xs text-slate-600 flex-1 truncate">{attachment.name}</span>
+                    <span className="text-[10px] text-slate-400">{(attachment.size / 1024).toFixed(1)} KB</span>
+                    <button onClick={() => setAttachment(null)} className="text-slate-400 hover:text-red-500 transition-colors"><X size={13} /></button>
+                  </div>
+                )}
                 <div className="flex gap-2 items-end rounded-2xl border border-slate-200 bg-slate-50 p-2 focus-within:border-indigo-400 focus-within:bg-white transition-all">
+                  <input ref={fileInputRef} type="file" className="hidden" onChange={e => { if (e.target.files?.[0]) setAttachment(e.target.files[0]); e.target.value = ""; }} />
+                  <button type="button" onClick={() => fileInputRef.current?.click()}
+                    className="shrink-0 p-2 rounded-xl text-slate-400 hover:text-indigo-500 hover:bg-white transition-colors"
+                    title="Attach file">
+                    <Paperclip size={15} />
+                  </button>
                   <textarea
                     ref={textareaRef}
                     value={text}
@@ -297,11 +394,11 @@ function AdminMessages() {
                     }}
                     onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                     rows={1}
-                    placeholder={`Reply to ${selected.dentist?.name || "dentist"}… (Enter to send)`}
+                    placeholder={`Reply to ${selected.dentist?.name || selected._isGeneral ? "dentist" : "dentist"}… (Enter to send)`}
                     className="flex-1 bg-transparent outline-none text-sm text-slate-700 placeholder:text-slate-400 resize-none py-1.5 px-2 leading-relaxed"
                     style={{ maxHeight: "120px" }}
                   />
-                  <button onClick={sendMessage} disabled={!text.trim() || sending}
+                  <button onClick={sendMessage} disabled={(!text.trim() && !attachment) || sending}
                     className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-white transition-all disabled:opacity-35 hover:scale-105 active:scale-95"
                     style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)" }}>
                     <Send size={15} />

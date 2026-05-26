@@ -50,18 +50,23 @@ casesRouter.get("/", async (req, res) => {
 });
 
 casesRouter.post("/", validate(submitSchema), async (req, res) => {
-  const data = req.validated.body;
-  const dentalCase = await Case.create({
-    ...data,
-    requestedCompletion: data.requestedCompletion ? new Date(data.requestedCompletion) : undefined,
-    dentist: req.user._id,
-    clinic: req.user.clinic,
-    statusHistory: [{ status: "Submitted", by: req.user._id }],
-  });
+  try {
+    const data = req.validated.body;
+    const dentalCase = await Case.create({
+      ...data,
+      requestedCompletion: data.requestedCompletion ? new Date(data.requestedCompletion) : undefined,
+      dentist: req.user._id,
+      clinic: req.user.clinic,
+      statusHistory: [{ status: "Submitted", by: req.user._id }],
+    });
 
-  await logActivity({ actor: req.user._id, action: "case.created", entityType: "Case", entityId: dentalCase._id });
-  await sendCaseSubmittedEmail({ to: req.user.email, name: req.user.name, caseNumber: dentalCase.caseNumber });
-  res.status(201).json({ case: dentalCase });
+    logActivity({ actor: req.user._id, action: "case.created", entityType: "Case", entityId: dentalCase._id }).catch(() => {});
+    sendCaseSubmittedEmail({ to: req.user.email, name: req.user.name, caseNumber: dentalCase.caseNumber }).catch(() => {});
+    res.status(201).json({ case: dentalCase });
+  } catch (err) {
+    console.error("[case create error]", err);
+    res.status(500).json({ error: err.message || "Failed to create case. Please try again." });
+  }
 });
 
 casesRouter.get("/:id", async (req, res) => {

@@ -13,8 +13,8 @@ const MARKETING_TABS = [
 /* ── Portal bottom nav ────────────────────────────────── */
 const PORTAL_TABS = [
   { to: "/portal",           label: "Home",     icon: LayoutDashboard, exact: true  },
-  { to: "/portal/cases/new", label: "New Case", icon: FilePlus,        exact: false },
-  { to: "/portal/cases",     label: "Cases",    icon: Folder,          exact: false },
+  { to: "/portal/cases/new", label: "New Case", icon: FilePlus,        exact: true  },
+  { to: "/portal/cases",     label: "Cases",    icon: Folder,          exact: false, exclude: "/portal/cases/new" },
   { to: "/portal/messages",  label: "Messages", icon: MessageSquare,   exact: false },
   { to: "/portal/profile",   label: "Profile",  icon: User,            exact: false },
 ];
@@ -28,7 +28,7 @@ const ADMIN_TABS = [
   { to: "/admin/settings", label: "Settings",  icon: Settings,        exact: false },
 ];
 
-type Tab = { to: string; label: string; icon: React.ElementType; exact?: boolean };
+type Tab = { to: string; label: string; icon: React.ElementType; exact?: boolean; exclude?: string };
 
 function BottomNav({ tabs, accent = "#0aabbd" }: { tabs: Tab[]; accent?: string }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -55,7 +55,7 @@ function BottomNav({ tabs, accent = "#0aabbd" }: { tabs: Tab[]; accent?: string 
         const Icon = tab.icon;
         const active = tab.exact
           ? path === tab.to
-          : path === tab.to || path.startsWith(tab.to + "/");
+          : path === tab.to || (path.startsWith(tab.to + "/") && (!tab.exclude || !path.startsWith(tab.exclude)));
 
         return (
           <Link

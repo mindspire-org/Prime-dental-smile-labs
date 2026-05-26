@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
+import { logoUrl } from "@/lib/logo";
 
 const NAV: { label: string; to?: string; items?: { label: string; to: string }[] }[] = [
   {
@@ -55,7 +56,7 @@ export function SiteHeader() {
       />
       <div className="max-w-7xl mx-auto px-5 lg:px-8 h-[72px] flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5">
-          <img src="/Primesmile logo.png" alt="Prime Smiles logo" className="h-10 w-auto object-contain" />
+          <img src={logoUrl} alt="Prime Smiles logo" className="h-10 w-auto object-contain" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1">
@@ -150,7 +151,7 @@ export function SiteHeader() {
           <div className="absolute right-0 top-0 h-full w-[86%] max-w-[380px] bg-white shadow-[0_18px_60px_rgba(2,8,23,.25)] overflow-y-auto">
             <div className="p-5 border-b border-border-silver flex items-center justify-between">
               <Link to="/" onClick={() => setMobileOpen(false)}>
-                <img src="/Primesmile logo.png" alt="Prime Smiles logo" className="h-9 w-auto object-contain" />
+                <img src={logoUrl} alt="Prime Smiles logo" className="h-9 w-auto object-contain" />
               </Link>
               <button
                 className="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-bg-soft text-text-slate"
