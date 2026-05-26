@@ -4,8 +4,8 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "dev": "concurrently -k -n API,VITE -c cyan,green \"npm run dev:api\" \"vite dev\"",
-    "dev:api": "node --watch backend/dev-server.mjs",
+    "dev": "concurrently -k -n API,VITE -c cyan,green \"npm run dev:api\" \"vite dev --port 8080\"",
+    "dev:api": "npm run dev --prefix backend",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "start": "node server.mjs",

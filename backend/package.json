@@ -1,0 +1,9 @@
+{
+  "name": "prime-smile-labs-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch dev-server.mjs",
+    "start": "node dev-server.mjs"
+  }
+}
