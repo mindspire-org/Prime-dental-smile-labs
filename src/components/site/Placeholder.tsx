@@ -1,6 +1,6 @@
 const IMAGE_MAP: Record<string, string> = {
   // Hero — dental lab milling machine / CAD-CAM environment
-  "hero":              "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1600&q=80&auto=format&fit=crop",
+  "hero":              "https://images.unsplash.com/photo-1468493858157-0da44aaf1d13?w=1600&q=80&auto=format&fit=crop",
   "hero — lab facility photo": "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1600&q=80&auto=format&fit=crop",
   "lab facility":      "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1600&q=80&auto=format&fit=crop",
   // Zirconia — ceramic dental prosthetics / disc
