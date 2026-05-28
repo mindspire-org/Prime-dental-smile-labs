@@ -1,21 +1,21 @@
 const IMAGE_MAP: Record<string, string> = {
   // Hero — dental lab milling machine / CAD-CAM environment
-  "hero":              "https://images.unsplash.com/photo-1468493858157-0da44aaf1d13?w=1600&q=80&auto=format&fit=crop",
-  "hero — lab facility photo": "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=1600&q=80&auto=format&fit=crop",
-  "lab facility":      "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=1600&q=80&auto=format&fit=crop",
+  "hero":              "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=1600&q=80&auto=format&fit=crop",
+  "hero — lab facility photo": "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1600&q=80&auto=format&fit=crop",
+  "lab facility":      "https://images.unsplash.com/photo-1581093806997-124204d9fa9d?w=1600&q=80&auto=format&fit=crop",
   // Zirconia — ceramic dental prosthetics / disc
-  "zircon":            "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=800&q=80&auto=format&fit=crop",
-  "zirconia":          "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=800&q=80&auto=format&fit=crop",
-  "crown":             "https://images.unsplash.com/photo-1590424693420-634a0b0b782c?w=800&q=80&auto=format&fit=crop",
+  "zircon":            "https://images.unsplash.com/photo-1581093806997-124204d9fa9d?w=800&q=80&auto=format&fit=crop",
+  "zirconia":          "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&q=80&auto=format&fit=crop",
+  "crown":             "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=800&q=80&auto=format&fit=crop",
   // Porcelain — ceramic lab finishing / layering
-  "porcelain":         "https://images.unsplash.com/photo-1468493858157-0da44aaf1d13?w=800&q=80&auto=format&fit=crop",
-  "bridge":            "https://images.unsplash.com/photo-1468493858157-0da44aaf1d13?w=800&q=80&auto=format&fit=crop",
+  "porcelain":         "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800&q=80&auto=format&fit=crop",
+  "bridge":            "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800&q=80&auto=format&fit=crop",
   // Implants — titanium implant components
   "implants":          "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=800&q=80&auto=format&fit=crop",
   "implant":           "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=800&q=80&auto=format&fit=crop",
   // Inlays — precision lab work under magnification
-  "inlays":            "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=800&q=80&auto=format&fit=crop",
-  "inlays / onlays":   "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=800&q=80&auto=format&fit=crop",
+  "inlays":            "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&q=80&auto=format&fit=crop",
+  "inlays / onlays":   "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&q=80&auto=format&fit=crop",
   // Equipment / technology — CAD/CAM scanner, milling
   "materials & equipment": "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=800&q=80&auto=format&fit=crop",
   "technology":        "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=1200&q=80&auto=format&fit=crop",
@@ -24,18 +24,18 @@ const IMAGE_MAP: Record<string, string> = {
   "production management": "https://images.unsplash.com/photo-1581093806997-124204d9fa9d?w=800&q=80&auto=format&fit=crop",
   "workflow":          "https://images.unsplash.com/photo-1581093806997-124204d9fa9d?w=1200&q=80&auto=format&fit=crop",
   // About / facility — modern dental lab interior
-  "about":             "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=1200&q=80&auto=format&fit=crop",
+  "about":             "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1200&q=80&auto=format&fit=crop",
   // Team — lab technicians working
-  "team":              "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=800&q=80&auto=format&fit=crop",
+  "team":              "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&q=80&auto=format&fit=crop",
   // Quality — precision measurement / inspection
   "quality":           "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=1200&q=80&auto=format&fit=crop",
   // Contact — lab reception / modern facility
-  "contact":           "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=1200&q=80&auto=format&fit=crop",
+  "contact":           "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1200&q=80&auto=format&fit=crop",
   // News / service — lab environment
-  "news image":        "https://images.unsplash.com/photo-1581093806997-124204d9fa9d?w=800&q=80&auto=format&fit=crop",
-  "service":           "https://images.unsplash.com/photo-1581093806997-124204d9fa9d?w=800&q=80&auto=format&fit=crop",
+  "news image":        "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=800&q=80&auto=format&fit=crop",
+  "service":           "https://cdn.pixabay.com/photo/2021/11/24/20/55/tooth-6822084_1280.png?w=800&q=80&auto=format&fit=crop",
   // Default — dental lab CAD/CAM
-  "default":           "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=800&q=80&auto=format&fit=crop",
+  "default":           "https://cdn.pixabay.com/photo/2021/11/24/20/55/tooth-6822084_1280.png?w=800&q=80&auto=format&fit=crop",
 };
 
 function resolveImage(label: string): string {

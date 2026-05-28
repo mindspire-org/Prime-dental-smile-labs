@@ -1,7 +1,10 @@
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
 
 const allowedExtensions = ["stl", "ply", "obj", "dcm", "dicom", "zip", "rar", "jpg", "jpeg", "png", "pdf"];
+const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 
 function client() {
   return new S3Client({
@@ -14,6 +17,8 @@ function client() {
   });
 }
 
+export const isLocalStorage = () => !process.env.S3_BUCKET;
+
 export function validateFileName(name) {
   const ext = name.split(".").pop()?.toLowerCase();
   return Boolean(ext && allowedExtensions.includes(ext));
@@ -21,21 +26,45 @@ export function validateFileName(name) {
 
 export async function createUploadUrl({ caseNumber, fileName, contentType }) {
   if (!validateFileName(fileName)) throw new Error("Unsupported file type");
-  const bucket = process.env.S3_BUCKET;
-  if (!bucket) throw new Error("S3_BUCKET is not configured");
-
   const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
   const key = `cases/${caseNumber}/${Date.now()}-${safeName}`;
-  const command = new PutObjectCommand({ Bucket: bucket, Key: key, ContentType: contentType || "application/octet-stream" });
-  const uploadUrl = await getSignedUrl(client(), command, { expiresIn: 900 });
 
+  if (isLocalStorage()) {
+    const uploadUrl = `/api/files/upload-local?key=${encodeURIComponent(key)}`;
+    return { key, uploadUrl };
+  }
+
+  const command = new PutObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key, ContentType: contentType || "application/octet-stream" });
+  const uploadUrl = await getSignedUrl(client(), command, { expiresIn: 900 });
+  return { key, uploadUrl };
+}
+
+export async function createMessageUploadUrl({ fileName, contentType }) {
+  if (!validateFileName(fileName)) throw new Error("Unsupported file type");
+  const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const key = `messages/${Date.now()}-${safeName}`;
+
+  if (isLocalStorage()) {
+    const uploadUrl = `/api/files/upload-local?key=${encodeURIComponent(key)}`;
+    return { key, uploadUrl };
+  }
+
+  const command = new PutObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key, ContentType: contentType || "application/octet-stream" });
+  const uploadUrl = await getSignedUrl(client(), command, { expiresIn: 900 });
   return { key, uploadUrl };
 }
 
 export async function createDownloadUrl(key) {
-  const bucket = process.env.S3_BUCKET;
-  if (!bucket) throw new Error("S3_BUCKET is not configured");
+  if (isLocalStorage()) {
+    return `/uploads/${key}`;
+  }
 
-  const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+  const command = new GetObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key });
   return getSignedUrl(client(), command, { expiresIn: 900 });
+}
+
+export async function saveLocalFile(key, buffer) {
+  const filePath = path.join(UPLOADS_DIR, key);
+  await mkdir(path.dirname(filePath), { recursive: true });
+  await writeFile(filePath, buffer);
 }

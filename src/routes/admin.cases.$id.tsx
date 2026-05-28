@@ -3,8 +3,8 @@ import { Download, Upload, FileText, ChevronLeft, Send, Paperclip, CheckCheck, T
 import { useEffect, useRef, useState } from "react";
 import { apiFetch, getCurrentUser, openRealtimeConnection, type AuthUser } from "@/lib/api";
 
-export const Route = createFileRoute("/portal/cases/$id")({
-  component: CaseDetail,
+export const Route = createFileRoute("/admin/cases/$id")({
+  component: AdminCaseDetail,
 });
 
 const STEPS = [
@@ -26,7 +26,7 @@ const defaultChip = { bg: "bg-slate-100", text: "text-slate-600", dot: "bg-slate
 
 type CaseDetailData = { case: any; messages: any[] };
 
-function CaseDetail() {
+function AdminCaseDetail() {
   const { id } = Route.useParams();
   const [data, setData] = useState<CaseDetailData | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -158,16 +158,18 @@ function CaseDetail() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <Link to="/portal/cases" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-teal font-medium transition-colors mb-4">
+        <Link to="/admin/cases" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-indigo-500 font-medium transition-colors mb-4">
           <ChevronLeft size={15}/> Back to Cases
         </Link>
         <div className="bg-white rounded-2xl px-6 py-5 shadow-[0_2px_16px_rgba(0,0,0,0.05)]"
-          style={{ borderLeft: "4px solid #0aabbd" }}>
+          style={{ borderLeft: "4px solid #6366f1" }}>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <div className="text-[10px] uppercase tracking-wider text-teal font-semibold mb-1">Case Reference</div>
+              <div className="text-[10px] uppercase tracking-wider text-indigo-500 font-semibold mb-1">Case Reference</div>
               <h1 className="text-2xl font-bold font-mono text-slate-800">{dentalCase.caseNumber}</h1>
               <div className="text-sm text-slate-400 mt-0.5">{dentalCase.patientRef}</div>
+              <div className="text-xs text-slate-400 mt-1">Dentist: <span className="font-medium text-slate-600">{dentalCase.dentist?.name}</span> · {dentalCase.dentist?.email}</div>
+              <div className="text-xs text-slate-400 mt-0.5">Clinic: <span className="font-medium text-slate-600">{dentalCase.clinic?.name || "—"}</span></div>
             </div>
             <div className="flex flex-col items-end gap-2">
               <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${chip.bg} ${chip.text}`}>
@@ -179,15 +181,14 @@ function CaseDetail() {
               </div>
             </div>
           </div>
-          {/* Progress bar */}
           <div className="mt-4">
             <div className="flex justify-between text-[10px] text-slate-400 mb-1.5">
               <span>Progress</span>
-              <span className="font-semibold text-teal">{pct}%</span>
+              <span className="font-semibold text-indigo-500">{pct}%</span>
             </div>
             <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
               <div className="h-full rounded-full transition-all duration-700"
-                style={{ width: `${pct}%`, background: "linear-gradient(90deg, #0aabbd, #078a99)" }}/>
+                style={{ width: `${pct}%`, background: "linear-gradient(90deg, #6366f1, #4f46e5)" }}/>
             </div>
           </div>
         </div>
@@ -199,7 +200,7 @@ function CaseDetail() {
           {/* Prescription */}
           <section className="bg-white rounded-2xl p-6 shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
             <h2 className="font-bold text-slate-800 mb-5 flex items-center gap-2">
-              <span className="w-1 h-5 rounded-full bg-teal inline-block"/>
+              <span className="w-1 h-5 rounded-full bg-indigo-500 inline-block"/>
               Prescription Summary
             </h2>
             <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
@@ -212,19 +213,45 @@ function CaseDetail() {
                 ["Urgency",      dentalCase.urgency || "Standard"],
                 ["Submitted",    new Date(dentalCase.createdAt).toLocaleDateString("en-GB")],
                 ["Requested By", dentalCase.requestedCompletion ? new Date(dentalCase.requestedCompletion).toLocaleDateString("en-GB") : "—"],
+                ["Clinic Ref",   dentalCase.clinicReference || "—"],
+                ["Notes",        dentalCase.notes || "—"],
               ].map(([k, v]) => (
                 <div key={k} className="flex flex-col gap-0.5">
-                  <span className="text-[9px] uppercase tracking-wider text-teal font-semibold">{k}</span>
+                  <span className="text-[9px] uppercase tracking-wider text-indigo-500 font-semibold">{k}</span>
                   <span className="text-sm font-medium text-slate-700">{v}</span>
                 </div>
               ))}
             </div>
+            {dentalCase.implant && dentalCase.implant.brand && (
+              <div className="mt-4 pt-4 border-t border-slate-100">
+                <h3 className="text-xs font-bold text-slate-600 mb-2">Implant Details</h3>
+                <div className="grid sm:grid-cols-3 gap-3 text-sm">
+                  {[
+                    ["Brand", dentalCase.implant.brand],
+                    ["System", dentalCase.implant.system || "—"],
+                    ["Platform", dentalCase.implant.platform || "—"],
+                    ["Connection", dentalCase.implant.connection || "—"],
+                    ["Retention", dentalCase.implant.retention || "—"],
+                  ].map(([label, val]) => (
+                    <div key={label}><span className="text-[10px] text-slate-400 uppercase">{label}</span><div className="text-slate-700 font-medium">{val}</div></div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {dentalCase.shipping && (
+              <div className="mt-4 pt-4 border-t border-slate-100">
+                <h3 className="text-xs font-bold text-slate-600 mb-2">Shipping</h3>
+                <div className="text-sm text-slate-700">Method: {dentalCase.shipping.method || "—"}</div>
+                <div className="text-sm text-slate-700">Address: {dentalCase.shipping.address || "—"}</div>
+                {dentalCase.shipping.instructions && <div className="text-sm text-slate-500 mt-1">{dentalCase.shipping.instructions}</div>}
+              </div>
+            )}
           </section>
 
           {/* Files */}
           <section className="bg-white rounded-2xl p-6 shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
             <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <span className="w-1 h-5 rounded-full bg-teal inline-block"/>
+              <span className="w-1 h-5 rounded-full bg-indigo-500 inline-block"/>
               Uploaded Files
             </h2>
             {(!dentalCase.files || dentalCase.files.length === 0) ? (
@@ -236,9 +263,9 @@ function CaseDetail() {
               <div className="space-y-2">
                 {dentalCase.files.map((f: any) => (
                   <div key={f._id}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-cyan-50 transition-colors border border-slate-100 group">
+                    className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-indigo-50 transition-colors border border-slate-100 group">
                     <div className="w-9 h-9 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0 border border-slate-100">
-                      <FileText size={16} className="text-teal"/>
+                      <FileText size={16} className="text-indigo-500"/>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-slate-700 truncate">{f.originalName}</div>
@@ -246,7 +273,7 @@ function CaseDetail() {
                     </div>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button onClick={() => download(f._id)}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-teal px-2.5 py-1.5 rounded-lg hover:bg-teal hover:text-white transition-colors">
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-500 px-2.5 py-1.5 rounded-lg hover:bg-indigo-500 hover:text-white transition-colors">
                         <Download size={11}/> Download
                       </button>
                       <button onClick={() => deleteFile(f._id)} disabled={deletingId === f._id}
@@ -258,17 +285,28 @@ function CaseDetail() {
                 ))}
               </div>
             )}
+
+            {/* Admin upload */}
+            <div className="mt-4 pt-4 border-t border-slate-100">
+              <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileUpload} />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors disabled:opacity-50"
+              >
+                <Upload size={14}/>
+                {uploading ? uploadProgress || "Uploading…" : "Upload file to case"}
+              </button>
+            </div>
           </section>
 
           {/* Messages */}
           <section className="bg-white rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.05)] overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
-              <span className="w-1 h-5 rounded-full bg-teal inline-block"/>
+              <span className="w-1 h-5 rounded-full bg-indigo-500 inline-block"/>
               <h2 className="font-bold text-slate-800">Messages</h2>
               {messages.length > 0 && (
-                <span className="ml-auto text-[10px] font-semibold bg-cyan-50 text-teal px-2 py-0.5 rounded-full">
-                  {messages.length}
-                </span>
+                <span className="ml-auto text-[10px] font-semibold bg-indigo-50 text-indigo-500 px-2 py-0.5 rounded-full">{messages.length}</span>
               )}
             </div>
 
@@ -281,10 +319,10 @@ function CaseDetail() {
                     <line x1="10" y1="16" x2="30" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                     <line x1="10" y1="22" x2="22" y2="22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                   </svg>
-                  No messages yet. Start the conversation.
+                  No messages yet.
                 </div>
               ) : messages.map((m) => {
-                const isMine = m.sender?._id === currentUser?.id || m.sender?.role === "dentist";
+                const isMine = m.sender?._id === currentUser?.id || m.sender?._role === currentUser?.role;
                 return (
                   <div key={m._id} className={`flex flex-col max-w-[78%] gap-1 ${isMine ? "ml-auto items-end" : "items-start"}`}>
                     {!isMine && (
@@ -295,15 +333,13 @@ function CaseDetail() {
                         ? "text-white rounded-br-sm"
                         : "bg-slate-100 text-slate-700 rounded-bl-sm"
                     } ${m._optimistic ? "opacity-70" : ""}`}
-                      style={isMine ? { background: "linear-gradient(135deg, #0aabbd, #078a99)" } : {}}>
+                      style={isMine ? { background: "linear-gradient(135deg, #6366f1, #4f46e5)" } : {}}>
                       {m.body}
                       {(m.attachmentName || m.attachment) && (
-                        <div className={`mt-1.5 flex items-center gap-1.5 text-[11px] font-medium ${isMine ? "text-white/80" : "text-teal"}`}>
+                        <div className={`mt-1.5 flex items-center gap-1.5 text-[11px] font-medium ${isMine ? "text-white/80" : "text-indigo-500"}`}>
                           <Paperclip size={10} />
                           {m.attachment ? (
-                            <button onClick={() => download(m.attachment)} className="underline text-left">
-                              {m.attachmentName || "Attachment"}
-                            </button>
+                            <button onClick={() => download(m.attachment)} className="underline text-left">{m.attachmentName || "Attachment"}</button>
                           ) : (
                             <span>{m.attachmentName}</span>
                           )}
@@ -312,7 +348,7 @@ function CaseDetail() {
                     </div>
                     <div className={`flex items-center gap-1 text-[10px] text-slate-400 px-1 ${isMine ? "flex-row-reverse" : ""}`}>
                       <span>{new Date(m.createdAt).toLocaleString("en-GB", { hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" })}</span>
-                      {isMine && <CheckCheck size={10} className={m._optimistic ? "text-slate-300" : "text-teal"}/>}
+                      {isMine && <CheckCheck size={10} className={m._optimistic ? "text-slate-300" : "text-indigo-500"}/>}
                     </div>
                   </div>
                 );
@@ -321,8 +357,8 @@ function CaseDetail() {
             </div>
 
             <div className="px-4 pb-4">
-              <div className="flex gap-2 items-end bg-slate-50 border border-slate-200 rounded-2xl p-2 focus-within:border-teal transition-colors">
-                <button className="p-2 rounded-xl text-slate-400 hover:text-teal hover:bg-white transition-colors shrink-0">
+              <div className="flex gap-2 items-end bg-slate-50 border border-slate-200 rounded-2xl p-2 focus-within:border-indigo-400 transition-colors">
+                <button className="p-2 rounded-xl text-slate-400 hover:text-indigo-500 hover:bg-white transition-colors shrink-0">
                   <Paperclip size={15}/>
                 </button>
                 <textarea
@@ -335,7 +371,7 @@ function CaseDetail() {
                 />
                 <button onClick={sendMessage} disabled={!message.trim() || sending}
                   className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-white transition-all disabled:opacity-40 hover:scale-105"
-                  style={{ background: "linear-gradient(135deg, #0aabbd, #078a99)" }}>
+                  style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5)" }}>
                   <Send size={14}/>
                 </button>
               </div>
@@ -348,7 +384,7 @@ function CaseDetail() {
           {/* Timeline */}
           <section className="bg-white rounded-2xl p-6 shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
             <h2 className="font-bold text-slate-800 mb-5 flex items-center gap-2">
-              <span className="w-1 h-5 rounded-full bg-teal inline-block"/>
+              <span className="w-1 h-5 rounded-full bg-indigo-500 inline-block"/>
               Status Timeline
             </h2>
             <ol className="relative space-y-0">
@@ -356,28 +392,22 @@ function CaseDetail() {
               {STEPS.map((s, i) => {
                 const done = i < active;
                 const current = i === active;
-                const future = i > active;
                 return (
-                  <li key={s} className="flex items-center gap-3 py-1.5 relative">
-                    <span className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 z-10 transition-all text-[10px] font-bold
-                      ${done    ? "bg-teal text-white shadow-[0_0_0_3px_rgba(10,171,189,0.15)]" : ""}
-                      ${current ? "text-white shadow-[0_0_0_4px_rgba(10,171,189,0.25)] scale-110" : ""}
-                      ${future  ? "bg-white border-2 border-slate-200 text-slate-400" : ""}
-                    `}
-                      style={current ? { background: "linear-gradient(135deg, #0aabbd, #078a99)" } : {}}>
-                      {done ? (
-                        <svg viewBox="0 0 12 12" className="w-3 h-3" fill="none">
-                          <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      ) : i + 1}
+                  <li key={s} className="relative pl-8 pb-5 last:pb-0">
+                    <span className={`absolute left-0 top-0.5 w-[26px] h-[26px] rounded-full flex items-center justify-center text-[10px] font-bold border-2 transition-all ${
+                      current
+                        ? "bg-white border-indigo-500 text-indigo-500 shadow-[0_0_0_4px_rgba(99,102,241,0.15)]"
+                        : done
+                          ? "bg-indigo-500 border-indigo-500 text-white"
+                          : "bg-white border-slate-200 text-slate-300"
+                    }`}>
+                      {done ? "✓" : i + 1}
                     </span>
-                    <span className={`text-sm leading-tight
-                      ${current ? "font-semibold text-teal" : ""}
-                      ${done    ? "text-slate-600 line-through decoration-slate-300" : ""}
-                      ${future  ? "text-slate-400" : ""}
-                    `}>{s}</span>
-                    {current && (
-                      <span className="ml-auto text-[9px] font-semibold bg-cyan-50 text-teal px-1.5 py-0.5 rounded-full shrink-0">Now</span>
+                    <div className={`text-xs font-semibold ${current ? "text-indigo-500" : done ? "text-slate-700" : "text-slate-400"}`}>{s}</div>
+                    {current && dentalCase.statusHistory?.[dentalCase.statusHistory.length - 1]?.note && (
+                      <div className="text-[10px] text-slate-400 mt-0.5 italic">
+                        {dentalCase.statusHistory[dentalCase.statusHistory.length - 1].note}
+                      </div>
                     )}
                   </li>
                 );
@@ -385,26 +415,24 @@ function CaseDetail() {
             </ol>
           </section>
 
-          {/* Actions */}
-          <div className="space-y-3">
-            <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileUpload}
-              accept=".stl,.ply,.obj,.dcm,.zip,.jpg,.jpeg,.png,.pdf,.3ds,.wrl"/>
-            <button onClick={() => fileInputRef.current?.click()} disabled={uploading}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:scale-[1.02] shadow-[0_2px_12px_rgba(10,171,189,0.3)] disabled:opacity-60"
-              style={{ background: "linear-gradient(90deg, #0aabbd, #078a99)" }}>
-              {uploading ? <><Loader2 size={15} className="animate-spin"/> {uploadProgress || "Uploading…"}</> : <><Upload size={15}/> Upload Additional Files</>}
-            </button>
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all hover:scale-[1.02] shadow-[0_2px_12px_rgba(201,162,39,0.25)]"
-              style={{ background: "linear-gradient(90deg, #c9a227, #a37e1a)", color: "#fff" }}>
-              <Download size={15}/> Download Prescription PDF
-            </button>
-          </div>
-
-          {/* Case notes */}
-          {dentalCase.notes && (
-            <section className="bg-amber-50 border border-amber-100 rounded-2xl p-5">
-              <div className="text-[10px] uppercase tracking-wider text-amber-600 font-semibold mb-2">Lab Notes</div>
-              <p className="text-sm text-amber-800 leading-relaxed">{dentalCase.notes}</p>
+          {/* Status History */}
+          {dentalCase.statusHistory && dentalCase.statusHistory.length > 0 && (
+            <section className="bg-white rounded-2xl p-6 shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
+              <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <span className="w-1 h-5 rounded-full bg-indigo-500 inline-block"/>
+                History
+              </h2>
+              <div className="space-y-3">
+                {dentalCase.statusHistory.map((h: any, i: number) => (
+                  <div key={i} className="flex items-start gap-3 text-sm">
+                    <span className="w-2 h-2 rounded-full bg-indigo-400 mt-1.5 shrink-0"/>
+                    <div>
+                      <div className="font-medium text-slate-700">{h.status}</div>
+                      <div className="text-[10px] text-slate-400">{h.note || "—"} · {new Date(h.createdAt).toLocaleDateString("en-GB")}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </section>
           )}
         </aside>

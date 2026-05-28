@@ -24,8 +24,8 @@ export function SiteFooter() {
         </div>
         {[
           { title: "Lab Services", links: [["Fixed Restorations", "/services/fixed-restorations"], ["Implant Prosthetics", "/services/implant-prosthetics"], ["Removable Prosthetics", "/services/removable-prosthetics"], ["Metal Frameworks", "/services/metal-frameworks"], ["Splints & Guards", "/services/splints-guards"]] },
-          { title: "Digital Workflow", links: [["How It Works", "/workflow"], ["Digital Prescription", "/workflow"], ["Case Tracking", "/workflow"], ["File Upload", "/workflow"]] },
-          { title: "Resources", links: [["Quality & Compliance", "/quality"], ["Technology", "/technology"], ["Contact", "/contact"], ["Dentist Portal", "/portal"]] },
+          { title: "Resources", links: [["Prescription Guide", "/resources"], ["Material Guide", "/resources"], ["Shade Taking", "/resources"], ["Implant Requirements", "/resources"], ["File Upload Help", "/resources"], ["FAQs", "/resources"]] },
+          { title: "Support", links: [["Quality & Compliance", "/quality"], ["Technology", "/technology"], ["Contact", "/contact"], ["Dentist Portal", "/portal"]] },
         ].map((col) => (
           <div key={col.title}>
             <h4 className="text-white font-semibold mb-4 text-sm">{col.title}</h4>
@@ -44,9 +44,9 @@ export function SiteFooter() {
             <div className="text-white/25">Developed &amp; Designed by <a href="https://mindspire.org" target="_blank" rel="noopener noreferrer" className="text-teal/60 hover:text-teal transition-colors">Mindspire</a> &mdash; <a href="https://mindspire.org" target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white/60 transition-colors">mindspire.org</a></div>
           </div>
           <div className="flex gap-5">
-            <a href="#" className="hover:text-teal">Privacy Policy</a>
-            <a href="#" className="hover:text-teal">Terms of Service</a>
-            <a href="#" className="hover:text-teal">Data Notice</a>
+            <Link to="/privacy-policy" className="hover:text-teal">Privacy Policy</Link>
+            <Link to="/terms-of-service" className="hover:text-teal">Terms of Service</Link>
+            <Link to="/data-notice" className="hover:text-teal">Data Notice</Link>
           </div>
         </div>
       </div>

@@ -65,8 +65,8 @@ function WorkflowPage() {
           <Reveal delay={0.1}>
             <div className="rounded-2xl overflow-hidden shadow-[0_4px_32px_rgba(0,0,0,0.1)] aspect-4/3">
               <img
-                src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80&auto=format&fit=crop"
-                alt="Digital prescription workflow"
+                src="https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=800&q=80&auto=format&fit=crop"
+                alt="Digital CAD workflow"
                 className="w-full h-full object-cover"
                 loading="lazy"
               />

@@ -166,6 +166,21 @@ function NewCasePage() {
           notes: patientForm.notes || undefined,
         }),
       });
+      // Upload all attached files to the newly created case
+      const caseId = result.case._id;
+      if (files.length > 0 && caseId) {
+        for (const file of files) {
+          try {
+            const { uploadUrl } = await apiFetch<{ uploadUrl: string }>("/api/files/upload-url", {
+              method: "POST",
+              body: JSON.stringify({ caseId, fileName: file.name, contentType: file.type || "application/octet-stream", size: file.size }),
+            });
+            await fetch(uploadUrl, { method: "PUT", body: file, headers: { "content-type": file.type || "application/octet-stream" } });
+          } catch (uploadErr) {
+            console.error("File upload failed:", uploadErr);
+          }
+        }
+      }
       setDone(result.case);
     } catch (e: any) {
       setError(e.message || "Submission failed. Please try again.");
@@ -447,11 +462,33 @@ function NewCasePage() {
         <SectionHeader icon={Truck} title="Shipping & Delivery" />
         <div className="grid grid-cols-2 gap-4">
           <Field label="Delivery Method">
-            <select className={inp} value={shipping.method} onChange={e => setShipping(s => ({ ...s, method: e.target.value }))}>
-              <option>DHL Express (1-2 days)</option>
-              <option>UPS Standard (3-5 days)</option>
-              <option>Courier (local — same day)</option>
-            </select>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { name: "DHL Express", sub: "1-2 days", img: "https://upload.wikimedia.org/wikipedia/commons/a/ac/DHL_Logo.svg" },
+                { name: "UPS Standard", sub: "3-5 days", img: "https://upload.wikimedia.org/wikipedia/commons/6/6b/United_Parcel_Service_logo_2014.svg" },
+                { name: "Local Courier", sub: "Same day", img: null },
+              ].map((opt) => {
+                const selected = shipping.method.startsWith(opt.name);
+                return (
+                  <button
+                    key={opt.name}
+                    type="button"
+                    onClick={() => setShipping(s => ({ ...s, method: `${opt.name} (${opt.sub})` }))}
+                    className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition text-center ${
+                      selected ? "border-teal bg-teal/5 ring-1 ring-teal" : "border-slate-200 hover:border-teal/40"
+                    }`}
+                  >
+                    {opt.img ? (
+                      <img src={opt.img} alt={opt.name} className="h-7 w-auto object-contain" />
+                    ) : (
+                      <Truck size={22} className="text-slate-400" />
+                    )}
+                    <span className={`text-xs font-semibold ${selected ? "text-teal" : "text-slate-700"}`}>{opt.name}</span>
+                    <span className="text-[10px] text-slate-400">{opt.sub}</span>
+                  </button>
+                );
+              })}
+            </div>
           </Field>
           <Field label="Return Address">
             <select className={inp} value={shipping.returnAddress} onChange={e => setShipping(s => ({ ...s, returnAddress: e.target.value }))}>

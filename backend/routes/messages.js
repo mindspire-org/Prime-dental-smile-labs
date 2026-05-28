@@ -24,13 +24,15 @@ messagesRouter.get("/general", async (req, res) => {
 
 messagesRouter.post("/general", async (req, res) => {
   try {
-    if (!req.body.body?.trim()) return res.status(400).json({ error: "Message is required" });
+    if (!req.body.body?.trim() && !req.body.attachment) return res.status(400).json({ error: "Message or attachment is required" });
     const isAdmin = req.user.role !== "dentist";
     const recipientDentist = isAdmin ? (req.body.recipientDentist || null) : req.user._id;
     const msg = await Message.create({
       case: null,
       sender: req.user._id,
-      body: req.body.body.trim(),
+      body: req.body.body?.trim() || "",
+      attachment: req.body.attachment || null,
+      attachmentName: req.body.attachmentName || null,
       recipientDentist,
       readBy: [req.user._id],
     });
@@ -62,19 +64,32 @@ messagesRouter.get("/case/:caseId", async (req, res) => {
 messagesRouter.post("/case/:caseId", async (req, res) => {
   const dentalCase = await findAccessibleCase(req.params.caseId, req.user);
   if (!dentalCase) return res.status(404).json({ error: "Case not found" });
-  if (!req.body.body?.trim()) return res.status(400).json({ error: "Message is required" });
+  if (!req.body.body?.trim() && !req.body.attachment) return res.status(400).json({ error: "Message or attachment is required" });
 
-  const message = await Message.create({ case: dentalCase._id, sender: req.user._id, body: req.body.body.trim(), readBy: [req.user._id] });
+  const message = await Message.create({
+    case: dentalCase._id,
+    sender: req.user._id,
+    body: req.body.body?.trim() || "",
+    attachment: req.body.attachment || null,
+    attachmentName: req.body.attachmentName || null,
+    readBy: [req.user._id],
+  });
   const populated = await message.populate("sender", "name role");
   await logActivity({ actor: req.user._id, action: "message.created", entityType: "Message", entityId: message._id, metadata: { case: dentalCase._id } });
 
   if (req.user.role === "dentist") {
     // Notify all online admins/lab_staff of a new dentist message
-    broadcastToAdmins({ type: "case:new_message", caseId: dentalCase._id, message: populated, dentistId: dentalCase.dentist._id });
+    broadcastToAdmins({ type: "case:new_message", caseId: dentalCase._id, message: populated, dentistId: dentalCase.dentist?._id });
   } else {
     // Notify the dentist that admin/lab replied
-    notifyUser(dentalCase.dentist._id, { type: "case:new_message", caseId: dentalCase._id, message: populated });
-    await sendNewMessageEmail({ to: dentalCase.dentist.email, name: dentalCase.dentist.name, caseNumber: dentalCase.caseNumber, senderName: req.user.name });
+    if (dentalCase.dentist?._id) {
+      notifyUser(dentalCase.dentist._id, { type: "case:new_message", caseId: dentalCase._id, message: populated });
+      try {
+        await sendNewMessageEmail({ to: dentalCase.dentist.email, name: dentalCase.dentist.name, caseNumber: dentalCase.caseNumber, senderName: req.user.name });
+      } catch (emailErr) {
+        console.error("[email] Failed to send new message email:", emailErr.message);
+      }
+    }
   }
   res.status(201).json({ message: populated });
 });

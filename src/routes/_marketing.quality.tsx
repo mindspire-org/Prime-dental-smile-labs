@@ -7,10 +7,10 @@ export const Route = createFileRoute("/_marketing/quality")({
   head: () => ({
     meta: [
       { title: "Quality & Compliance — Prime Smile Dental Laboratory" },
-      { name: "description", content: "ISO 9001:2015 and ISO 13485:2016 certified dental laboratory. CE-certified materials with full traceability — meeting UK MDR 2002 standards." },
+      { name: "description", content: "Robust quality practices and CE-certified consumables with full traceability — meeting UK MDR 2002 standards." },
       { name: "robots", content: "index, follow" },
       { property: "og:title", content: "Quality & Compliance — Prime Smile Dental Laboratory" },
-      { property: "og:description", content: "ISO 9001 & ISO 13485 certified. CE-certified materials, full traceability, UK MDR compliant." },
+      { property: "og:description", content: "CE-certified consumables, full traceability, UK MDR compliant." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://primesmilelab.com/quality" },
     ],
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_marketing/quality")({
       { rel: "canonical", href: "https://primesmilelab.com/quality" },
     ],
     scripts: [
-      { type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [ { "@type": "Question", "name": "Is Prime Smile Dental Laboratory ISO certified?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. We hold ISO 9001:2015 and ISO 13485:2016 certifications, and all restorations use CE-certified materials only." } }, { "@type": "Question", "name": "Does Prime Smile comply with UK MDR 2002?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. All custom-made dental devices are manufactured in compliance with the UK Medical Devices Regulations 2002 (SI 2002/618) and carry full material traceability." } }, { "@type": "Question", "name": "What materials does the lab use?", "acceptedAnswer": { "@type": "Answer", "text": "We use exclusively CE-certified materials including zirconia, lithium disilicate, cobalt-chrome (SLM), PMMA, and resin composites, all with full lot-number traceability." } } ] }) },
+      { type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [ { "@type": "Question", "name": "Is Prime Smile Dental Laboratory ISO certified?", "acceptedAnswer": { "@type": "Answer", "text": "Not yet certified — we operate documented quality practices and use CE-certified consumables for all restorations." } }, { "@type": "Question", "name": "Does Prime Smile comply with UK MDR 2002?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. All custom-made dental devices are manufactured in compliance with the UK Medical Devices Regulations 2002 (SI 2002/618) and carry full material traceability." } }, { "@type": "Question", "name": "What materials does the lab use?", "acceptedAnswer": { "@type": "Answer", "text": "We use exclusively CE-certified materials including zirconia, lithium disilicate, cobalt-chrome (SLM), PMMA, and resin composites, all with full lot-number traceability." } } ] }) },
     ],
   }),
   component: QualityPage,
@@ -50,7 +50,7 @@ function QualityPage() {
             <span className="eyebrow">Quality</span>
             <h1 className="mt-3 text-4xl md:text-5xl font-bold inline-block border-b-4 border-teal pb-2">Quality & Compliance</h1>
             <p className="mt-6 text-muted-grey max-w-3xl text-lg leading-relaxed">
-              Every Prime Smile case is processed through a documented, audited quality system aligned with ISO 9001:2015 and ISO 13485:2016.
+              Every Prime Smile case is processed through a documented quality system with robust QC checkpoints to ensure patient safety and fit.
             </p>
           </Reveal>
           <div className="mt-14 space-y-4">
@@ -72,8 +72,8 @@ function QualityPage() {
       <section className="bg-bg-soft py-16">
         <div className="max-w-7xl mx-auto px-5 lg:px-8 grid md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
           {[
-            { t: "ISO 9001:2015", d: "Quality Management System" },
-            { t: "ISO 13485:2016", d: "Medical Devices Standard" },
+            { t: "CE-Certified Consumables", d: "Verified supplier materials" },
+            { t: "Quality Practices", d: "Documented QC checkpoints" },
             { t: "CE-Certified Materials", d: "World-Renowned Suppliers" },
             { t: "Digital Case Tracking", d: "Submission to Dispatch" },
           ].map((b) => (

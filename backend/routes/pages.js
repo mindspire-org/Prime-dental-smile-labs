@@ -5,18 +5,24 @@ import { logActivity } from "../services/activity.js";
 import crypto from "node:crypto";
 
 export const pagesRouter = express.Router();
-pagesRouter.use(requireAuth, requireRole("admin", "lab_staff"));
 
 const EDITABLE_PAGES = [
-  { slug: "home",        title: "Home Page" },
-  { slug: "about",       title: "About Us" },
-  { slug: "services",    title: "Services" },
-  { slug: "quality",     title: "Quality" },
-  { slug: "technology",  title: "Technology" },
-  { slug: "workflow",    title: "Workflow" },
-  { slug: "contact",     title: "Contact" },
+  { slug: "home",                     title: "Home Page" },
+  { slug: "about",                    title: "About Us" },
+  { slug: "services",                 title: "Services" },
+  { slug: "quality",                  title: "Quality" },
+  { slug: "technology",               title: "Technology" },
+  { slug: "workflow",                 title: "Workflow" },
+  { slug: "contact",                  title: "Contact" },
+  { slug: "fixed-restorations",       title: "Service — Fixed Restorations" },
+  { slug: "implant-prosthetics",      title: "Service — Implant Prosthetics" },
+  { slug: "removable-prosthetics",    title: "Service — Removable Prosthetics" },
+  { slug: "metal-frameworks",         title: "Service — Metal Frameworks" },
+  { slug: "splints-guards",           title: "Service — Splints & Guards" },
+  { slug: "digital-design",           title: "Service — Digital Design Support" },
 ];
 
+// Public read routes
 pagesRouter.get("/", async (req, res) => {
   const saved = await Page.find().select("slug title published updatedAt").sort({ slug: 1 });
   const savedMap = Object.fromEntries(saved.map(p => [p.slug, p]));
@@ -33,6 +39,8 @@ pagesRouter.get("/:slug", async (req, res) => {
   }
   res.json({ page });
 });
+
+pagesRouter.use(requireAuth, requireRole("admin", "lab_staff"));
 
 pagesRouter.put("/:slug", requireRole("admin"), async (req, res) => {
   const { blocks, title, published } = req.body;

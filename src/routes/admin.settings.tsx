@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { apiFetch } from "@/lib/api";
-import { Save, Settings, Palette, Mail, Globe, ToggleLeft, Search, CheckCircle2 } from "lucide-react";
+import { Save, Settings, Palette, Mail, Globe, ToggleLeft, Search, CheckCircle2, Image, Upload, Send, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/settings")({ component: AdminSettings });
 
@@ -15,6 +15,54 @@ const GROUP_META: Record<string, { label: string; icon: any; color: string }> = 
   seo:        { label: "SEO",        icon: Search,      color: "bg-pink-500" },
   features:   { label: "Features",   icon: ToggleLeft,  color: "bg-emerald-500" },
 };
+
+function ImageUploadField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append("files", file);
+      const r = await apiFetch<{ items: { url: string }[] }>("/api/admin/media", { method: "POST", body: form });
+      if (r.items?.[0]?.url) onChange(r.items[0].url);
+    } catch (err: any) {
+      alert(err.message || "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-3">
+      {value ? (
+        <div className="relative group">
+          <img src={value} alt="Preview" className="w-12 h-12 rounded-lg object-cover border border-slate-200" />
+          <button onClick={() => onChange("")} className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <Trash2 size={9} />
+          </button>
+        </div>
+      ) : (
+        <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-slate-300">
+          <Image size={18} />
+        </div>
+      )}
+      <div className="flex-1 flex items-center gap-2">
+        <input type="text" value={value || ""} onChange={e => onChange(e.target.value)} placeholder="https://... or upload"
+          className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-400" />
+        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+        <button onClick={() => fileRef.current?.click()} disabled={uploading}
+          className="px-3 py-2 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors disabled:opacity-50 inline-flex items-center gap-1">
+          {uploading ? <><Save size={12} className="animate-spin"/> Uploading</> : <><Upload size={12}/> Upload</>}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function SettingField({ s, value, onChange }: { s: Setting; value: any; onChange: (v: any) => void }) {
   if (s.type === "boolean") return (
@@ -35,6 +83,9 @@ function SettingField({ s, value, onChange }: { s: Setting; value: any; onChange
     <textarea value={value || ""} onChange={e => onChange(e.target.value)} rows={3}
       className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-400 resize-none"/>
   );
+  if (s.type === "url" && (s.key === "site.logo" || s.key === "site.favicon")) return (
+    <ImageUploadField value={value || ""} onChange={onChange} />
+  );
   return (
     <input type={s.type === "number" ? "number" : s.type === "email" ? "email" : s.type === "url" ? "url" : "text"}
       value={value ?? ""} onChange={e => onChange(e.target.value)}
@@ -48,6 +99,7 @@ function AdminSettings() {
   const [saving,   setSaving]   = useState(false);
   const [saved,    setSaved]    = useState(false);
   const [activeGroup, setActiveGroup] = useState("general");
+  const [testEmailStatus, setTestEmailStatus] = useState<string>("");
 
   useEffect(() => {
     apiFetch<{ settings: Setting[] }>("/api/admin/settings").then(r => {
@@ -64,6 +116,17 @@ function AdminSettings() {
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } finally { setSaving(false); }
+  }
+
+  async function sendTestEmail() {
+    setTestEmailStatus("Sending…");
+    try {
+      const r = await apiFetch<{ ok: boolean; message: string }>("/api/admin/settings/test-email", { method: "POST" });
+      setTestEmailStatus(r.message || "Test email sent!");
+    } catch (err: any) {
+      setTestEmailStatus(err.message || "Failed to send test email");
+    }
+    setTimeout(() => setTestEmailStatus(""), 5000);
   }
 
   const groups = [...new Set(settings.map(s => s.group))].filter(g => GROUP_META[g]);
@@ -126,6 +189,19 @@ function AdminSettings() {
                 <p className="text-[11px] text-slate-400 mt-1 font-mono">{s.key}</p>
               </div>
             ))}
+            {activeGroup === "smtp" && (
+              <div className="pt-2">
+                <button onClick={sendTestEmail} disabled={testEmailStatus === "Sending…"}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-orange-50 text-orange-600 hover:bg-orange-100 transition-colors disabled:opacity-50">
+                  <Send size={13}/> Send Test Email
+                </button>
+                {testEmailStatus && (
+                  <p className={`text-xs mt-2 ${testEmailStatus.includes("Failed") || testEmailStatus.includes("error") ? "text-red-500" : "text-emerald-600"}`}>
+                    {testEmailStatus}
+                  </p>
+                )}
+              </div>
+            )}
             {groupSettings.length === 0 && (
               <div className="text-slate-400 text-sm text-center py-12">No settings in this group</div>
             )}

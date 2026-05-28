@@ -1,18 +1,44 @@
 import nodemailer from "nodemailer";
-import { EmailTemplate } from "../models/index.js";
+import { EmailTemplate, Setting } from "../models/index.js";
 
 let transporter;
+let cachedSmtpConfig = null;
 
-function getTransporter() {
+async function getSmtpConfig() {
+  if (cachedSmtpConfig) return cachedSmtpConfig;
+
+  const settings = await Setting.find({ key: /^smtp\./ });
+  const map = Object.fromEntries(settings.map(s => [s.key, s.value]));
+
+  // Priority: database settings > env vars > Hostinger defaults
+  const host     = map["smtp.host"]     || process.env.SMTP_HOST     || "smtp.hostinger.com";
+  const port     = Number(map["smtp.port"] || process.env.SMTP_PORT || 587);
+  const secure   = (map["smtp.secure"] !== undefined ? map["smtp.secure"] : (process.env.SMTP_SECURE === "true" || port === 465));
+  const user     = map["smtp.user"]     || process.env.SMTP_USER     || "";
+  const pass     = map["smtp.pass"]     || process.env.SMTP_PASS     || "";
+  const from     = map["smtp.from"]     || process.env.EMAIL_FROM     || "Prime Smile Labs <no-reply@primesmile.co.uk>";
+
+  cachedSmtpConfig = { host, port, secure, user, pass, from };
+  return cachedSmtpConfig;
+}
+
+async function getTransporter() {
   if (transporter) return transporter;
-  if (!process.env.SMTP_HOST) return null;
+  const cfg = await getSmtpConfig();
+  if (!cfg.host) return null;
   transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT || 587),
-    secure: process.env.SMTP_SECURE === "true",
-    auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined,
+    host: cfg.host,
+    port: cfg.port,
+    secure: cfg.secure,
+    auth: cfg.user ? { user: cfg.user, pass: cfg.pass } : undefined,
   });
   return transporter;
+}
+
+// Invalidate cached config when settings change
+export function invalidateSmtpCache() {
+  cachedSmtpConfig = null;
+  transporter = null;
 }
 
 function wrap(title, body) {
@@ -54,9 +80,10 @@ function replaceVariables(template, variables) {
 }
 
 export async function sendEmail({ to, subject, text, html }) {
-  const mailer = getTransporter();
+  const mailer = await getTransporter();
   if (!mailer) { console.log("[email skipped]", { to, subject }); return; }
-  await mailer.sendMail({ from: process.env.EMAIL_FROM || "Prime Smile Labs <no-reply@primesmile.co.uk>", to, subject, text, html });
+  const cfg = await getSmtpConfig();
+  await mailer.sendMail({ from: cfg.from, to, subject, text, html });
 }
 
 export async function sendWelcomeEmail({ to, name, temporaryPassword }) {

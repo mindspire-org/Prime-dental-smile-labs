@@ -1,31 +1,47 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Menu, X, ChevronDown } from "lucide-react";
+import {
+  Menu, X, ChevronDown, Building2, Sparkles, Award, Globe,
+  FlaskConical, Puzzle, Crown, Wrench, Monitor, Palette,
+  Cpu, Printer, Box, ScanLine, Flame, ArrowRight,
+} from "lucide-react";
 import { logoUrl } from "@/lib/logo";
 
-const NAV: { label: string; to?: string; items?: { label: string; to: string }[] }[] = [
+const NAV: { label: string; to?: string; items?: { label: string; to: string; icon: React.ElementType }[] }[] = [
   {
     label: "Facility",
     items: [
-      { label: "About Us", to: "/about" },
-      { label: "Our Laboratory", to: "/about" },
-      { label: "Why Prime Smile", to: "/about" },
+      { label: "About Us", to: "/about", icon: Building2 },
+      { label: "Our Laboratory", to: "/about/our-laboratory", icon: Sparkles },
+      { label: "Why Prime Smile", to: "/about/why-prime", icon: Award },
+      { label: "Export Capability", to: "/about/export-capability", icon: Globe },
     ],
   },
   {
     label: "Lab Services",
     items: [
-      { label: "Fixed Restorations", to: "/services/fixed-restorations" },
-      { label: "Implant Prosthetics", to: "/services/implant-prosthetics" },
-      { label: "Removable Prosthetics", to: "/services/removable-prosthetics" },
-      { label: "Metal Frameworks", to: "/services/metal-frameworks" },
-      { label: "Splints & Guards", to: "/services/splints-guards" },
-      { label: "Digital Design Support", to: "/services/digital-design" },
+      { label: "Fixed Restorations", to: "/services/fixed-restorations", icon: Crown },
+      { label: "Implant Prosthetics", to: "/services/implant-prosthetics", icon: Puzzle },
+      { label: "Removable Prosthetics", to: "/services/removable-prosthetics", icon: Wrench },
+      { label: "Metal Frameworks", to: "/services/metal-frameworks", icon: FlaskConical },
+      { label: "Splints & Guards", to: "/services/splints-guards", icon: Monitor },
+      { label: "Digital Design Support", to: "/services/digital-design", icon: Palette },
     ],
   },
   { label: "Digital Workflow", to: "/workflow" },
-  { label: "Technology", to: "/technology" },
+  {
+    label: "Technology",
+    items: [
+      { label: "CAD/CAM Milling", to: "/technology/cad-cam-milling", icon: Cpu },
+      { label: "SLM Metal Printing", to: "/technology/slm-metal-printing", icon: Printer },
+      { label: "3D Printing", to: "/technology/3d-printing", icon: Box },
+      { label: "Sintering & Firing", to: "/technology/sintering-ceramic-firing", icon: Flame },
+      { label: "Scanning & Design", to: "/technology/scanning-design", icon: ScanLine },
+      { label: "Finishing Equipment", to: "/technology/finishing-equipment", icon: Sparkles },
+    ],
+  },
   { label: "Quality & Compliance", to: "/quality" },
+  { label: "Resources", to: "/resources" },
   { label: "Contact", to: "/contact" },
 ];
 
@@ -40,6 +56,15 @@ export function SiteHeader() {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   return (
     <header
@@ -110,9 +135,12 @@ export function SiteHeader() {
                       <Link
                         key={it.label}
                         to={it.to}
-                        className="block px-4 py-3 text-[13.5px] text-text-slate hover:bg-bg-soft hover:text-teal border-l-2 border-transparent hover:border-teal transition-all"
+                        className="flex items-center gap-3 px-4 py-3 text-[13.5px] text-text-slate hover:bg-bg-soft hover:text-teal border-l-2 border-transparent hover:border-teal transition-all"
                       >
-                        {it.label}
+                        <div className="w-8 h-8 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center shrink-0 group-hover:bg-teal/10 group-hover:text-teal transition-colors">
+                          <it.icon size={16} />
+                        </div>
+                        <span className="font-medium">{it.label}</span>
                       </Link>
                     ))}
                   </div>
@@ -130,9 +158,7 @@ export function SiteHeader() {
         <div className="lg:hidden flex items-center gap-2">
           <Link to="/submit" className="btn-gold py-1.5! px-3! text-xs">Submit</Link>
           <button
-            className={`h-10 w-10 inline-flex items-center justify-center rounded-xl transition ${
-              scrolled ? "bg-bg-soft text-text-slate" : "bg-bg-soft text-text-slate"
-            }`}
+            className="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-slate-100 text-slate-700 active:scale-95 transition"
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"
           >
@@ -141,73 +167,134 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-50">
+      <MobileOverlay open={mobileOpen} onClose={() => setMobileOpen(false)} />
+    </header>
+  );
+}
+
+/* ── Mobile overlay (rendered outside header for reliability) ── */
+function MobileOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
+  if (!open) return null;
+  return (
+    <div className="lg:hidden">
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+        onClick={onClose}
+        style={{ zIndex: 9998 }}
+      />
+      {/* Panel */}
+      <div
+        className="fixed top-0 right-0 bottom-0 w-full bg-white shadow-2xl flex flex-col"
+        style={{ zIndex: 9999 }}
+      >
+        <div className="h-[3px] w-full bg-teal flex-none" />
+        <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-white flex-none">
+          <Link to="/" onClick={onClose}>
+            <img src={logoUrl} alt="Prime Smiles logo" className="h-9 w-auto object-contain" />
+          </Link>
           <button
-            className="absolute inset-0 bg-navy/30 backdrop-blur-sm"
-            onClick={() => setMobileOpen(false)}
+            className="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-slate-100 text-slate-700 active:scale-95 transition"
+            onClick={onClose}
             aria-label="Close menu"
-          />
-          <div className="absolute right-0 top-0 h-full w-[86%] max-w-[380px] bg-white shadow-[0_18px_60px_rgba(2,8,23,.25)] overflow-y-auto">
-            <div className="p-5 border-b border-border-silver flex items-center justify-between">
-              <Link to="/" onClick={() => setMobileOpen(false)}>
-                <img src={logoUrl} alt="Prime Smiles logo" className="h-9 w-auto object-contain" />
-              </Link>
-              <button
-                className="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-bg-soft text-text-slate"
-                onClick={() => setMobileOpen(false)}
-                aria-label="Close menu"
-              >
-                <X />
-              </button>
-            </div>
+          >
+            <X size={20} />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 bg-white">
+          <MobileMenuContent onClose={onClose} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
-            <div className="p-5">
-              <div className="grid gap-2">
-                {NAV.map((n) =>
-                  n.to ? (
-                    <Link
-                      key={n.label}
-                      to={n.to}
-                      onClick={() => setMobileOpen(false)}
-                      className="px-4 py-3 rounded-xl font-semibold text-text-slate hover:bg-bg-soft transition"
-                    >
-                      {n.label}
-                    </Link>
-                  ) : (
-                    <div key={n.label} className="rounded-2xl border border-border-silver overflow-hidden">
-                      <div className="px-4 py-3 bg-bg-soft">
-                        <div className="text-[11px] uppercase tracking-[0.16em] text-muted-grey">{n.label}</div>
-                      </div>
-                      <div className="p-2">
-                        {n.items?.map((it) => (
-                          <Link
-                            key={it.label}
-                            to={it.to}
-                            onClick={() => setMobileOpen(false)}
-                            className="block px-3 py-2.5 rounded-xl text-sm text-text-slate hover:bg-bg-soft hover:text-teal transition"
-                          >
-                            {it.label}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                )}
+/* ── Mobile menu content ── */
+function MobileMenuContent({ onClose }: { onClose: () => void }) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  return (
+    <div className="space-y-1.5">
+      {NAV.map((n) => {
+        if (n.to) {
+          return (
+            <Link
+              key={n.label}
+              to={n.to}
+              onClick={onClose}
+              className="group flex items-center justify-between px-4 py-3.5 rounded-xl font-semibold text-text-slate hover:bg-bg-soft hover:text-teal transition-colors"
+            >
+              <span>{n.label}</span>
+              <ArrowRight size={14} className="text-slate-300 group-hover:text-teal group-hover:translate-x-1 transition-all" />
+            </Link>
+          );
+        }
+
+        const isOpen = expanded === n.label;
+        return (
+          <div key={n.label}>
+            <button
+              onClick={() => setExpanded(isOpen ? null : n.label)}
+              className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl font-semibold transition-colors ${
+                isOpen ? "bg-bg-soft text-teal" : "text-text-slate hover:bg-bg-soft"
+              }`}
+            >
+              <span>{n.label}</span>
+              <div className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}>
+                <ChevronDown size={16} />
               </div>
+            </button>
 
-              <div className="mt-5 grid gap-3">
-                <Link to="/portal" onClick={() => setMobileOpen(false)} className="btn-outline-teal w-full">
-                  Dentist Portal
-                </Link>
-                <Link to="/submit" onClick={() => setMobileOpen(false)} className="btn-gold w-full">
-                  Submit Case
-                </Link>
+            <div
+              className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                isOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+              }`}
+            >
+              <div className="pl-2 pr-2 pb-2 pt-1 space-y-1">
+                {n.items?.map((it) => (
+                  <Link
+                    key={it.label}
+                    to={it.to}
+                    onClick={onClose}
+                    className="group flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-text-slate hover:bg-bg-soft hover:text-teal transition-colors"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-teal/10 text-teal flex items-center justify-center shrink-0 transition-transform group-hover:scale-110">
+                      <it.icon size={17} />
+                    </div>
+                    <span className="font-medium">{it.label}</span>
+                    <ArrowRight size={12} className="ml-auto text-slate-300 opacity-0 group-hover:opacity-100 group-hover:text-teal group-hover:translate-x-1 transition-all" />
+                  </Link>
+                ))}
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </header>
+        );
+      })}
+
+      {/* CTA buttons */}
+      <div className="pt-4 space-y-3">
+        <Link
+          to="/portal"
+          onClick={onClose}
+          className="btn-outline-teal w-full flex items-center justify-center gap-2"
+        >
+          Dentist Portal
+        </Link>
+        <Link
+          to="/submit"
+          onClick={onClose}
+          className="btn-gold w-full flex items-center justify-center gap-2"
+        >
+          Submit Case <ArrowRight size={16} />
+        </Link>
+      </div>
+
+      {/* Tagline */}
+      <div className="pt-6 text-center">
+        <p className="text-[11px] text-muted-grey tracking-wider uppercase">
+          Precision Craftsmanship · Delivered Digitally
+        </p>
+      </div>
+    </div>
   );
 }

@@ -122,20 +122,63 @@ function AdminMessages() {
     } finally { setLoadingMsgs(false); }
   }
 
+  async function downloadAttachment(fileId: string) {
+    try {
+      const res = await apiFetch<{ downloadUrl: string }>(`/api/files/${fileId}/download-url`);
+      window.open(res.downloadUrl, "_blank");
+    } catch {
+      alert("Failed to download file.");
+    }
+  }
+
   async function sendMessage() {
     if ((!text.trim() && !attachment) || !selected || sending) return;
     setSending(true);
-    const body = text.trim() || (attachment ? attachment.name : "");
+    let attachmentId: string | null = null;
+    let attachmentFileName: string | null = null;
+
+    // Upload file first if present
+    if (attachment) {
+      try {
+        if (selected._isGeneral) {
+          // General message attachment — no case
+          const { file, uploadUrl } = await apiFetch<{ file: any; uploadUrl: string }>("/api/files/message-upload-url", {
+            method: "POST",
+            body: JSON.stringify({ fileName: attachment.name, contentType: attachment.type || "application/octet-stream", size: attachment.size }),
+          });
+          await fetch(uploadUrl, { method: "PUT", body: attachment, headers: { "content-type": attachment.type || "application/octet-stream" } });
+          attachmentId = file._id;
+          attachmentFileName = file.originalName;
+        } else {
+          // Case message attachment
+          const { file, uploadUrl } = await apiFetch<{ file: any; uploadUrl: string }>("/api/files/upload-url", {
+            method: "POST",
+            body: JSON.stringify({ caseId: selected._id, fileName: attachment.name, contentType: attachment.type || "application/octet-stream", size: attachment.size }),
+          });
+          await fetch(uploadUrl, { method: "PUT", body: attachment, headers: { "content-type": attachment.type || "application/octet-stream" } });
+          attachmentId = file._id;
+          attachmentFileName = file.originalName;
+        }
+      } catch (uploadErr: any) {
+        alert(uploadErr.message || "Failed to upload attachment.");
+        setSending(false);
+        return;
+      }
+    }
+
+    const body = text.trim() || "";
     const optimistic = {
       _id: `temp-${Date.now()}`,
       body,
       sender: { _id: currentUser?.id, name: currentUser?.name, role: currentUser?.role },
       createdAt: new Date().toISOString(),
       _optimistic: true,
-      attachmentName: attachment?.name || null,
+      attachment: attachmentId,
+      attachmentName: attachmentFileName || attachment?.name || null,
     };
     setMessages(prev => [...prev, optimistic]);
     setText("");
+    const fileToClear = attachment;
     setAttachment(null);
     if (textareaRef.current) textareaRef.current.style.height = "auto";
     setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 80);
@@ -145,12 +188,17 @@ function AdminMessages() {
         : `/api/messages/case/${selected._id}`;
       const payload: any = { body };
       if (selected._isGeneral) payload.recipientDentist = selected.dentistId;
+      if (attachmentId) {
+        payload.attachment = attachmentId;
+        payload.attachmentName = attachmentFileName || fileToClear?.name;
+      }
       const r = await apiFetch<any>(endpoint, { method: "POST", body: JSON.stringify(payload) });
       setMessages(prev => prev.map((m: any) => m._id === optimistic._id ? r.message : m));
       if (!selected._isGeneral) setCases(prev => prev.map((c: any) => c._id === selected._id ? { ...c, _lastMsg: r.message } : c));
     } catch {
       setMessages(prev => prev.filter((m: any) => m._id !== optimistic._id));
       setText(body);
+      if (fileToClear) setAttachment(fileToClear);
     } finally { setSending(false); }
   }
 
@@ -257,7 +305,8 @@ function AdminMessages() {
                       <div className="text-[10px] text-slate-400 font-mono mt-0.5">{c.caseNumber} · {c.patientRef}</div>
                       {lastMsg ? (
                         <div className={`text-[10px] truncate mt-0.5 ${hasUnread ? "text-slate-700 font-semibold" : "text-slate-400"}`}>
-                          {lastMsg.sender?.role !== "dentist" ? "You: " : ""}{lastMsg.body}
+                          {lastMsg.sender?.role !== "dentist" ? "You: " : ""}
+                          {lastMsg.attachmentName ? `📎 ${lastMsg.attachmentName}` : lastMsg.body}
                         </div>
                       ) : (
                         <div className="text-[10px] text-slate-300 mt-0.5 italic">No messages yet</div>
@@ -349,6 +398,18 @@ function AdminMessages() {
                             }`}
                               style={isMine ? { background: "linear-gradient(135deg,#6366f1,#4f46e5)" } : {}}>
                               {m.body}
+                              {(m.attachmentName || m.attachment) && (
+                                <div className={`mt-1.5 flex items-center gap-1.5 text-[11px] font-medium ${isMine ? "text-white/80" : "text-indigo-500"}`}>
+                                  <Paperclip size={10} />
+                                  {m.attachment ? (
+                                    <button onClick={() => downloadAttachment(m.attachment)} className="underline text-left">
+                                      {m.attachmentName || "Attachment"}
+                                    </button>
+                                  ) : (
+                                    <span>{m.attachmentName}</span>
+                                  )}
+                                </div>
+                              )}
                             </div>
                             <div className={`flex items-center gap-1 mt-1 px-1 ${isMine ? "flex-row-reverse" : ""}`}>
                               <span className="text-[10px] text-slate-400">

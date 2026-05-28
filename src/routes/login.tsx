@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link, useSearch } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Lock, Mail, User, Building2, Phone, BadgeCheck, Eye, EyeOff, ArrowRight, Sparkles } from "lucide-react";
 import { setSession } from "@/lib/api";
@@ -173,6 +173,8 @@ function DentalIllustration() {
 
 function LoginPage() {
   const navigate = useNavigate();
+  const search = useSearch({ from: "/login" }) as { redirect?: string };
+  const redirectTo = search.redirect || "/portal";
   const [tab, setTab] = useState<"login" | "register">("login");
 
   /* login state */
@@ -202,7 +204,8 @@ function LoginPage() {
       if (!res.ok) throw new Error(data.error || "Login failed");
       setSession(data);
       const role = data.user?.role;
-      navigate({ to: (role === "admin" || role === "lab_staff") ? "/admin" : "/portal" } as any);
+      const isAdmin = role === "admin" || role === "lab_staff";
+      navigate({ to: isAdmin ? "/admin" : redirectTo } as any);
     } catch (err) { setError(err instanceof Error ? err.message : "Login failed"); }
     finally { setLoading(false); }
   }
@@ -219,7 +222,7 @@ function LoginPage() {
       if (res.status === 503) throw new Error("The server is not connected to the database. Please ensure the backend is running and MongoDB is available.");
       if (!res.ok) throw new Error(data.error || "Registration failed");
       setSession(data);
-      navigate({ to: "/portal" });
+      navigate({ to: redirectTo } as any);
     } catch (err) { setError(err instanceof Error ? err.message : "Registration failed"); }
     finally { setLoading(false); }
   }

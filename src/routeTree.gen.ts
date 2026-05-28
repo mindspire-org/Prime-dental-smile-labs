@@ -41,18 +41,34 @@ import { Route as AdminCasesRouteImport } from './routes/admin.cases'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminActivityRouteImport } from './routes/admin.activity'
 import { Route as MarketingWorkflowRouteImport } from './routes/_marketing.workflow'
+import { Route as MarketingTermsOfServiceRouteImport } from './routes/_marketing.terms-of-service'
 import { Route as MarketingTechnologyRouteImport } from './routes/_marketing.technology'
 import { Route as MarketingSubmitRouteImport } from './routes/_marketing.submit'
+import { Route as MarketingResourcesRouteImport } from './routes/_marketing.resources'
 import { Route as MarketingQualityRouteImport } from './routes/_marketing.quality'
+import { Route as MarketingPrivacyPolicyRouteImport } from './routes/_marketing.privacy-policy'
+import { Route as MarketingDataNoticeRouteImport } from './routes/_marketing.data-notice'
 import { Route as MarketingContactRouteImport } from './routes/_marketing.contact'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing.about'
 import { Route as PortalCasesIndexRouteImport } from './routes/portal.cases.index'
+import { Route as MarketingTechnologyIndexRouteImport } from './routes/_marketing.technology.index'
 import { Route as MarketingServicesIndexRouteImport } from './routes/_marketing.services.index'
+import { Route as MarketingAboutIndexRouteImport } from './routes/_marketing.about.index'
 import { Route as PortalCasesNewRouteImport } from './routes/portal.cases.new'
 import { Route as PortalCasesIdRouteImport } from './routes/portal.cases.$id'
 import { Route as AdminPostEditorIdRouteImport } from './routes/admin.post-editor.$id'
 import { Route as AdminPageEditorSlugRouteImport } from './routes/admin.page-editor.$slug'
+import { Route as AdminCasesIdRouteImport } from './routes/admin.cases.$id'
+import { Route as MarketingTechnologySlmMetalPrintingRouteImport } from './routes/_marketing.technology.slm-metal-printing'
+import { Route as MarketingTechnologySinteringCeramicFiringRouteImport } from './routes/_marketing.technology.sintering-ceramic-firing'
+import { Route as MarketingTechnologyScanningDesignRouteImport } from './routes/_marketing.technology.scanning-design'
+import { Route as MarketingTechnologyFinishingEquipmentRouteImport } from './routes/_marketing.technology.finishing-equipment'
+import { Route as MarketingTechnologyCadCamMillingRouteImport } from './routes/_marketing.technology.cad-cam-milling'
+import { Route as MarketingTechnology3dPrintingRouteImport } from './routes/_marketing.technology.3d-printing'
 import { Route as MarketingServicesSlugRouteImport } from './routes/_marketing.services.$slug'
+import { Route as MarketingAboutWhyPrimeRouteImport } from './routes/_marketing.about.why-prime'
+import { Route as MarketingAboutOurLaboratoryRouteImport } from './routes/_marketing.about.our-laboratory'
+import { Route as MarketingAboutExportCapabilityRouteImport } from './routes/_marketing.about.export-capability'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -213,6 +229,11 @@ const MarketingWorkflowRoute = MarketingWorkflowRouteImport.update({
   path: '/workflow',
   getParentRoute: () => MarketingRoute,
 } as any)
+const MarketingTermsOfServiceRoute = MarketingTermsOfServiceRouteImport.update({
+  id: '/terms-of-service',
+  path: '/terms-of-service',
+  getParentRoute: () => MarketingRoute,
+} as any)
 const MarketingTechnologyRoute = MarketingTechnologyRouteImport.update({
   id: '/technology',
   path: '/technology',
@@ -223,9 +244,24 @@ const MarketingSubmitRoute = MarketingSubmitRouteImport.update({
   path: '/submit',
   getParentRoute: () => MarketingRoute,
 } as any)
+const MarketingResourcesRoute = MarketingResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => MarketingRoute,
+} as any)
 const MarketingQualityRoute = MarketingQualityRouteImport.update({
   id: '/quality',
   path: '/quality',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingPrivacyPolicyRoute = MarketingPrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingDataNoticeRoute = MarketingDataNoticeRouteImport.update({
+  id: '/data-notice',
+  path: '/data-notice',
   getParentRoute: () => MarketingRoute,
 } as any)
 const MarketingContactRoute = MarketingContactRouteImport.update({
@@ -243,10 +279,21 @@ const PortalCasesIndexRoute = PortalCasesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PortalCasesRoute,
 } as any)
+const MarketingTechnologyIndexRoute =
+  MarketingTechnologyIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => MarketingTechnologyRoute,
+  } as any)
 const MarketingServicesIndexRoute = MarketingServicesIndexRouteImport.update({
   id: '/services/',
   path: '/services/',
   getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingAboutIndexRoute = MarketingAboutIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MarketingAboutRoute,
 } as any)
 const PortalCasesNewRoute = PortalCasesNewRouteImport.update({
   id: '/new',
@@ -268,11 +315,69 @@ const AdminPageEditorSlugRoute = AdminPageEditorSlugRouteImport.update({
   path: '/page-editor/$slug',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCasesIdRoute = AdminCasesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminCasesRoute,
+} as any)
+const MarketingTechnologySlmMetalPrintingRoute =
+  MarketingTechnologySlmMetalPrintingRouteImport.update({
+    id: '/slm-metal-printing',
+    path: '/slm-metal-printing',
+    getParentRoute: () => MarketingTechnologyRoute,
+  } as any)
+const MarketingTechnologySinteringCeramicFiringRoute =
+  MarketingTechnologySinteringCeramicFiringRouteImport.update({
+    id: '/sintering-ceramic-firing',
+    path: '/sintering-ceramic-firing',
+    getParentRoute: () => MarketingTechnologyRoute,
+  } as any)
+const MarketingTechnologyScanningDesignRoute =
+  MarketingTechnologyScanningDesignRouteImport.update({
+    id: '/scanning-design',
+    path: '/scanning-design',
+    getParentRoute: () => MarketingTechnologyRoute,
+  } as any)
+const MarketingTechnologyFinishingEquipmentRoute =
+  MarketingTechnologyFinishingEquipmentRouteImport.update({
+    id: '/finishing-equipment',
+    path: '/finishing-equipment',
+    getParentRoute: () => MarketingTechnologyRoute,
+  } as any)
+const MarketingTechnologyCadCamMillingRoute =
+  MarketingTechnologyCadCamMillingRouteImport.update({
+    id: '/cad-cam-milling',
+    path: '/cad-cam-milling',
+    getParentRoute: () => MarketingTechnologyRoute,
+  } as any)
+const MarketingTechnology3dPrintingRoute =
+  MarketingTechnology3dPrintingRouteImport.update({
+    id: '/3d-printing',
+    path: '/3d-printing',
+    getParentRoute: () => MarketingTechnologyRoute,
+  } as any)
 const MarketingServicesSlugRoute = MarketingServicesSlugRouteImport.update({
   id: '/services/$slug',
   path: '/services/$slug',
   getParentRoute: () => MarketingRoute,
 } as any)
+const MarketingAboutWhyPrimeRoute = MarketingAboutWhyPrimeRouteImport.update({
+  id: '/why-prime',
+  path: '/why-prime',
+  getParentRoute: () => MarketingAboutRoute,
+} as any)
+const MarketingAboutOurLaboratoryRoute =
+  MarketingAboutOurLaboratoryRouteImport.update({
+    id: '/our-laboratory',
+    path: '/our-laboratory',
+    getParentRoute: () => MarketingAboutRoute,
+  } as any)
+const MarketingAboutExportCapabilityRoute =
+  MarketingAboutExportCapabilityRouteImport.update({
+    id: '/export-capability',
+    path: '/export-capability',
+    getParentRoute: () => MarketingAboutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof MarketingIndexRoute
@@ -281,15 +386,19 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/portal': typeof PortalRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
-  '/about': typeof MarketingAboutRoute
+  '/about': typeof MarketingAboutRouteWithChildren
   '/contact': typeof MarketingContactRoute
+  '/data-notice': typeof MarketingDataNoticeRoute
+  '/privacy-policy': typeof MarketingPrivacyPolicyRoute
   '/quality': typeof MarketingQualityRoute
+  '/resources': typeof MarketingResourcesRoute
   '/submit': typeof MarketingSubmitRoute
-  '/technology': typeof MarketingTechnologyRoute
+  '/technology': typeof MarketingTechnologyRouteWithChildren
+  '/terms-of-service': typeof MarketingTermsOfServiceRoute
   '/workflow': typeof MarketingWorkflowRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
-  '/admin/cases': typeof AdminCasesRoute
+  '/admin/cases': typeof AdminCasesRouteWithChildren
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/email-templates': typeof AdminEmailTemplatesRoute
@@ -311,27 +420,41 @@ export interface FileRoutesByFullPath {
   '/portal/profile': typeof PortalProfileRoute
   '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
+  '/about/export-capability': typeof MarketingAboutExportCapabilityRoute
+  '/about/our-laboratory': typeof MarketingAboutOurLaboratoryRoute
+  '/about/why-prime': typeof MarketingAboutWhyPrimeRoute
   '/services/$slug': typeof MarketingServicesSlugRoute
+  '/technology/3d-printing': typeof MarketingTechnology3dPrintingRoute
+  '/technology/cad-cam-milling': typeof MarketingTechnologyCadCamMillingRoute
+  '/technology/finishing-equipment': typeof MarketingTechnologyFinishingEquipmentRoute
+  '/technology/scanning-design': typeof MarketingTechnologyScanningDesignRoute
+  '/technology/sintering-ceramic-firing': typeof MarketingTechnologySinteringCeramicFiringRoute
+  '/technology/slm-metal-printing': typeof MarketingTechnologySlmMetalPrintingRoute
+  '/admin/cases/$id': typeof AdminCasesIdRoute
   '/admin/page-editor/$slug': typeof AdminPageEditorSlugRoute
   '/admin/post-editor/$id': typeof AdminPostEditorIdRoute
   '/portal/cases/$id': typeof PortalCasesIdRoute
   '/portal/cases/new': typeof PortalCasesNewRoute
+  '/about/': typeof MarketingAboutIndexRoute
   '/services/': typeof MarketingServicesIndexRoute
+  '/technology/': typeof MarketingTechnologyIndexRoute
   '/portal/cases/': typeof PortalCasesIndexRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/about': typeof MarketingAboutRoute
   '/contact': typeof MarketingContactRoute
+  '/data-notice': typeof MarketingDataNoticeRoute
+  '/privacy-policy': typeof MarketingPrivacyPolicyRoute
   '/quality': typeof MarketingQualityRoute
+  '/resources': typeof MarketingResourcesRoute
   '/submit': typeof MarketingSubmitRoute
-  '/technology': typeof MarketingTechnologyRoute
+  '/terms-of-service': typeof MarketingTermsOfServiceRoute
   '/workflow': typeof MarketingWorkflowRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
-  '/admin/cases': typeof AdminCasesRoute
+  '/admin/cases': typeof AdminCasesRouteWithChildren
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/email-templates': typeof AdminEmailTemplatesRoute
@@ -353,12 +476,24 @@ export interface FileRoutesByTo {
   '/': typeof MarketingIndexRoute
   '/admin': typeof AdminIndexRoute
   '/portal': typeof PortalIndexRoute
+  '/about/export-capability': typeof MarketingAboutExportCapabilityRoute
+  '/about/our-laboratory': typeof MarketingAboutOurLaboratoryRoute
+  '/about/why-prime': typeof MarketingAboutWhyPrimeRoute
   '/services/$slug': typeof MarketingServicesSlugRoute
+  '/technology/3d-printing': typeof MarketingTechnology3dPrintingRoute
+  '/technology/cad-cam-milling': typeof MarketingTechnologyCadCamMillingRoute
+  '/technology/finishing-equipment': typeof MarketingTechnologyFinishingEquipmentRoute
+  '/technology/scanning-design': typeof MarketingTechnologyScanningDesignRoute
+  '/technology/sintering-ceramic-firing': typeof MarketingTechnologySinteringCeramicFiringRoute
+  '/technology/slm-metal-printing': typeof MarketingTechnologySlmMetalPrintingRoute
+  '/admin/cases/$id': typeof AdminCasesIdRoute
   '/admin/page-editor/$slug': typeof AdminPageEditorSlugRoute
   '/admin/post-editor/$id': typeof AdminPostEditorIdRoute
   '/portal/cases/$id': typeof PortalCasesIdRoute
   '/portal/cases/new': typeof PortalCasesNewRoute
+  '/about': typeof MarketingAboutIndexRoute
   '/services': typeof MarketingServicesIndexRoute
+  '/technology': typeof MarketingTechnologyIndexRoute
   '/portal/cases': typeof PortalCasesIndexRoute
 }
 export interface FileRoutesById {
@@ -369,15 +504,19 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/portal': typeof PortalRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
-  '/_marketing/about': typeof MarketingAboutRoute
+  '/_marketing/about': typeof MarketingAboutRouteWithChildren
   '/_marketing/contact': typeof MarketingContactRoute
+  '/_marketing/data-notice': typeof MarketingDataNoticeRoute
+  '/_marketing/privacy-policy': typeof MarketingPrivacyPolicyRoute
   '/_marketing/quality': typeof MarketingQualityRoute
+  '/_marketing/resources': typeof MarketingResourcesRoute
   '/_marketing/submit': typeof MarketingSubmitRoute
-  '/_marketing/technology': typeof MarketingTechnologyRoute
+  '/_marketing/technology': typeof MarketingTechnologyRouteWithChildren
+  '/_marketing/terms-of-service': typeof MarketingTermsOfServiceRoute
   '/_marketing/workflow': typeof MarketingWorkflowRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
-  '/admin/cases': typeof AdminCasesRoute
+  '/admin/cases': typeof AdminCasesRouteWithChildren
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/email-templates': typeof AdminEmailTemplatesRoute
@@ -400,12 +539,24 @@ export interface FileRoutesById {
   '/_marketing/': typeof MarketingIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
+  '/_marketing/about/export-capability': typeof MarketingAboutExportCapabilityRoute
+  '/_marketing/about/our-laboratory': typeof MarketingAboutOurLaboratoryRoute
+  '/_marketing/about/why-prime': typeof MarketingAboutWhyPrimeRoute
   '/_marketing/services/$slug': typeof MarketingServicesSlugRoute
+  '/_marketing/technology/3d-printing': typeof MarketingTechnology3dPrintingRoute
+  '/_marketing/technology/cad-cam-milling': typeof MarketingTechnologyCadCamMillingRoute
+  '/_marketing/technology/finishing-equipment': typeof MarketingTechnologyFinishingEquipmentRoute
+  '/_marketing/technology/scanning-design': typeof MarketingTechnologyScanningDesignRoute
+  '/_marketing/technology/sintering-ceramic-firing': typeof MarketingTechnologySinteringCeramicFiringRoute
+  '/_marketing/technology/slm-metal-printing': typeof MarketingTechnologySlmMetalPrintingRoute
+  '/admin/cases/$id': typeof AdminCasesIdRoute
   '/admin/page-editor/$slug': typeof AdminPageEditorSlugRoute
   '/admin/post-editor/$id': typeof AdminPostEditorIdRoute
   '/portal/cases/$id': typeof PortalCasesIdRoute
   '/portal/cases/new': typeof PortalCasesNewRoute
+  '/_marketing/about/': typeof MarketingAboutIndexRoute
   '/_marketing/services/': typeof MarketingServicesIndexRoute
+  '/_marketing/technology/': typeof MarketingTechnologyIndexRoute
   '/portal/cases/': typeof PortalCasesIndexRoute
 }
 export interface FileRouteTypes {
@@ -419,9 +570,13 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/about'
     | '/contact'
+    | '/data-notice'
+    | '/privacy-policy'
     | '/quality'
+    | '/resources'
     | '/submit'
     | '/technology'
+    | '/terms-of-service'
     | '/workflow'
     | '/admin/activity'
     | '/admin/analytics'
@@ -447,23 +602,37 @@ export interface FileRouteTypes {
     | '/portal/profile'
     | '/admin/'
     | '/portal/'
+    | '/about/export-capability'
+    | '/about/our-laboratory'
+    | '/about/why-prime'
     | '/services/$slug'
+    | '/technology/3d-printing'
+    | '/technology/cad-cam-milling'
+    | '/technology/finishing-equipment'
+    | '/technology/scanning-design'
+    | '/technology/sintering-ceramic-firing'
+    | '/technology/slm-metal-printing'
+    | '/admin/cases/$id'
     | '/admin/page-editor/$slug'
     | '/admin/post-editor/$id'
     | '/portal/cases/$id'
     | '/portal/cases/new'
+    | '/about/'
     | '/services/'
+    | '/technology/'
     | '/portal/cases/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
     | '/login'
     | '/reset-password'
-    | '/about'
     | '/contact'
+    | '/data-notice'
+    | '/privacy-policy'
     | '/quality'
+    | '/resources'
     | '/submit'
-    | '/technology'
+    | '/terms-of-service'
     | '/workflow'
     | '/admin/activity'
     | '/admin/analytics'
@@ -489,12 +658,24 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/portal'
+    | '/about/export-capability'
+    | '/about/our-laboratory'
+    | '/about/why-prime'
     | '/services/$slug'
+    | '/technology/3d-printing'
+    | '/technology/cad-cam-milling'
+    | '/technology/finishing-equipment'
+    | '/technology/scanning-design'
+    | '/technology/sintering-ceramic-firing'
+    | '/technology/slm-metal-printing'
+    | '/admin/cases/$id'
     | '/admin/page-editor/$slug'
     | '/admin/post-editor/$id'
     | '/portal/cases/$id'
     | '/portal/cases/new'
+    | '/about'
     | '/services'
+    | '/technology'
     | '/portal/cases'
   id:
     | '__root__'
@@ -506,9 +687,13 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_marketing/about'
     | '/_marketing/contact'
+    | '/_marketing/data-notice'
+    | '/_marketing/privacy-policy'
     | '/_marketing/quality'
+    | '/_marketing/resources'
     | '/_marketing/submit'
     | '/_marketing/technology'
+    | '/_marketing/terms-of-service'
     | '/_marketing/workflow'
     | '/admin/activity'
     | '/admin/analytics'
@@ -535,12 +720,24 @@ export interface FileRouteTypes {
     | '/_marketing/'
     | '/admin/'
     | '/portal/'
+    | '/_marketing/about/export-capability'
+    | '/_marketing/about/our-laboratory'
+    | '/_marketing/about/why-prime'
     | '/_marketing/services/$slug'
+    | '/_marketing/technology/3d-printing'
+    | '/_marketing/technology/cad-cam-milling'
+    | '/_marketing/technology/finishing-equipment'
+    | '/_marketing/technology/scanning-design'
+    | '/_marketing/technology/sintering-ceramic-firing'
+    | '/_marketing/technology/slm-metal-printing'
+    | '/admin/cases/$id'
     | '/admin/page-editor/$slug'
     | '/admin/post-editor/$id'
     | '/portal/cases/$id'
     | '/portal/cases/new'
+    | '/_marketing/about/'
     | '/_marketing/services/'
+    | '/_marketing/technology/'
     | '/portal/cases/'
   fileRoutesById: FileRoutesById
 }
@@ -779,6 +976,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingWorkflowRouteImport
       parentRoute: typeof MarketingRoute
     }
+    '/_marketing/terms-of-service': {
+      id: '/_marketing/terms-of-service'
+      path: '/terms-of-service'
+      fullPath: '/terms-of-service'
+      preLoaderRoute: typeof MarketingTermsOfServiceRouteImport
+      parentRoute: typeof MarketingRoute
+    }
     '/_marketing/technology': {
       id: '/_marketing/technology'
       path: '/technology'
@@ -793,11 +997,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingSubmitRouteImport
       parentRoute: typeof MarketingRoute
     }
+    '/_marketing/resources': {
+      id: '/_marketing/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof MarketingResourcesRouteImport
+      parentRoute: typeof MarketingRoute
+    }
     '/_marketing/quality': {
       id: '/_marketing/quality'
       path: '/quality'
       fullPath: '/quality'
       preLoaderRoute: typeof MarketingQualityRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/privacy-policy': {
+      id: '/_marketing/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof MarketingPrivacyPolicyRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/data-notice': {
+      id: '/_marketing/data-notice'
+      path: '/data-notice'
+      fullPath: '/data-notice'
+      preLoaderRoute: typeof MarketingDataNoticeRouteImport
       parentRoute: typeof MarketingRoute
     }
     '/_marketing/contact': {
@@ -821,12 +1046,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalCasesIndexRouteImport
       parentRoute: typeof PortalCasesRoute
     }
+    '/_marketing/technology/': {
+      id: '/_marketing/technology/'
+      path: '/'
+      fullPath: '/technology/'
+      preLoaderRoute: typeof MarketingTechnologyIndexRouteImport
+      parentRoute: typeof MarketingTechnologyRoute
+    }
     '/_marketing/services/': {
       id: '/_marketing/services/'
       path: '/services'
       fullPath: '/services/'
       preLoaderRoute: typeof MarketingServicesIndexRouteImport
       parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/about/': {
+      id: '/_marketing/about/'
+      path: '/'
+      fullPath: '/about/'
+      preLoaderRoute: typeof MarketingAboutIndexRouteImport
+      parentRoute: typeof MarketingAboutRoute
     }
     '/portal/cases/new': {
       id: '/portal/cases/new'
@@ -856,6 +1095,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPageEditorSlugRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/cases/$id': {
+      id: '/admin/cases/$id'
+      path: '/$id'
+      fullPath: '/admin/cases/$id'
+      preLoaderRoute: typeof AdminCasesIdRouteImport
+      parentRoute: typeof AdminCasesRoute
+    }
+    '/_marketing/technology/slm-metal-printing': {
+      id: '/_marketing/technology/slm-metal-printing'
+      path: '/slm-metal-printing'
+      fullPath: '/technology/slm-metal-printing'
+      preLoaderRoute: typeof MarketingTechnologySlmMetalPrintingRouteImport
+      parentRoute: typeof MarketingTechnologyRoute
+    }
+    '/_marketing/technology/sintering-ceramic-firing': {
+      id: '/_marketing/technology/sintering-ceramic-firing'
+      path: '/sintering-ceramic-firing'
+      fullPath: '/technology/sintering-ceramic-firing'
+      preLoaderRoute: typeof MarketingTechnologySinteringCeramicFiringRouteImport
+      parentRoute: typeof MarketingTechnologyRoute
+    }
+    '/_marketing/technology/scanning-design': {
+      id: '/_marketing/technology/scanning-design'
+      path: '/scanning-design'
+      fullPath: '/technology/scanning-design'
+      preLoaderRoute: typeof MarketingTechnologyScanningDesignRouteImport
+      parentRoute: typeof MarketingTechnologyRoute
+    }
+    '/_marketing/technology/finishing-equipment': {
+      id: '/_marketing/technology/finishing-equipment'
+      path: '/finishing-equipment'
+      fullPath: '/technology/finishing-equipment'
+      preLoaderRoute: typeof MarketingTechnologyFinishingEquipmentRouteImport
+      parentRoute: typeof MarketingTechnologyRoute
+    }
+    '/_marketing/technology/cad-cam-milling': {
+      id: '/_marketing/technology/cad-cam-milling'
+      path: '/cad-cam-milling'
+      fullPath: '/technology/cad-cam-milling'
+      preLoaderRoute: typeof MarketingTechnologyCadCamMillingRouteImport
+      parentRoute: typeof MarketingTechnologyRoute
+    }
+    '/_marketing/technology/3d-printing': {
+      id: '/_marketing/technology/3d-printing'
+      path: '/3d-printing'
+      fullPath: '/technology/3d-printing'
+      preLoaderRoute: typeof MarketingTechnology3dPrintingRouteImport
+      parentRoute: typeof MarketingTechnologyRoute
+    }
     '/_marketing/services/$slug': {
       id: '/_marketing/services/$slug'
       path: '/services/$slug'
@@ -863,15 +1151,85 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingServicesSlugRouteImport
       parentRoute: typeof MarketingRoute
     }
+    '/_marketing/about/why-prime': {
+      id: '/_marketing/about/why-prime'
+      path: '/why-prime'
+      fullPath: '/about/why-prime'
+      preLoaderRoute: typeof MarketingAboutWhyPrimeRouteImport
+      parentRoute: typeof MarketingAboutRoute
+    }
+    '/_marketing/about/our-laboratory': {
+      id: '/_marketing/about/our-laboratory'
+      path: '/our-laboratory'
+      fullPath: '/about/our-laboratory'
+      preLoaderRoute: typeof MarketingAboutOurLaboratoryRouteImport
+      parentRoute: typeof MarketingAboutRoute
+    }
+    '/_marketing/about/export-capability': {
+      id: '/_marketing/about/export-capability'
+      path: '/export-capability'
+      fullPath: '/about/export-capability'
+      preLoaderRoute: typeof MarketingAboutExportCapabilityRouteImport
+      parentRoute: typeof MarketingAboutRoute
+    }
   }
 }
 
+interface MarketingAboutRouteChildren {
+  MarketingAboutExportCapabilityRoute: typeof MarketingAboutExportCapabilityRoute
+  MarketingAboutOurLaboratoryRoute: typeof MarketingAboutOurLaboratoryRoute
+  MarketingAboutWhyPrimeRoute: typeof MarketingAboutWhyPrimeRoute
+  MarketingAboutIndexRoute: typeof MarketingAboutIndexRoute
+}
+
+const MarketingAboutRouteChildren: MarketingAboutRouteChildren = {
+  MarketingAboutExportCapabilityRoute: MarketingAboutExportCapabilityRoute,
+  MarketingAboutOurLaboratoryRoute: MarketingAboutOurLaboratoryRoute,
+  MarketingAboutWhyPrimeRoute: MarketingAboutWhyPrimeRoute,
+  MarketingAboutIndexRoute: MarketingAboutIndexRoute,
+}
+
+const MarketingAboutRouteWithChildren = MarketingAboutRoute._addFileChildren(
+  MarketingAboutRouteChildren,
+)
+
+interface MarketingTechnologyRouteChildren {
+  MarketingTechnology3dPrintingRoute: typeof MarketingTechnology3dPrintingRoute
+  MarketingTechnologyCadCamMillingRoute: typeof MarketingTechnologyCadCamMillingRoute
+  MarketingTechnologyFinishingEquipmentRoute: typeof MarketingTechnologyFinishingEquipmentRoute
+  MarketingTechnologyScanningDesignRoute: typeof MarketingTechnologyScanningDesignRoute
+  MarketingTechnologySinteringCeramicFiringRoute: typeof MarketingTechnologySinteringCeramicFiringRoute
+  MarketingTechnologySlmMetalPrintingRoute: typeof MarketingTechnologySlmMetalPrintingRoute
+  MarketingTechnologyIndexRoute: typeof MarketingTechnologyIndexRoute
+}
+
+const MarketingTechnologyRouteChildren: MarketingTechnologyRouteChildren = {
+  MarketingTechnology3dPrintingRoute: MarketingTechnology3dPrintingRoute,
+  MarketingTechnologyCadCamMillingRoute: MarketingTechnologyCadCamMillingRoute,
+  MarketingTechnologyFinishingEquipmentRoute:
+    MarketingTechnologyFinishingEquipmentRoute,
+  MarketingTechnologyScanningDesignRoute:
+    MarketingTechnologyScanningDesignRoute,
+  MarketingTechnologySinteringCeramicFiringRoute:
+    MarketingTechnologySinteringCeramicFiringRoute,
+  MarketingTechnologySlmMetalPrintingRoute:
+    MarketingTechnologySlmMetalPrintingRoute,
+  MarketingTechnologyIndexRoute: MarketingTechnologyIndexRoute,
+}
+
+const MarketingTechnologyRouteWithChildren =
+  MarketingTechnologyRoute._addFileChildren(MarketingTechnologyRouteChildren)
+
 interface MarketingRouteChildren {
-  MarketingAboutRoute: typeof MarketingAboutRoute
+  MarketingAboutRoute: typeof MarketingAboutRouteWithChildren
   MarketingContactRoute: typeof MarketingContactRoute
+  MarketingDataNoticeRoute: typeof MarketingDataNoticeRoute
+  MarketingPrivacyPolicyRoute: typeof MarketingPrivacyPolicyRoute
   MarketingQualityRoute: typeof MarketingQualityRoute
+  MarketingResourcesRoute: typeof MarketingResourcesRoute
   MarketingSubmitRoute: typeof MarketingSubmitRoute
-  MarketingTechnologyRoute: typeof MarketingTechnologyRoute
+  MarketingTechnologyRoute: typeof MarketingTechnologyRouteWithChildren
+  MarketingTermsOfServiceRoute: typeof MarketingTermsOfServiceRoute
   MarketingWorkflowRoute: typeof MarketingWorkflowRoute
   MarketingIndexRoute: typeof MarketingIndexRoute
   MarketingServicesSlugRoute: typeof MarketingServicesSlugRoute
@@ -879,11 +1237,15 @@ interface MarketingRouteChildren {
 }
 
 const MarketingRouteChildren: MarketingRouteChildren = {
-  MarketingAboutRoute: MarketingAboutRoute,
+  MarketingAboutRoute: MarketingAboutRouteWithChildren,
   MarketingContactRoute: MarketingContactRoute,
+  MarketingDataNoticeRoute: MarketingDataNoticeRoute,
+  MarketingPrivacyPolicyRoute: MarketingPrivacyPolicyRoute,
   MarketingQualityRoute: MarketingQualityRoute,
+  MarketingResourcesRoute: MarketingResourcesRoute,
   MarketingSubmitRoute: MarketingSubmitRoute,
-  MarketingTechnologyRoute: MarketingTechnologyRoute,
+  MarketingTechnologyRoute: MarketingTechnologyRouteWithChildren,
+  MarketingTermsOfServiceRoute: MarketingTermsOfServiceRoute,
   MarketingWorkflowRoute: MarketingWorkflowRoute,
   MarketingIndexRoute: MarketingIndexRoute,
   MarketingServicesSlugRoute: MarketingServicesSlugRoute,
@@ -894,10 +1256,22 @@ const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
   MarketingRouteChildren,
 )
 
+interface AdminCasesRouteChildren {
+  AdminCasesIdRoute: typeof AdminCasesIdRoute
+}
+
+const AdminCasesRouteChildren: AdminCasesRouteChildren = {
+  AdminCasesIdRoute: AdminCasesIdRoute,
+}
+
+const AdminCasesRouteWithChildren = AdminCasesRoute._addFileChildren(
+  AdminCasesRouteChildren,
+)
+
 interface AdminRouteChildren {
   AdminActivityRoute: typeof AdminActivityRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
-  AdminCasesRoute: typeof AdminCasesRoute
+  AdminCasesRoute: typeof AdminCasesRouteWithChildren
   AdminClinicsRoute: typeof AdminClinicsRoute
   AdminContentRoute: typeof AdminContentRoute
   AdminEmailTemplatesRoute: typeof AdminEmailTemplatesRoute
@@ -921,7 +1295,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminActivityRoute: AdminActivityRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
-  AdminCasesRoute: AdminCasesRoute,
+  AdminCasesRoute: AdminCasesRouteWithChildren,
   AdminClinicsRoute: AdminClinicsRoute,
   AdminContentRoute: AdminContentRoute,
   AdminEmailTemplatesRoute: AdminEmailTemplatesRoute,

@@ -57,7 +57,9 @@ async function refreshAccessToken(): Promise<string | null> {
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = getAccessToken();
   const headers = new Headers(init.headers);
-  if (!headers.has("content-type") && init.body) headers.set("content-type", "application/json");
+  if (!headers.has("content-type") && init.body && !(init.body instanceof FormData)) {
+    headers.set("content-type", "application/json");
+  }
   // Send Bearer header if we have an in-memory token; cookies are sent automatically.
   if (token) headers.set("authorization", `Bearer ${token}`);
 

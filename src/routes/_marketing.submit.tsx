@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { 
   ArrowLeft, 
@@ -22,8 +22,30 @@ import {
 import { ToothChart, type ToothRole } from "@/components/site/ToothChart";
 import { Reveal } from "@/components/site/Reveal";
 import { analytics } from "@/components/analytics/GoogleAnalytics";
+import { getCurrentUser } from "@/lib/api";
 
 export const Route = createFileRoute("/_marketing/submit")({
+  beforeLoad: async () => {
+    if (typeof window === "undefined") return;
+    if (!getCurrentUser()) {
+      try {
+        const res = await fetch("/api/auth/refresh", {
+          method: "POST", credentials: "include",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({}),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.accessToken && data?.user) {
+            const { setSession } = await import("@/lib/api");
+            setSession({ accessToken: data.accessToken, user: data.user });
+            return;
+          }
+        }
+      } catch {}
+      throw redirect({ to: "/login" as any, search: { redirect: "/submit" } });
+    }
+  },
   head: () => ({
     meta: [
       { title: "Submit a Case — Prime Smile Dental Laboratory" },
@@ -206,9 +228,9 @@ function SubmitPage() {
                 >
                   Submit Another Case
                 </button>
-                <button className="flex-1 btn-outline-teal">
-                  Track Case Status
-                </button>
+                <Link to="/portal/cases" className="flex-1 btn-outline-teal text-center">
+                  View My Cases
+                </Link>
               </div>
             </div>
           </Reveal>

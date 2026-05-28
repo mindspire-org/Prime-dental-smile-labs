@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Cpu, Lock, FlaskConical, Target, ArrowRight, CheckCircle2, Star,
@@ -50,7 +51,75 @@ const TECH = [
   { name: "EKOSAN / Stanley AIR COM", brand: "Air Infrastructure", tags: ["Clean Air"] },
 ];
 
-const BRANDS = ["ALFAMILL","VENEA","Asiga","Dental Wings","Ivoclar","CEREC","Renfert","KaVo","DHL","ISO 9001","ISO 13485","CE Certified"];
+const BRANDS = ["ALFAMILL","VENEA","Asiga","Dental Wings","Ivoclar","CEREC","Renfert","KaVo","DHL","CE Certified"];
+
+type Testimonial = { _id: string; name: string; title: string; clinic: string; text: string; rating: number; photo: string; approved: boolean; order: number };
+
+const DEFAULT_TESTIMONIALS: Testimonial[] = [
+  { _id: "default-1",  name: "Dr. Andreas Petrou",     title: "Prosthodontist", clinic: "Nicosia Dental Clinic, Cyprus",       text: "Consistent precision across every zirconia case. Their digital workflow has cut my chairtime significantly.", rating: 5, photo: "", approved: true, order: 1 },
+  { _id: "default-2",  name: "Dr. Sarah Whitfield",     title: "Principal Dentist", clinic: "Whitfield Dental, London UK",      text: "Implant prosthetics fit beautifully. Clear communication and on-time delivery, every time.", rating: 5, photo: "", approved: true, order: 2 },
+  { _id: "default-3",  name: "Dr. Marios Constantinou", title: "Implantologist", clinic: "Limassol Smile Studio, Cyprus",     text: "The case tracking portal is a game-changer. I always know exactly where my patient's case is.", rating: 5, photo: "", approved: true, order: 3 },
+  { _id: "default-4",  name: "Dr. James Mitchell",       title: "General Dental Practitioner", clinic: "Mitchell & Partners, Manchester", text: "We've sent over 200 cases to Prime Smile. The fit accuracy is outstanding and the turnaround is reliable.", rating: 5, photo: "", approved: true, order: 4 },
+  { _id: "default-5",  name: "Dr. Elena Georgiou",     title: "Orthodontist", clinic: "Georgiou Dental, Paphos, Cyprus",     text: "Their clear aligner models and surgical guides are produced with incredible precision. Highly recommended.", rating: 5, photo: "", approved: true, order: 5 },
+  { _id: "default-6",  name: "Dr. William Chen",       title: "Restorative Dentist", clinic: "Chen Dental Practice, Birmingham",  text: "The e.max crowns from Prime Smile are some of the best I've seen. Shade matching is consistently excellent.", rating: 5, photo: "", approved: true, order: 6 },
+  { _id: "default-7",  name: "Dr. Catherine Bell",     title: "Dental Surgeon", clinic: "Bell Dental Care, Glasgow",           text: "Professional service with outstanding technical support. Their team understands digital dentistry inside out.", rating: 5, photo: "", approved: true, order: 7 },
+  { _id: "default-8",  name: "Dr. Michael Stavrou",    title: "Periodontist", clinic: "Stavrou Dental, Larnaca, Cyprus",       text: "Implant bars and custom abutments are delivered with excellent passive fit. Saves me hours of chair time.", rating: 5, photo: "", approved: true, order: 8 },
+  { _id: "default-9",  name: "Dr. Priya Sharma",       title: "Cosmetic Dentist", clinic: "Sharma Aesthetics, Leeds",          text: "My patients consistently comment on the aesthetics of the restorations. The team truly understands beauty.", rating: 5, photo: "", approved: true, order: 9 },
+  { _id: "default-10", name: "Dr. Thomas Wright",      title: "Dental Implantologist", clinic: "Wright Implants, Bristol",        text: "SLM printed Co-Cr frameworks have excellent fit. Prime Smile's quality control is second to none.", rating: 5, photo: "", approved: true, order: 10 },
+  { _id: "default-11", name: "Dr. Anna Philippou",    title: "Prosthodontist", clinic: "Philippou Dental, Nicosia, Cyprus",   text: "Full-arch zirconia cases are handled with exceptional care. The occlusion is always spot on.", rating: 5, photo: "", approved: true, order: 11 },
+  { _id: "default-12", name: "Dr. Robert Foster",      title: "Dental Surgeon", clinic: "Foster Dental, Liverpool",              text: "Their emergency express service has saved me multiple times. Reliable partner for complex cases.", rating: 5, photo: "", approved: true, order: 12 },
+  { _id: "default-13", name: "Dr. Sofia Markou",       title: "General Dentist", clinic: "Markou Family Dental, Limassol",       text: "The digital prescription process is seamless. Submitting a case takes under 2 minutes now.", rating: 5, photo: "", approved: true, order: 13 },
+  { _id: "default-14", name: "Dr. Henry Blackwood",    title: "Restorative Specialist", clinic: "Blackwood Dental, Edinburgh",    text: "Every restoration comes with complete documentation and material certificates. Peace of mind guaranteed.", rating: 5, photo: "", approved: true, order: 14 },
+  { _id: "default-15", name: "Dr. Natalia Ioannou",    title: "Dental Surgeon", clinic: "Ioannou Dental, Famagusta, Cyprus",    text: "Prime Smile has been our lab partner for 3 years. The consistency and quality never waver.", rating: 5, photo: "", approved: true, order: 15 },
+];
+
+function TestimonialsSection() {
+  const [items, setItems] = useState<Testimonial[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const display = items.length > 0 ? items : DEFAULT_TESTIMONIALS;
+
+  useEffect(() => {
+    fetch("/api/testimonials?limit=15")
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(d => setItems(d.items || []))
+      .catch(() => {})
+      .finally(() => setLoaded(true));
+  }, []);
+
+  return (
+    <section className="bg-bg-soft py-20">
+      <div className="max-w-7xl mx-auto px-5 lg:px-8">
+        <Reveal className="text-center">
+          <span className="eyebrow">Testimonials</span>
+          <h2 className="mt-3 text-3xl md:text-4xl font-semibold">What Dentists Say</h2>
+          <div className="flex items-center justify-center gap-2 mt-4">
+            <div className="flex">{[...Array(5)].map((_,i)=>(<Star key={i} size={18} className="fill-teal text-teal"/>))}</div>
+            <span className="text-sm text-muted-grey font-medium">4.9 based on {display.length}+ reviews</span>
+          </div>
+        </Reveal>
+        <Stagger className="mt-12 grid md:grid-cols-3 gap-6">
+          {display.slice(0, 15).map((r) => (
+            <StaggerItem key={r._id}>
+              <div className="bg-white rounded-xl p-7 shadow-[0_2px_16px_rgba(0,0,0,.06)] h-full flex flex-col">
+                <div className="flex">{[...Array(5)].map((_,i)=>(<Star key={i} size={14} className={i < r.rating ? "fill-teal text-teal" : "text-slate-200"}/>))}</div>
+                <p className="italic text-text-slate mt-4 leading-relaxed flex-1">"{r.text}"</p>
+                <div className="mt-5 pt-5 border-t border-border-silver">
+                  <div className="font-semibold">{r.name}</div>
+                  <div className="text-sm text-muted-grey">— {r.clinic}{r.title ? ` · ${r.title}` : ""}</div>
+                </div>
+              </div>
+            </StaggerItem>
+          ))}
+        </Stagger>
+        <div className="text-center mt-8">
+          {display.length > 15 && (
+            <button className="text-teal font-semibold hover:underline">Load more</button>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function HomePage() {
   return (
@@ -62,7 +131,7 @@ function HomePage() {
           backgroundSize:"48px 48px",
         }}/>
         <div className="absolute inset-0">
-          <Placeholder label="Hero — Lab Facility Photo" className="absolute inset-0 opacity-40" />
+          <img src="https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=1600&q=80&auto=format&fit=crop" alt="Dental laboratory" className="absolute inset-0 w-full h-full object-cover opacity-40" loading="lazy" />
         </div>
         <div className="relative max-w-7xl mx-auto px-5 lg:px-8 pt-32 pb-28">
           <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:.7}}>
@@ -199,13 +268,13 @@ function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-0 rounded-2xl overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.12)]">
             {[
               { label: "Zirconia",       sub: "Achieve High Level Of Aesthetic\nWithout Sacrificing Durability",  img: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600&q=80&auto=format&fit=crop", text: true  },
-              { label: "",               sub: "",  img: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=600&q=80&auto=format&fit=crop", text: false },
+              { label: "",               sub: "",  img: "https://images.pexels.com/photos/7800553/pexels-photo-7800553.jpeg?w=600&q=80&auto=format&fit=crop", text: false },
               { label: "Porcelain",      sub: "Aesthetic And Function Are\nTogether",                              img: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&q=80&auto=format&fit=crop", text: true  },
-              { label: "",               sub: "",  img: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=600&q=80&auto=format&fit=crop", text: false },
+              { label: "",               sub: "",  img: "https://images.pexels.com/photos/5355922/pexels-photo-5355922.jpeg?w=600&q=80&auto=format&fit=crop", text: false },
               { label: "Implants",       sub: "Long Lasting Prosthetics",                                          img: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80&auto=format&fit=crop", text: true  },
-              { label: "",               sub: "",  img: "https://images.unsplash.com/photo-1581093806997-124204d9fa9d?w=600&q=80&auto=format&fit=crop", text: false },
+              { label: "",               sub: "",  img: "https://images.pexels.com/photos/6501859/pexels-photo-6501859.jpeg?w=600&q=80&auto=format&fit=crop", text: false },
               { label: "Inlays / Onlays",sub: "Perfect Match At The Most\nPrecision Points",                      img: "https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=600&q=80&auto=format&fit=crop", text: true  },
-              { label: "",               sub: "",  img: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&q=80&auto=format&fit=crop", text: false },
+              { label: "",               sub: "",  img: "https://images.pexels.com/photos/33800642/pexels-photo-33800642.jpeg?w=600&q=80&auto=format&fit=crop", text: false },
             ].map((tile, i) => (
               <div key={i} className="relative h-52 md:h-64 overflow-hidden group">
                 <img src={tile.img} alt={tile.label || "dental"} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
@@ -284,10 +353,10 @@ function HomePage() {
       <section className="bg-white py-16 border-t border-border-silver">
         <div className="max-w-7xl mx-auto px-5 lg:px-8 grid md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
           {[
-            { t: "ISO 9001:2015", d: "Quality Management System" },
-            { t: "ISO 13485:2016", d: "Medical Devices Standard" },
-            { t: "CE-Certified Materials", d: "World-Renowned Suppliers" },
-            { t: "Digital Case Tracking", d: "Submission to Dispatch" },
+            { t: "CE-Certified Consumables", d: "Verified supplier materials" },
+              { t: "Quality Practices", d: "Documented QC checkpoints" },
+              { t: "CE-Certified Materials", d: "World-Renowned Suppliers" },
+              { t: "Digital Case Tracking", d: "Submission to Dispatch" },
           ].map((b) => (
             <div key={b.t}>
               <div className="w-14 h-14 rounded-full bg-teal/10 text-teal flex items-center justify-center mx-auto mb-3"><CheckCircle2 size={26}/></div>
@@ -315,39 +384,7 @@ function HomePage() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="bg-bg-soft py-20">
-        <div className="max-w-7xl mx-auto px-5 lg:px-8">
-          <Reveal className="text-center">
-            <span className="eyebrow">Testimonials</span>
-            <h2 className="mt-3 text-3xl md:text-4xl font-semibold">What Dentists Say</h2>
-            <div className="flex items-center justify-center gap-2 mt-4">
-              <div className="flex">{[...Array(5)].map((_,i)=>(<Star key={i} size={18} className="fill-teal text-teal"/>))}</div>
-              <span className="text-sm text-muted-grey font-medium">4.9 based on reviews</span>
-            </div>
-          </Reveal>
-          <Stagger className="mt-12 grid md:grid-cols-3 gap-6">
-            {[
-              { q: "Consistent precision across every zirconia case. Their digital workflow has cut my chairtime significantly.", n: "Dr. Andreas Petrou", c: "Nicosia Dental Clinic, Cyprus" },
-              { q: "Implant prosthetics fit beautifully. Clear communication and on-time delivery, every time.", n: "Dr. Sarah Whitfield", c: "Whitfield Dental, London UK" },
-              { q: "The case tracking portal is a game-changer. I always know exactly where my patient's case is.", n: "Dr. Marios Constantinou", c: "Limassol Smile Studio, Cyprus" },
-            ].map((r) => (
-              <StaggerItem key={r.n}>
-                <div className="bg-white rounded-xl p-7 shadow-[0_2px_16px_rgba(0,0,0,.06)] h-full flex flex-col">
-                  <div className="flex">{[...Array(5)].map((_,i)=>(<Star key={i} size={14} className="fill-teal text-teal"/>))}</div>
-                  <p className="italic text-text-slate mt-4 leading-relaxed flex-1">"{r.q}"</p>
-                  <div className="mt-5 pt-5 border-t border-border-silver">
-                    <div className="font-semibold">{r.n}</div>
-                    <div className="text-sm text-muted-grey">— {r.c}</div>
-                  </div>
-                </div>
-              </StaggerItem>
-            ))}
-          </Stagger>
-          <div className="text-center mt-8">
-            <button className="text-teal font-semibold hover:underline">Load more</button>
-          </div>
-        </div>
-      </section>
+      <TestimonialsSection />
 
       {/* NEWS */}
       <section className="bg-white py-20">
@@ -358,14 +395,14 @@ function HomePage() {
           </div>
           <Stagger className="grid md:grid-cols-3 gap-6">
             {[
-              { c: "Industry News", t: "New SLM metal printing capabilities now live in our Cyprus facility", d: "12 Apr 2026" },
-              { c: "Case Study", t: "Full-arch implant rehabilitation: workflow walkthrough", d: "28 Mar 2026" },
-              { c: "Materials", t: "Updated zirconia portfolio: improved translucency and strength", d: "14 Mar 2026" },
+              { c: "Industry News", t: "New SLM metal printing capabilities now live in our Cyprus facility", d: "12 Apr 2026", img: "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=800&q=80&auto=format&fit=crop" },
+              { c: "Case Study", t: "Full-arch implant rehabilitation: workflow walkthrough", d: "28 Mar 2026", img: "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=800&q=80&auto=format&fit=crop" },
+              { c: "Materials", t: "Updated zirconia portfolio: improved translucency and strength", d: "14 Mar 2026", img: "https://images.unsplash.com/photo-1590424693420-634a0b0b782c?w=800&q=80&auto=format&fit=crop" },
             ].map((n) => (
               <StaggerItem key={n.t}>
                 <article className="rounded-xl overflow-hidden bg-white border border-border-silver hover:shadow-[0_8px_28px_rgba(0,0,0,.08)] transition-all hover:-translate-y-1">
                   <div className="relative h-44">
-                    <Placeholder label="News Image" className="absolute inset-0" />
+                    <img src={n.img} alt={n.c} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
                     <div className="absolute inset-0 bg-linear-to-t from-navy/70 to-transparent"/>
                     <span className="absolute top-3 left-3 text-[10px] uppercase tracking-[0.12em] font-medium text-white bg-teal px-2 py-1 rounded">{n.c}</span>
                   </div>

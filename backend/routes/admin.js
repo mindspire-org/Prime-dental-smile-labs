@@ -64,6 +64,15 @@ adminRouter.get("/cases", async (req, res) => {
   ];
   if (req.query.dentist) filter.dentist = req.query.dentist;
   if (req.query.urgency) filter.urgency = req.query.urgency;
+  if (req.query.from || req.query.to) {
+    filter.createdAt = {};
+    if (req.query.from) filter.createdAt.$gte = new Date(req.query.from);
+    if (req.query.to) {
+      const toDate = new Date(req.query.to);
+      toDate.setHours(23, 59, 59, 999);
+      filter.createdAt.$lte = toDate;
+    }
+  }
 
   const [items, total] = await Promise.all([
     Case.find(filter).populate("dentist", "name email").populate("clinic", "name city").sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit),
@@ -110,6 +119,9 @@ adminRouter.get("/users", requireRole("admin"), async (req, res) => {
 
 adminRouter.post("/users", requireRole("admin"), async (req, res) => {
   const { name, email, role, clinicId, phone, gdcNumber, password } = req.body;
+  if (!email?.trim()) return res.status(400).json({ error: "Email is required" });
+  const existing = await User.findOne({ email: email.toLowerCase() });
+  if (existing) return res.status(409).json({ error: "A user with this email already exists" });
   const pw = password || crypto.randomBytes(9).toString("base64url");
   const user = await User.create({
     name, email: email.toLowerCase(), role: role || "dentist",
@@ -213,19 +225,31 @@ adminRouter.put("/seo/:page", requireRole("admin"), async (req, res) => {
 
 /* ── Finance / Reports ──────────────────────────────────── */
 adminRouter.get("/finance", async (req, res) => {
-  const months = Number(req.query.months || 6);
-  const from = new Date();
-  from.setMonth(from.getMonth() - months);
+  let from, to;
+  if (req.query.from && req.query.to) {
+    from = new Date(req.query.from);
+    to = new Date(req.query.to);
+    to.setHours(23, 59, 59, 999);
+  } else {
+    const months = Number(req.query.months || 6);
+    from = new Date();
+    from.setMonth(from.getMonth() - months);
+    to = new Date();
+    to.setHours(23, 59, 59, 999);
+  }
 
-  const [monthlyCases, statusBreakdown, urgencyBreakdown, topDentists, topClinics] = await Promise.all([
+  const dateFilter = { createdAt: { $gte: from, $lte: to } };
+
+  const [monthlyCases, statusBreakdown, urgencyBreakdown, topDentists, topClinics, totalCases, totalClinics, totalDentists] = await Promise.all([
     Case.aggregate([
-      { $match: { createdAt: { $gte: from } } },
+      { $match: dateFilter },
       { $group: { _id: { y: { $year: "$createdAt" }, m: { $month: "$createdAt" } }, count: { $sum: 1 } } },
       { $sort: { "_id.y": 1, "_id.m": 1 } },
     ]),
-    Case.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
-    Case.aggregate([{ $group: { _id: "$urgency", count: { $sum: 1 } } }]),
+    Case.aggregate([{ $match: dateFilter }, { $group: { _id: "$status", count: { $sum: 1 } } }]),
+    Case.aggregate([{ $match: dateFilter }, { $group: { _id: "$urgency", count: { $sum: 1 } } }]),
     Case.aggregate([
+      { $match: dateFilter },
       { $group: { _id: "$dentist", count: { $sum: 1 } } },
       { $sort: { count: -1 } }, { $limit: 10 },
       { $lookup: { from: "users", localField: "_id", foreignField: "_id", as: "dentist" } },
@@ -233,16 +257,19 @@ adminRouter.get("/finance", async (req, res) => {
       { $project: { name: "$dentist.name", email: "$dentist.email", count: 1 } },
     ]),
     Case.aggregate([
-      { $match: { clinic: { $ne: null } } },
+      { $match: { ...dateFilter, clinic: { $ne: null } } },
       { $group: { _id: "$clinic", count: { $sum: 1 } } },
       { $sort: { count: -1 } }, { $limit: 10 },
       { $lookup: { from: "clinics", localField: "_id", foreignField: "_id", as: "clinic" } },
       { $unwind: "$clinic" },
       { $project: { name: "$clinic.name", city: "$clinic.city", count: 1 } },
     ]),
+    Case.countDocuments(dateFilter),
+    Case.distinct("clinic", dateFilter).then(arr => arr.filter(Boolean).length),
+    Case.distinct("dentist", dateFilter).then(arr => arr.length),
   ]);
 
-  res.json({ monthlyCases, statusBreakdown, urgencyBreakdown, topDentists, topClinics });
+  res.json({ monthlyCases, statusBreakdown, urgencyBreakdown, topDentists, topClinics, totalCases, totalClinics, totalDentists, from, to });
 });
 
 /* ── Activity Log ───────────────────────────────────────── */
