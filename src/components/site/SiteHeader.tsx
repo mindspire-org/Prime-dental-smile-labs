@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Menu, X, ChevronDown, Building2, Sparkles, Award, Globe,
   FlaskConical, Puzzle, Crown, Wrench, Monitor, Palette,
@@ -172,21 +173,21 @@ export function SiteHeader() {
   );
 }
 
-/* ── Mobile overlay (rendered outside header for reliability) ── */
+/* ── Mobile overlay (portal to body, completely outside header) ── */
 function MobileOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   if (!open) return null;
-  return (
+  return createPortal(
     <div className="lg:hidden">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
         onClick={onClose}
-        style={{ zIndex: 9998 }}
+        style={{ zIndex: 2147483646 }}
       />
       {/* Panel */}
       <div
-        className="fixed top-0 right-0 bottom-0 w-full bg-white shadow-2xl flex flex-col"
-        style={{ zIndex: 9999 }}
+        className="fixed inset-0 bg-white flex flex-col"
+        style={{ zIndex: 2147483647 }}
       >
         <div className="h-[3px] w-full bg-teal flex-none" />
         <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-white flex-none">
@@ -205,7 +206,8 @@ function MobileOverlay({ open, onClose }: { open: boolean; onClose: () => void }
           <MobileMenuContent onClose={onClose} />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
