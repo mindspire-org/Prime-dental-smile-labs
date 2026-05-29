@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { apiFetch, getCurrentUser, openRealtimeConnection, type AuthUser } from "@/lib/api";
-import { Send, CheckCheck, MessageSquare, Search, Circle, Users, Paperclip, X, FileText } from "lucide-react";
+import { Send, CheckCheck, MessageSquare, Search, Circle, Users, Paperclip, X, FileText, ChevronLeft } from "lucide-react";
 
 export const Route = createFileRoute("/admin/messages")({
   component: AdminMessages,
@@ -42,6 +42,7 @@ function AdminMessages() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [attachment, setAttachment] = useState<File | null>(null);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [mobileChatOpen, setMobileChatOpen] = useState(false);
   const selectedRef = useRef<any>(null);
   selectedRef.current = selected;
 
@@ -96,6 +97,7 @@ function AdminMessages() {
   async function selectCase(c: any) {
     setSelected(c);
     setAttachment(null);
+    setMobileChatOpen(true);
     setUnread(prev => { const n = { ...prev }; delete n[c._id]; return n; });
     setLoadingMsgs(true);
     try {
@@ -109,6 +111,7 @@ function AdminMessages() {
     const thread = { _isGeneral: true, dentistId: dentist.id, dentist: { name: dentist.name || "Dentist" }, _id: `general_${dentist.id}` };
     setSelected(thread);
     setAttachment(null);
+    setMobileChatOpen(true);
     setUnread(prev => { const n = { ...prev }; delete n[`general_${dentist.id}`]; return n; });
     setLoadingMsgs(true);
     try {
@@ -230,7 +233,7 @@ function AdminMessages() {
       <div className="flex flex-1 min-h-0 rounded-2xl overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.08)] bg-white border border-slate-100">
 
         {/* ── Sidebar ── */}
-        <aside className="w-80 shrink-0 flex flex-col border-r border-slate-100">
+        <aside className={`lg:w-80 w-full shrink-0 flex flex-col border-r border-slate-100 ${mobileChatOpen ? 'hidden lg:flex' : 'flex'}`}>
           <div className="p-3 border-b border-slate-100">
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 focus-within:border-indigo-400 transition-colors">
               <Search size={13} className="text-slate-400 shrink-0" />
@@ -253,7 +256,7 @@ function AdminMessages() {
                   const hasUnread = (unread[key] || 0) > 0;
                   return (
                     <button key={key} onClick={() => selectGeneral(d)}
-                      className="w-full text-left px-4 py-3.5 transition-colors border-b border-slate-50"
+                      className="w-full text-left px-4 py-4 transition-colors border-b border-slate-50 active:bg-slate-50"
                       style={isActive ? { background: "rgba(99,102,241,0.06)", borderLeft: "3px solid #6366f1" } : { borderLeft: "3px solid transparent" }}>
                       <div className="flex items-center gap-3">
                         <Avatar name={d.name || "Dentist"} color="indigo" size={36} />
@@ -287,7 +290,7 @@ function AdminMessages() {
               const dentistName = c.dentist?.name || "Unknown Dentist";
               return (
                 <button key={c._id} onClick={() => selectCase(c)}
-                  className={`w-full text-left px-4 py-3.5 transition-colors border-b border-slate-50`}
+                  className={`w-full text-left px-4 py-4 transition-colors border-b border-slate-50 active:bg-slate-50`}
                   style={isActive
                     ? { background: "rgba(99,102,241,0.06)", borderLeft: "3px solid #6366f1" }
                     : { borderLeft: "3px solid transparent" }}>
@@ -323,7 +326,7 @@ function AdminMessages() {
         </aside>
 
         {/* ── Chat area ── */}
-        <div className="flex-1 flex flex-col min-w-0" style={{ background: "#f8fafc" }}>
+        <div className={`flex-1 flex flex-col min-w-0 ${mobileChatOpen ? 'flex' : 'hidden lg:flex'}`} style={{ background: "#f8fafc" }}>
           {!selected ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4">
               <div className="w-20 h-20 rounded-full flex items-center justify-center"
@@ -338,24 +341,27 @@ function AdminMessages() {
           ) : (
             <>
               {/* Chat header */}
-              <div className="px-5 py-3.5 bg-white border-b border-slate-100 flex items-center gap-3">
+              <div className="px-3 lg:px-5 py-3 bg-white border-b border-slate-100 flex items-center gap-3">
+                <button onClick={() => setMobileChatOpen(false)} className="lg:hidden shrink-0 p-1.5 -ml-1 rounded-lg hover:bg-slate-100 transition-colors" aria-label="Back to conversations">
+                  <ChevronLeft size={20} className="text-slate-500" />
+                </button>
                 <Avatar name={selected.dentist?.name || "Dentist"} color="teal" size={36} />
                 <div className="flex-1 min-w-0">
                   <div className="font-bold text-slate-800 text-sm">{selected.dentist?.name || "Unknown Dentist"}</div>
                   <div className="flex items-center gap-2 mt-0.5">
                     <Circle size={7} className="text-emerald-400 fill-emerald-400" />
                     <span className="text-[10px] text-slate-400 font-mono">{selected.caseNumber}</span>
-                    <span className="text-[10px] text-slate-400">· {selected.patientRef} · {selected.status}</span>
+                    <span className="hidden sm:inline text-[10px] text-slate-400">· {selected.patientRef} · {selected.status}</span>
                   </div>
                 </div>
                 <a href={`/admin/cases`}
-                  className="text-xs text-indigo-500 font-semibold hover:underline px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-colors">
+                  className="hidden sm:inline-block text-xs text-indigo-500 font-semibold hover:underline px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-colors shrink-0">
                   View Cases
                 </a>
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-5 py-4 space-y-1">
+              <div className="flex-1 overflow-y-auto px-3 lg:px-5 py-3 lg:py-4 space-y-1">
                 {loadingMsgs ? (
                   <div className="space-y-3 pt-4">
                     {[...Array(5)].map((_, i) => (
@@ -387,26 +393,26 @@ function AdminMessages() {
                               {showAvatar && <Avatar name={m.sender?.name || "Dentist"} color="teal" size={28} />}
                             </div>
                           )}
-                          <div className={`flex flex-col max-w-[68%] ${isMine ? "items-end" : "items-start"}`}>
+                          <div className={`flex flex-col max-w-[85%] lg:max-w-[68%] ${isMine ? "items-end" : "items-start"}`}>
                             {showName && (
                               <span className="text-[10px] text-slate-400 font-medium mb-1 px-1">{m.sender?.name}</span>
                             )}
-                            <div className={`px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap wrap-break-word ${
+                            <div className={`px-4 py-2.5 text-sm leading-relaxed wrap-break-word ${
                               isMine
-                                ? `text-white rounded-2xl rounded-br-sm ${m._optimistic ? "opacity-60" : ""}`
-                                : "bg-white text-slate-700 rounded-2xl rounded-bl-sm shadow-[0_1px_4px_rgba(0,0,0,0.06)]"
+                                ? `text-white rounded-[1.25rem] rounded-br-md shadow-lg shadow-indigo-500/25 ${m._optimistic ? "opacity-60" : ""}`
+                                : "bg-white text-slate-700 rounded-[1.25rem] rounded-bl-md shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
                             }`}
                               style={isMine ? { background: "linear-gradient(135deg,#6366f1,#4f46e5)" } : {}}>
-                              {m.body}
+                              <div className="whitespace-pre-wrap">{m.body}</div>
                               {(m.attachmentName || m.attachment) && (
-                                <div className={`mt-1.5 flex items-center gap-1.5 text-[11px] font-medium ${isMine ? "text-white/80" : "text-indigo-500"}`}>
-                                  <Paperclip size={10} />
+                                <div className={`mt-1.5 flex items-center gap-1.5 text-[11px] font-medium max-w-full ${isMine ? "text-white/80" : "text-indigo-500"}`}>
+                                  <Paperclip size={10} className="shrink-0" />
                                   {m.attachment ? (
-                                    <button onClick={() => downloadAttachment(m.attachment)} className="underline text-left">
+                                    <button onClick={() => downloadAttachment(m.attachment)} className="underline text-left truncate max-w-[200px]">
                                       {m.attachmentName || "Attachment"}
                                     </button>
                                   ) : (
-                                    <span>{m.attachmentName}</span>
+                                    <span className="truncate max-w-[200px]">{m.attachmentName}</span>
                                   )}
                                 </div>
                               )}
@@ -429,7 +435,7 @@ function AdminMessages() {
               </div>
 
               {/* Input */}
-              <div className="px-4 pb-4 pt-2 bg-white border-t border-slate-100">
+              <div className="px-3 lg:px-4 pb-3 lg:pb-4 pt-2 bg-white border-t border-slate-100">
                 {attachment && (
                   <div className="mb-2 flex items-center gap-2 px-3 py-2 bg-indigo-50 border border-indigo-100 rounded-xl">
                     <FileText size={13} className="text-indigo-500 shrink-0" />

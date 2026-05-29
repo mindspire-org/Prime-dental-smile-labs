@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { apiFetch, getCurrentUser, openRealtimeConnection, type AuthUser } from "@/lib/api";
 import { logoUrl } from "@/lib/logo";
-import { Send, CheckCheck, MessageSquare, Search, Circle, Paperclip, X, FileText } from "lucide-react";
+import { Send, CheckCheck, MessageSquare, Search, Circle, Paperclip, X, FileText, ChevronLeft } from "lucide-react";
 
 export const Route = createFileRoute("/portal/messages")({
   component: PortalMessages,
@@ -60,6 +60,7 @@ function PortalMessages() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [attachment, setAttachment] = useState<File | null>(null);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [mobileChatOpen, setMobileChatOpen] = useState(false);
   const selectedRef = useRef<any>(null);
   selectedRef.current = selected;
 
@@ -97,6 +98,7 @@ function PortalMessages() {
   async function selectCase(c: any) {
     setSelected(c);
     setAttachment(null);
+    setMobileChatOpen(true);
     if (c._isAdmin) {
       setUnread(prev => { const n = { ...prev }; delete n.__admin__; return n; });
       setLoadingMsgs(true);
@@ -208,7 +210,7 @@ function PortalMessages() {
       <div className="flex flex-1 min-h-0 rounded-2xl overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.08)] bg-white border border-slate-100">
 
         {/* ── Sidebar ── */}
-        <aside className="w-72 shrink-0 flex flex-col border-r border-slate-100">
+        <aside className={`lg:w-72 w-full shrink-0 flex flex-col border-r border-slate-100 ${mobileChatOpen ? 'hidden lg:flex' : 'flex'}`}>
           {/* Search */}
           <div className="p-3 border-b border-slate-100">
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 focus-within:border-teal transition-colors">
@@ -226,7 +228,7 @@ function PortalMessages() {
               const adminUnread = unread.__admin__ || 0;
               return (
                 <button onClick={() => selectCase(ADMIN_CONTACT)}
-                  className="w-full text-left px-4 py-3.5 border-b-2 border-slate-100 transition-colors"
+                  className="w-full text-left px-4 py-4 border-b-2 border-slate-100 transition-colors active:bg-slate-50"
                   style={isActive
                     ? { background: "linear-gradient(90deg,rgba(10,171,189,0.08),rgba(10,171,189,0.03))", borderLeft: "3px solid #0aabbd" }
                     : { borderLeft: "3px solid transparent", background: "rgba(248,250,252,0.6)" }}>
@@ -266,7 +268,7 @@ function PortalMessages() {
               const lastMsg = c._lastMsg;
               return (
                 <button key={c._id} onClick={() => selectCase(c)}
-                  className="w-full text-left px-4 py-3.5 transition-colors border-b border-slate-50 hover:bg-slate-50"
+                  className="w-full text-left px-4 py-4 transition-colors border-b border-slate-50 hover:bg-slate-50 active:bg-slate-50"
                   style={isActive ? { background: "rgba(10,171,189,0.06)", borderLeft: "3px solid #0aabbd" } : { borderLeft: "3px solid transparent" }}>
                   <div className="flex items-start gap-3">
                     <Avatar name={c.dentist?.name || "Me"} size={9} />
@@ -299,7 +301,7 @@ function PortalMessages() {
         </aside>
 
         {/* ── Chat area ── */}
-        <div className="flex-1 flex flex-col min-w-0" style={{ background: "#f8fafc" }}>
+        <div className={`flex-1 flex flex-col min-w-0 ${mobileChatOpen ? 'flex' : 'hidden lg:flex'}`} style={{ background: "#f8fafc" }}>
           {!selected ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4 text-slate-300">
               <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg,rgba(10,171,189,0.08),rgba(10,171,189,0.04))" }}>
@@ -313,7 +315,10 @@ function PortalMessages() {
           ) : (
             <>
               {/* Chat header */}
-              <div className="px-5 py-3.5 bg-white border-b border-slate-100 flex items-center gap-3">
+              <div className="px-3 lg:px-5 py-3 bg-white border-b border-slate-100 flex items-center gap-3">
+                <button onClick={() => setMobileChatOpen(false)} className="lg:hidden shrink-0 p-1.5 -ml-1 rounded-lg hover:bg-slate-100 transition-colors" aria-label="Back to conversations">
+                  <ChevronLeft size={20} className="text-slate-500" />
+                </button>
                 <Avatar name={selected.dentist?.name || "Lab"} size={9} admin={!!selected._isAdmin} />
                 <div className="flex-1 min-w-0">
                   <div className="font-bold text-slate-800 text-sm">
@@ -321,21 +326,21 @@ function PortalMessages() {
                   </div>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <Circle size={7} className="text-emerald-400 fill-emerald-400" />
-                    <span className="text-[10px] text-slate-400">
+                    <span className="text-[10px] text-slate-400 truncate">
                       {selected._isAdmin ? "Direct line to your lab team · Always available" : `${selected.patientRef} · ${selected.status}`}
                     </span>
                   </div>
                 </div>
                 {!selected._isAdmin && (
                   <Link to="/portal/cases/$id" params={{ id: selected._id }}
-                    className="text-xs text-teal font-semibold hover:underline px-3 py-1.5 rounded-lg bg-teal/5 hover:bg-teal/10 transition-colors">
+                    className="hidden sm:inline-block text-xs text-teal font-semibold hover:underline px-3 py-1.5 rounded-lg bg-teal/5 hover:bg-teal/10 transition-colors shrink-0">
                     View Case
                   </Link>
                 )}
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-5 py-4 space-y-1">
+              <div className="flex-1 overflow-y-auto px-3 lg:px-5 py-3 lg:py-4 space-y-1">
                 {loadingMsgs ? (
                   <div className="space-y-3 pt-4">
                     {[...Array(5)].map((_, i) => (
@@ -379,29 +384,29 @@ function PortalMessages() {
                               {showAvatar && <Avatar name={m.sender?.name || "Lab"} size={7} />}
                             </div>
                           )}
-                          <div className={`flex flex-col max-w-[68%] ${isMine ? "items-end" : "items-start"}`}>
+                          <div className={`flex flex-col max-w-[85%] lg:max-w-[68%] ${isMine ? "items-end" : "items-start"}`}>
                             {showName && (
                               <span className="text-[10px] text-slate-400 font-medium mb-1 px-1">{m.sender?.name || "Lab Team"}</span>
                             )}
-                            <div className={`px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap wrap-break-word ${
+                            <div className={`px-4 py-2.5 text-sm leading-relaxed wrap-break-word ${
                               isMine
-                                ? `text-white rounded-2xl rounded-br-sm ${m._optimistic ? "opacity-60" : ""}`
-                                : "bg-white text-slate-700 rounded-2xl rounded-bl-sm shadow-[0_1px_4px_rgba(0,0,0,0.06)]"
+                                ? `text-white rounded-[1.25rem] rounded-br-md shadow-lg shadow-teal-500/25 ${m._optimistic ? "opacity-60" : ""}`
+                                : "bg-white text-slate-700 rounded-[1.25rem] rounded-bl-md shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
                             }`}
                               style={isMine ? { background: "linear-gradient(135deg,#0aabbd,#078a99)" } : {}}>
-                              {m.body}
+                              <div className="whitespace-pre-wrap">{m.body}</div>
                               {(m.attachmentName || m.attachment) && (
-                                <div className={`mt-1.5 flex items-center gap-1.5 text-[11px] font-medium ${isMine ? "text-white/80" : "text-teal"}`}>
-                                  <Paperclip size={10} />
+                                <div className={`mt-1.5 flex items-center gap-1.5 text-[11px] font-medium max-w-full ${isMine ? "text-white/80" : "text-teal"}`}>
+                                  <Paperclip size={10} className="shrink-0" />
                                   {m.attachment ? (
                                     <button
                                       onClick={() => downloadAttachment(m.attachment)}
-                                      className="underline text-left"
+                                      className="underline text-left truncate max-w-[200px]"
                                     >
                                       {m.attachmentName || "Attachment"}
                                     </button>
                                   ) : (
-                                    <span>{m.attachmentName}</span>
+                                    <span className="truncate max-w-[200px]">{m.attachmentName}</span>
                                   )}
                                 </div>
                               )}
@@ -424,7 +429,7 @@ function PortalMessages() {
               </div>
 
               {/* Input */}
-              <div className="px-4 pb-4 pt-2 bg-white border-t border-slate-100">
+              <div className="px-3 lg:px-4 pb-3 lg:pb-4 pt-2 bg-white border-t border-slate-100">
                 {attachment && (
                   <div className="mb-2 flex items-center gap-2 px-3 py-2 bg-teal/5 border border-teal/20 rounded-xl">
                     <FileText size={13} className="text-teal shrink-0" />
