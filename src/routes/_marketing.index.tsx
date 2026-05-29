@@ -267,13 +267,13 @@ function HomePage() {
           </Reveal>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-0 rounded-2xl overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.12)]">
             {[
-              { label: "Zirconia",       sub: "Achieve High Level Of Aesthetic\nWithout Sacrificing Durability",  img: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600&q=80&auto=format&fit=crop", text: true  },
+              { label: "Zirconia",       sub: "Achieve High Level Of Aesthetic\nWithout Sacrificing Durability",  img: "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=600&q=80&auto=format&fit=crop", text: true  },
               { label: "",               sub: "",  img: "https://images.pexels.com/photos/7800553/pexels-photo-7800553.jpeg?w=600&q=80&auto=format&fit=crop", text: false },
               { label: "Porcelain",      sub: "Aesthetic And Function Are\nTogether",                              img: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&q=80&auto=format&fit=crop", text: true  },
               { label: "",               sub: "",  img: "https://images.pexels.com/photos/5355922/pexels-photo-5355922.jpeg?w=600&q=80&auto=format&fit=crop", text: false },
               { label: "Implants",       sub: "Long Lasting Prosthetics",                                          img: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80&auto=format&fit=crop", text: true  },
               { label: "",               sub: "",  img: "https://images.pexels.com/photos/6501859/pexels-photo-6501859.jpeg?w=600&q=80&auto=format&fit=crop", text: false },
-              { label: "Inlays / Onlays",sub: "Perfect Match At The Most\nPrecision Points",                      img: "https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=600&q=80&auto=format&fit=crop", text: true  },
+              { label: "Inlays / Onlays",sub: "Perfect Match At The Most\nPrecision Points",                      img: "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=600&q=80&auto=format&fit=crop", text: true  },
               { label: "",               sub: "",  img: "https://images.pexels.com/photos/33800642/pexels-photo-33800642.jpeg?w=600&q=80&auto=format&fit=crop", text: false },
             ].map((tile, i) => (
               <div key={i} className="relative h-52 md:h-64 overflow-hidden group">

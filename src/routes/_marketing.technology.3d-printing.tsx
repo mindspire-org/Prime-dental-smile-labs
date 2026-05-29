@@ -17,7 +17,7 @@ const MACHINES = [
   {
     name: "Asiga MAX UV DLP Printer",
     type: "DLP 3D Printing",
-    image: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1590424693420-634a0b0b782c?w=800&q=80&auto=format&fit=crop",
     desc: "High-resolution DLP printing with UV LED light engine for precise, biocompatible dental applications.",
     materials: ["Asiga DentaGUIDE", "Asiga DentaCLEAR", "Biocompatible resins", "Model resins"],
     services: ["Surgical guides", "Splints & guards", "Study models", "Try-ins", "Orthodontic retainers"],
@@ -25,7 +25,7 @@ const MACHINES = [
   {
     name: "Anycubic Wash & Cure Max Post-Processing",
     type: "Post-Processing",
-    image: "https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80&auto=format&fit=crop",
     desc: "Automated wash and UV cure station for consistent post-processing of printed resin parts.",
     materials: ["All DLP/SLA resin types"],
     services: ["Post-curing", "Surface cleaning", "Support removal"],

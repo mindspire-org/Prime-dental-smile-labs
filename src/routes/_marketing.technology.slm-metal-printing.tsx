@@ -17,7 +17,7 @@ const MACHINES = [
   {
     name: "VENEA VDexk1 eco SLM 3D Metal Laser Printer",
     type: "SLM Metal Printing",
-    image: "https://images.unsplash.com/photo-1581093806997-124204d9fa9d?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=800&q=80&auto=format&fit=crop",
     desc: "Selective laser melting system for additive manufacturing of cobalt-chrome and titanium frameworks with layer-by-layer precision.",
     materials: ["Cobalt-chrome (CE-certified)", "Titanium Grade 5"],
     services: ["Partial denture frameworks", "Implant bar frameworks", "Telescopic crowns", "Combination cases"],

@@ -36,11 +36,11 @@ const MATERIAL_TILES = [
   { label: "Zirconia",        sub: "Achieve High Level Of Aesthetic\nWithout Sacrificing Durability",  img: "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=600&q=80&auto=format&fit=crop", text: true  },
   { label: "",                sub: "", img: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80&auto=format&fit=crop", text: false },
   { label: "Porcelain",       sub: "Aesthetic And Function Are Together",                               img: "https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=600&q=80&auto=format&fit=crop", text: true  },
-  { label: "",                sub: "", img: "https://images.unsplash.com/photo-1581093806997-124204d9fa9d?w=600&q=80&auto=format&fit=crop", text: false },
-  { label: "Implants",        sub: "Long Lasting Dentures",                                             img: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=600&q=80&auto=format&fit=crop", text: true  },
-  { label: "",                sub: "", img: "https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=600&q=80&auto=format&fit=crop", text: false },
-  { label: "Inlays / Onlays", sub: "Perfect Match At The Most Precision Points",                        img: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&q=80&auto=format&fit=crop", text: true  },
-  { label: "",                sub: "", img: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600&q=80&auto=format&fit=crop", text: false },
+  { label: "",                sub: "", img: "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=600&q=80&auto=format&fit=crop", text: false },
+  { label: "Implants",        sub: "Long Lasting Dentures",                                             img: "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=600&q=80&auto=format&fit=crop", text: true  },
+  { label: "",                sub: "", img: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&q=80&auto=format&fit=crop", text: false },
+  { label: "Inlays / Onlays", sub: "Perfect Match At The Most Precision Points",                        img: "https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=600&q=80&auto=format&fit=crop", text: true  },
+  { label: "",                sub: "", img: "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=600&q=80&auto=format&fit=crop", text: false },
 ];
 
 function ServicesPage() {
@@ -49,7 +49,7 @@ function ServicesPage() {
       {/* Hero */}
       <section className="relative bg-navy text-white overflow-hidden">
         <div className="absolute inset-0">
-          <img src="https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1600&q=80&auto=format&fit=crop" alt="Dental laboratory" className="w-full h-full object-cover opacity-30" loading="lazy"/>
+          <img src="https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=1600&q=80&auto=format&fit=crop" alt="Dental laboratory" className="w-full h-full object-cover opacity-30" loading="lazy"/>
           <div className="absolute inset-0 bg-linear-to-b from-navy/70 to-navy/90"/>
         </div>
         <div className="relative max-w-7xl mx-auto px-5 lg:px-8 py-24">

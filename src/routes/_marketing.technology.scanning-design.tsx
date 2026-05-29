@@ -17,7 +17,7 @@ const MACHINES = [
   {
     name: "Dental Wings 7 Series Desktop Scanner",
     type: "Scanning",
-    image: "https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80&auto=format&fit=crop",
     desc: "Lab-grade blue-light structured-light scanner with 7-micron accuracy for models, impressions and articulator setups.",
     materials: ["Plaster models", "Impressions", "Articulator setups", "Wax-ups"],
     services: ["Model digitization", "Wax-up scanning", "Articulator transfer", "Implant case scanning"],
@@ -25,7 +25,7 @@ const MACHINES = [
   {
     name: "CAD Workflow Suite",
     type: "Digital Design",
-    image: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1590424693420-634a0b0b782c?w=800&q=80&auto=format&fit=crop",
     desc: "Complete CAD design environment for crown & bridge, implant restoration, RPD framework and surgical guide design.",
     materials: ["STL files", "PLY files", "OBJ files"],
     services: ["Crown & bridge design", "Implant planning", "Bar design", "Surgical guide design", "Smile design"],

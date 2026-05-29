@@ -17,7 +17,7 @@ const MACHINES = [
   {
     name: "ALFAMILL Universal 5-Axis Hybrid CNC Dental Mill",
     type: "CAD/CAM Milling",
-    image: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=800&q=80&auto=format&fit=crop",
     desc: "High-performance 5-axis simultaneous milling with hybrid wet/dry capability for complex geometries.",
     materials: ["Zirconia", "PMMA", "Wax", "Titanium", "CoCr", "Lithium disilicate", "Hybrid ceramics"],
     services: ["Crowns & bridges", "Veneers", "Inlays / onlays", "Custom abutments", "Implant bars"],
@@ -25,7 +25,7 @@ const MACHINES = [
   {
     name: "Yena Makina D30 High-Performance 5-Axis Dry CNC Dental Milling Center",
     type: "CAD/CAM Milling",
-    image: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1590424693420-634a0b0b782c?w=800&q=80&auto=format&fit=crop",
     desc: "Dry milling centre optimised for zirconia and PMMA with rapid tool-change and automated nesting.",
     materials: ["Zirconia", "PMMA", "Wax", "PEEK"],
     services: ["Crowns & bridges", "Temporary restorations", "Wax-ups for casting"],

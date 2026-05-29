@@ -25,7 +25,7 @@ const MACHINES = [
   {
     name: "Ivoclar Programat P300 Ceramic Furnace",
     type: "Ceramic Firing",
-    image: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=800&q=80&auto=format&fit=crop",
     desc: "Precision ceramic furnace for lithium disilicate pressing and porcelain layering with vacuum-assisted firing cycles.",
     materials: ["Lithium disilicate (e.max)", "Feldspathic porcelain", "Glaze"],
     services: ["e.max crowns", "e.max veneers", "Layered porcelain", "Glaze & stain"],
@@ -33,7 +33,7 @@ const MACHINES = [
   {
     name: "Dentsply Sirona CEREC SpeedFire",
     type: "Speed Sintering",
-    image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=800&q=80&auto=format&fit=crop",
     desc: "Fast-sintering furnace for same-day zirconia and glazed restorations with rapid heating technology.",
     materials: ["Zirconia", "Glaze"],
     services: ["Express zirconia crowns", "Same-day restorations", "Glaze finishing"],

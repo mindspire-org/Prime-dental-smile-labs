@@ -17,7 +17,7 @@ const MACHINES = [
   {
     name: "Renfert Sandblasting & Surface Processing",
     type: "Surface Finishing",
-    image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=800&q=80&auto=format&fit=crop",
     desc: "Precision sandblasting for framework cleaning, oxide removal and surface preparation before ceramic application or polishing.",
     materials: ["Cobalt-chrome", "Titanium", "Zirconia", "Metal frameworks"],
     services: ["Framework cleaning", "Oxide removal", "Surface prep", "Ceramic bonding prep"],
@@ -25,7 +25,7 @@ const MACHINES = [
   {
     name: "Zhermack Steam & Ultrasonic Cleaning",
     type: "Cleaning Systems",
-    image: "https://images.unsplash.com/photo-1581093806997-124204d9fa9d?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=800&q=80&auto=format&fit=crop",
     desc: "Steam and ultrasonic cleaning stations for removing investment residue, polishing paste and contaminants before final QC.",
     materials: ["All restoration types", "Ceramic", "Metal", "Acrylic"],
     services: ["Pre-dispatch cleaning", "Investment removal", "Contaminant removal"],
@@ -33,7 +33,7 @@ const MACHINES = [
   {
     name: "GC Curing, Micro-Motors & Laser Welding",
     type: "Final Processing",
-    image: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=800&q=80&auto=format&fit=crop",
     desc: "Composite curing lights, high-speed micro-motors, turbines and laser welding for final adaptation, repair and occlusal adjustment.",
     materials: ["Composite", "Metal frameworks", "Ceramic", "Acrylic"],
     services: ["Composite curing", "Occlusal adjustment", "Framework repair", "Laser welding", "Final polish"],
