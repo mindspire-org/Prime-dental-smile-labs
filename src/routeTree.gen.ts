@@ -51,6 +51,7 @@ import { Route as MarketingDataNoticeRouteImport } from './routes/_marketing.dat
 import { Route as MarketingContactRouteImport } from './routes/_marketing.contact'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing.about'
 import { Route as PortalCasesIndexRouteImport } from './routes/portal.cases.index'
+import { Route as AdminCasesIndexRouteImport } from './routes/admin.cases.index'
 import { Route as MarketingTechnologyIndexRouteImport } from './routes/_marketing.technology.index'
 import { Route as MarketingServicesIndexRouteImport } from './routes/_marketing.services.index'
 import { Route as MarketingAboutIndexRouteImport } from './routes/_marketing.about.index'
@@ -279,6 +280,11 @@ const PortalCasesIndexRoute = PortalCasesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PortalCasesRoute,
 } as any)
+const AdminCasesIndexRoute = AdminCasesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminCasesRoute,
+} as any)
 const MarketingTechnologyIndexRoute =
   MarketingTechnologyIndexRouteImport.update({
     id: '/',
@@ -438,6 +444,7 @@ export interface FileRoutesByFullPath {
   '/about/': typeof MarketingAboutIndexRoute
   '/services/': typeof MarketingServicesIndexRoute
   '/technology/': typeof MarketingTechnologyIndexRoute
+  '/admin/cases/': typeof AdminCasesIndexRoute
   '/portal/cases/': typeof PortalCasesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -454,7 +461,6 @@ export interface FileRoutesByTo {
   '/workflow': typeof MarketingWorkflowRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
-  '/admin/cases': typeof AdminCasesRouteWithChildren
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/email-templates': typeof AdminEmailTemplatesRoute
@@ -494,6 +500,7 @@ export interface FileRoutesByTo {
   '/about': typeof MarketingAboutIndexRoute
   '/services': typeof MarketingServicesIndexRoute
   '/technology': typeof MarketingTechnologyIndexRoute
+  '/admin/cases': typeof AdminCasesIndexRoute
   '/portal/cases': typeof PortalCasesIndexRoute
 }
 export interface FileRoutesById {
@@ -557,6 +564,7 @@ export interface FileRoutesById {
   '/_marketing/about/': typeof MarketingAboutIndexRoute
   '/_marketing/services/': typeof MarketingServicesIndexRoute
   '/_marketing/technology/': typeof MarketingTechnologyIndexRoute
+  '/admin/cases/': typeof AdminCasesIndexRoute
   '/portal/cases/': typeof PortalCasesIndexRoute
 }
 export interface FileRouteTypes {
@@ -620,6 +628,7 @@ export interface FileRouteTypes {
     | '/about/'
     | '/services/'
     | '/technology/'
+    | '/admin/cases/'
     | '/portal/cases/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -636,7 +645,6 @@ export interface FileRouteTypes {
     | '/workflow'
     | '/admin/activity'
     | '/admin/analytics'
-    | '/admin/cases'
     | '/admin/clinics'
     | '/admin/content'
     | '/admin/email-templates'
@@ -676,6 +684,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/services'
     | '/technology'
+    | '/admin/cases'
     | '/portal/cases'
   id:
     | '__root__'
@@ -738,6 +747,7 @@ export interface FileRouteTypes {
     | '/_marketing/about/'
     | '/_marketing/services/'
     | '/_marketing/technology/'
+    | '/admin/cases/'
     | '/portal/cases/'
   fileRoutesById: FileRoutesById
 }
@@ -1046,6 +1056,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalCasesIndexRouteImport
       parentRoute: typeof PortalCasesRoute
     }
+    '/admin/cases/': {
+      id: '/admin/cases/'
+      path: '/'
+      fullPath: '/admin/cases/'
+      preLoaderRoute: typeof AdminCasesIndexRouteImport
+      parentRoute: typeof AdminCasesRoute
+    }
     '/_marketing/technology/': {
       id: '/_marketing/technology/'
       path: '/'
@@ -1258,10 +1275,12 @@ const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
 
 interface AdminCasesRouteChildren {
   AdminCasesIdRoute: typeof AdminCasesIdRoute
+  AdminCasesIndexRoute: typeof AdminCasesIndexRoute
 }
 
 const AdminCasesRouteChildren: AdminCasesRouteChildren = {
   AdminCasesIdRoute: AdminCasesIdRoute,
+  AdminCasesIndexRoute: AdminCasesIndexRoute,
 }
 
 const AdminCasesRouteWithChildren = AdminCasesRoute._addFileChildren(
