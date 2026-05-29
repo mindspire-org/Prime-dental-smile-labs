@@ -8,6 +8,7 @@ import {
 import { Reveal, Stagger, StaggerItem } from "@/components/site/Reveal";
 import { StatCounter } from "@/components/site/StatCounter";
 import { Placeholder } from "@/components/site/Placeholder";
+import { PageBlocks } from "@/components/site/PageBlocks";
 
 export const Route = createFileRoute("/_marketing/")({
   head: () => ({
@@ -122,8 +123,28 @@ function TestimonialsSection() {
 }
 
 function HomePage() {
+  const [cmsBlocks, setCmsBlocks] = useState<any[]>([]);
+  const [cmsLoaded, setCmsLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/pages/home")
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(d => { setCmsBlocks(d.page?.blocks || []); })
+      .catch(() => {})
+      .finally(() => setCmsLoaded(true));
+  }, []);
+
+  const hasSavedBlocks = cmsLoaded && cmsBlocks.length > 0;
+
   return (
     <div>
+      {hasSavedBlocks ? (
+        <>
+          <PageBlocks blocks={cmsBlocks} />
+          <TestimonialsSection />
+        </>
+      ) : (
+        <>
       {/* HERO */}
       <section className="relative bg-navy text-white overflow-hidden">
         <div className="absolute inset-0 opacity-[0.06]" style={{
@@ -416,6 +437,8 @@ function HomePage() {
           </Stagger>
         </div>
       </section>
+    </>
+  )}
     </div>
   );
 }

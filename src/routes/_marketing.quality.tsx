@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Reveal } from "@/components/site/Reveal";
 import { CheckCircle, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { PageBlocks } from "@/components/site/PageBlocks";
 
 export const Route = createFileRoute("/_marketing/quality")({
   head: () => ({
@@ -41,9 +42,25 @@ const FAQ = [
 
 function QualityPage() {
   const [open, setOpen] = useState<number | null>(0);
+  const [cmsBlocks, setCmsBlocks] = useState<any[]>([]);
+  const [cmsLoaded, setCmsLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/pages/quality")
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(d => { setCmsBlocks(d.page?.blocks || []); })
+      .catch(() => {})
+      .finally(() => setCmsLoaded(true));
+  }, []);
+
+  const hasSavedBlocks = cmsLoaded && cmsBlocks.length > 0;
 
   return (
     <div>
+      {hasSavedBlocks ? (
+        <PageBlocks blocks={cmsBlocks} />
+      ) : (
+    <>
       <section className="bg-white py-20">
         <div className="max-w-5xl mx-auto px-5 lg:px-8">
           <Reveal>
@@ -122,6 +139,8 @@ function QualityPage() {
           </div>
         </div>
       </section>
+    </>
+  )}
     </div>
   );
 }

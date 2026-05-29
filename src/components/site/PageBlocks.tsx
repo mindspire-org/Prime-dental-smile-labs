@@ -1,5 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, Users, PlayCircle, Image } from "lucide-react";
+import {
+  ArrowUpRight, Users, PlayCircle, Image,
+  ArrowRight, CheckCircle2, Star,
+  Cpu, Lock, FlaskConical, Target,
+  Smile, Wrench, Layers, Frame, Shield, PencilRuler,
+  MessageCircle, BookOpen
+} from "lucide-react";
+import { Placeholder } from "./Placeholder";
 
 type Block = { id: string; type: string; order: number; props: Record<string, any> };
 
@@ -17,27 +24,96 @@ export function PageBlocks({ blocks }: { blocks: Block[] }) {
   );
 }
 
+function resolveIcon(name: string) {
+  const map: Record<string, any> = {
+    ArrowUpRight, Users, PlayCircle, Image, ArrowRight, CheckCircle2, Star,
+    Cpu, Lock, FlaskConical, Target, Smile, Wrench, Layers, Frame, Shield,
+    PencilRuler, MessageCircle, BookOpen,
+  };
+  return map[name] || null;
+}
+
 function BlockRenderer({ type, props }: { type: string; props: any }) {
   switch (type) {
-    case "hero":
+    case "hero": {
+      const align = props.align || "center";
+      const textAlign = align === "left" ? "text-left" : "text-center";
+      const mx = align === "left" ? "" : "mx-auto";
       return (
-        <div className="min-h-[400px] text-white overflow-hidden relative" style={{ background: props.bgColor || "#0d1e2c" }}>
+        <section className="relative min-h-[520px] text-white overflow-hidden flex items-center" style={{ background: props.bgColor || "#0d1e2c" }}>
           {props.image && (
             <div className="absolute inset-0">
-              <img src={props.image} alt="" className="w-full h-full object-cover opacity-40" />
-              <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/20 to-black/40" style={{ opacity: props.overlayOpacity || 0.4 }} />
+              <img src={props.image} alt="" className="w-full h-full object-cover" style={{ opacity: 0.45 }} loading="lazy" />
+              <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, rgba(13,30,44,${props.overlayOpacity || 0.75}) 0%, rgba(10,171,189,${(props.overlayOpacity || 0.75) * 0.35}) 100%)` }} />
             </div>
           )}
-          <div className={`relative ${props.height === "large" ? "py-20" : "py-16"} px-8 md:px-12 text-center max-w-6xl mx-auto`}>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight drop-shadow-lg">{props.heading}</h1>
-            <p className="text-white/90 mb-8 md:mb-10 text-lg md:text-xl lg:text-2xl leading-relaxed drop-shadow max-w-3xl mx-auto">{props.subheading}</p>
-            {props.cta && (
-              <span className="inline-block px-8 py-4 bg-white text-slate-800 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 cursor-pointer text-lg shadow-lg hover:shadow-xl">
-                {props.cta} <ArrowUpRight size={18} className="inline ml-2" />
+          <div className={`relative w-full ${props.height === "large" ? "py-24" : "py-20"} px-8 md:px-12 ${textAlign} max-w-6xl mx-auto`}>
+            {props.eyebrow && (
+              <span className="inline-block text-[11px] uppercase tracking-[0.2em] text-teal-300 font-bold mb-4 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">
+                {props.eyebrow}
               </span>
             )}
+            <h1 className={`text-4xl md:text-5xl lg:text-6xl font-extrabold mb-5 md:mb-7 leading-[1.1] drop-shadow-xl ${mx} max-w-4xl tracking-tight`}>
+              {props.highlight ? (
+                <>
+                  {props.heading?.replace(props.highlight, "")}
+                  <span className="text-teal-400">{props.highlight}</span>
+                </>
+              ) : props.heading}
+            </h1>
+            <p className={`text-white/85 mb-10 md:mb-12 text-lg md:text-xl lg:text-[1.35rem] leading-relaxed drop-shadow-md max-w-3xl ${mx} font-light`}>{props.subheading}</p>
+            <div className={`flex flex-wrap gap-4 ${align === "left" ? "" : "justify-center"}`}>
+              {props.cta1 && (
+                <Link to={props.cta1Link || "#"} className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-white text-teal-700 rounded-full font-bold text-sm shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all">
+                  {props.cta1} <ArrowRight size={16} className="text-teal-500" />
+                </Link>
+              )}
+              {props.cta2 && (
+                <Link to={props.cta2Link || "#"} className="inline-flex items-center gap-2.5 px-7 py-3.5 border border-white/40 text-white rounded-full font-bold text-sm backdrop-blur-sm bg-white/5 hover:bg-white/10 hover:scale-[1.02] transition-all">
+                  {props.cta2}
+                </Link>
+              )}
+              {!props.cta1 && !props.cta2 && props.cta && (
+                <Link to={props.ctaLink || "#"} className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-white text-teal-700 rounded-full font-bold text-sm shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all">
+                  {props.cta} <ArrowUpRight size={16} className="text-teal-500" />
+                </Link>
+              )}
+            </div>
           </div>
-        </div>
+        </section>
+      );
+    }
+
+    case "about-hero":
+      return (
+        <section className="bg-white py-20">
+          <div className="max-w-7xl mx-auto px-5 lg:px-8 grid md:grid-cols-2 gap-14 items-center">
+            <div>
+              {props.eyebrow && <span className="eyebrow">{props.eyebrow}</span>}
+              <h1 className="mt-3 text-4xl md:text-5xl font-bold leading-tight">
+                {props.highlight ? (
+                  <>
+                    {props.heading?.replace(props.highlight, "")}
+                    <span className="text-teal">{props.highlight}</span>
+                    {props.heading?.split(props.highlight).slice(1).join(props.highlight)}
+                  </>
+                ) : props.heading}
+              </h1>
+              <p className="mt-6 text-lg text-muted-grey leading-relaxed">{props.subheading}</p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                {props.cta1 && <Link to={props.cta1Link || "#"} className="btn-teal">{props.cta1} <ArrowRight size={16}/></Link>}
+                {props.cta2 && <Link to={props.cta2Link || "#"} className="btn-outline-teal">{props.cta2} <ArrowRight size={16}/></Link>}
+              </div>
+            </div>
+            <div className="grid grid-cols-3 grid-rows-2 gap-3 h-80">
+              {(props.gallery || []).slice(0, 5).map((img: any, i: number) => (
+                <div key={i} className={`rounded-2xl overflow-hidden ${img.span ?? ""}`}>
+                  {img.src && <img src={img.src} alt={img.alt || ""} className="w-full h-full object-cover" loading="lazy" />}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       );
 
     case "text":
@@ -105,21 +181,35 @@ function BlockRenderer({ type, props }: { type: string; props: any }) {
         </div>
       );
 
-    case "cards":
+    case "cards": {
+      const iconSize = props.iconSize || "md";
+      const iconClass = iconSize === "lg" ? "w-14 h-14" : iconSize === "sm" ? "w-8 h-8" : "w-12 h-12";
+      const accentMap: Record<string, string> = { teal: "border-l-teal-400", gold: "border-l-amber-400", indigo: "border-l-indigo-400", slate: "border-l-slate-400" };
       return (
         <div className="py-6 px-6 rounded-2xl" style={{ backgroundColor: props.backgroundColor || "#f9fafb" }}>
           {props.heading && <h3 className="text-xl font-bold text-slate-800 text-center mb-6">{props.heading}</h3>}
           <div className={`grid gap-4 ${props.columns === 2 ? "grid-cols-1 md:grid-cols-2" : props.columns === 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-1 md:grid-cols-3"}`}>
-            {(props.cards || []).map((c: any, i: number) => (
-              <div key={i} className="bg-white rounded-xl p-4 text-center border border-gray-100 hover:shadow-md transition-shadow">
-                <div className="text-2xl mb-2">{c.icon || "✦"}</div>
-                <div className="font-semibold text-slate-800 mb-1">{c.title}</div>
-                <div className="text-sm text-slate-600">{c.text}</div>
-              </div>
-            ))}
+            {(props.cards || []).map((c: any, i: number) => {
+              const IconComp = resolveIcon(c.icon);
+              const borderAccent = accentMap[c.accent || props.accent || "teal"] || accentMap.teal;
+              return (
+                <div key={i} className={`bg-white rounded-xl p-5 border border-gray-100 hover:shadow-md transition-shadow h-full flex flex-col ${props.cardStyle === "borderLeft" ? `border-l-4 ${borderAccent}` : ""}`}>
+                  {IconComp && (
+                    <div className={`${iconClass} rounded-lg bg-teal/10 text-teal flex items-center justify-center mb-4`}>
+                      <IconComp size={iconSize === "lg" ? 26 : iconSize === "sm" ? 18 : 22} />
+                    </div>
+                  )}
+                  {!IconComp && c.icon && <div className="text-2xl mb-2">{c.icon}</div>}
+                  <h4 className="font-bold text-slate-800 mb-1">{c.title}</h4>
+                  <p className="text-sm text-slate-500 leading-relaxed flex-1">{c.text}</p>
+                  {c.link && <span className="text-teal text-sm font-semibold mt-3 inline-flex items-center gap-1">View <ArrowRight size={12}/></span>}
+                </div>
+              );
+            })}
           </div>
         </div>
       );
+    }
 
     case "testimonials":
       return (
@@ -210,6 +300,265 @@ function BlockRenderer({ type, props }: { type: string; props: any }) {
           </div>
         </div>
       );
+
+    /* ── Home Sections ─────────────────────────── */
+    case "home-hero": return (
+      <section className="relative bg-[#0d1e2c] text-white overflow-hidden">
+        {props.image && (
+          <div className="absolute inset-0">
+            <img src={props.image} alt="" className="w-full h-full object-cover opacity-40" loading="lazy" />
+          </div>
+        )}
+        <div className="absolute inset-0 opacity-[0.06]" style={{
+          backgroundImage:"linear-gradient(#0aabbd 1px, transparent 1px), linear-gradient(90deg, #0aabbd 1px, transparent 1px)",
+          backgroundSize:"48px 48px",
+        }}/>
+        <div className="relative max-w-7xl mx-auto px-5 lg:px-8 pt-32 pb-28">
+          <span className="eyebrow">{props.eyebrow}</span>
+          <h1 className="mt-4 font-bold text-4xl md:text-5xl lg:text-[56px] leading-[1.1] max-w-4xl">
+            {props.heading.replace(props.highlight || "", "")}
+            {props.highlight && <span className="text-teal">{props.highlight}</span>}
+          </h1>
+          <p className="mt-6 text-base md:text-lg text-white/80 max-w-3xl leading-relaxed">{props.subheading}</p>
+          <div className="mt-9 flex flex-wrap gap-3">
+            {props.cta1 && <Link to={props.cta1Link || "#"} className="btn-teal">{props.cta1} <ArrowRight size={16}/></Link>}
+            {props.cta2 && <Link to={props.cta2Link || "#"} className="btn-outline-white">{props.cta2}</Link>}
+          </div>
+        </div>
+      </section>
+    );
+
+    case "home-trust-strip": return (
+      <section className="bg-white border-y border-border-silver">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8 py-8 grid grid-cols-2 md:grid-cols-4 gap-6">
+          {(props.items || []).map((item: any, i: number) => {
+            const iconMap: Record<string, any> = { Cpu, Lock, FlaskConical, Target };
+            const I = iconMap[item.icon] || Cpu;
+            return (
+              <div key={i} className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-teal/10 flex items-center justify-center text-teal shrink-0"><I size={22}/></div>
+                <div>
+                  <div className="font-semibold text-text-slate">{item.title}</div>
+                  <div className="text-[11px] tracking-[0.12em] uppercase text-muted-grey font-medium">{item.desc}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    );
+
+    case "home-stats": return (
+      <section className="bg-bg-soft py-20">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <span className="eyebrow">{props.eyebrow}</span>
+            <h2 className="mt-3 text-3xl md:text-4xl font-semibold leading-tight">{props.heading}</h2>
+            <p className="mt-5 text-muted-grey leading-relaxed">{props.body}</p>
+            {props.linkText && <Link to={props.linkHref || "#"} className="inline-flex items-center gap-2 text-teal font-semibold mt-6 hover:gap-3 transition-all">{props.linkText} <ArrowRight size={16}/></Link>}
+          </div>
+          <div className="grid grid-cols-2 gap-6">
+            {(props.stats || []).map((s: any, i: number) => (
+              <div key={i} className="bg-white rounded-xl p-6 shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
+                <div className="text-4xl md:text-5xl font-bold text-teal">{s.value}{s.suffix}</div>
+                <div className="text-sm text-muted-grey mt-2 font-medium">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+
+    case "home-workflow": return (
+      <section className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8 text-center">
+          <span className="eyebrow">{props.eyebrow}</span>
+          <h2 className="mt-3 text-3xl md:text-4xl font-semibold">{props.heading}</h2>
+          <p className="mt-4 text-muted-grey max-w-2xl mx-auto">{props.subheading}</p>
+          <div className="mt-14 relative">
+            <div className="hidden md:block absolute top-7 left-[10%] right-[10%] h-[2px] bg-border-silver"/>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-8 relative">
+              {(props.steps || []).map((step: string, i: number) => (
+                <div key={i} className="flex flex-col items-center text-center">
+                  <div className="w-14 h-14 rounded-full bg-teal text-white flex items-center justify-center font-bold text-lg shadow-[0_4px_18px_rgba(10,171,189,.4)] relative z-10">{i + 1}</div>
+                  <div className="mt-4 font-semibold text-sm">{step}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {props.linkText && <Link to={props.linkHref || "#"} className="inline-flex items-center gap-2 text-teal font-semibold mt-12 hover:gap-3 transition-all">{props.linkText} <ArrowRight size={16}/></Link>}
+        </div>
+      </section>
+    );
+
+    case "home-services": return (
+      <section className="bg-bg-soft py-20">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto">
+            <span className="eyebrow">{props.eyebrow}</span>
+            <h2 className="mt-3 text-3xl md:text-4xl font-semibold">{props.heading}</h2>
+            <p className="mt-4 text-muted-grey">{props.subheading}</p>
+          </div>
+          <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {(props.services || []).map((s: any, i: number) => {
+              const iconMap: Record<string, any> = { Smile, Wrench, Layers, Frame, Shield, PencilRuler };
+              const I = iconMap[s.icon] || Smile;
+              return (
+                <div key={i} className="card-service h-full flex flex-col">
+                  <div className="w-12 h-12 rounded-lg bg-teal/10 text-teal flex items-center justify-center mb-4"><I size={22}/></div>
+                  <h3 className="font-semibold text-lg">{s.title}</h3>
+                  <p className="text-sm text-muted-grey mt-2 leading-relaxed flex-1">{s.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+          {props.linkText && (
+            <div className="text-center mt-10">
+              <Link to={props.linkHref || "#"} className="btn-outline-teal">{props.linkText} <ArrowRight size={16}/></Link>
+            </div>
+          )}
+        </div>
+      </section>
+    );
+
+    case "home-specialisations": return (
+      <section className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="eyebrow">{props.eyebrow}</span>
+            <h2 className="mt-3 text-3xl md:text-4xl font-semibold">{props.heading}</h2>
+            <p className="mt-4 text-muted-grey max-w-2xl mx-auto">{props.subheading}</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-0 rounded-2xl overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.12)]">
+            {(props.tiles || []).map((tile: any, i: number) => (
+              <div key={i} className="relative h-52 md:h-64 overflow-hidden group">
+                {tile.img && <img src={tile.img} alt={tile.label || "dental"} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />}
+                <div className="absolute inset-0 bg-navy/50 group-hover:bg-navy/60 transition-colors duration-300" />
+                {tile.text && tile.label && (
+                  <div className="absolute inset-0 flex flex-col justify-center p-5">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-[2px] bg-teal"/>
+                      <span className="text-white font-bold text-base md:text-lg tracking-wide uppercase">{tile.label}</span>
+                    </div>
+                    <p className="text-white/80 text-xs md:text-sm leading-relaxed whitespace-pre-line">{tile.sub}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+
+    case "home-technology": return (
+      <section className="bg-navy text-white py-20">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8">
+          <div>
+            <div className="eyebrow text-teal!">{props.eyebrow}</div>
+            <h2 className="mt-3 text-3xl md:text-4xl font-semibold max-w-2xl">{props.heading}</h2>
+          </div>
+          <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {(props.items || []).map((t: any, i: number) => (
+              <div key={i} className="card-tech h-full">
+                <div className="text-[11px] uppercase tracking-[0.12em] text-teal font-medium">{t.brand}</div>
+                <div className="font-semibold text-gold mt-2">{t.name}</div>
+                <div className="flex flex-wrap gap-1.5 mt-4">
+                  {t.tags.split(",").map((tag: string) => (
+                    <span key={tag} className="text-[10px] uppercase tracking-wider px-2 py-1 rounded bg-teal/15 text-teal font-medium">{tag.trim()}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          {props.linkText && (
+            <div className="mt-10">
+              <Link to={props.linkHref || "#"} className="btn-outline-white">{props.linkText} <ArrowRight size={16}/></Link>
+            </div>
+          )}
+        </div>
+      </section>
+    );
+
+    case "home-production": return (
+      <section className="bg-white py-20 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8 text-center">
+          <span className="eyebrow">{props.eyebrow}</span>
+          <h2 className="mt-3 text-3xl md:text-4xl font-semibold">{props.heading}</h2>
+        </div>
+        <div className="mt-10 relative">
+          <div className="flex marquee-track gap-3 w-max">
+            {(props.brands || "").split(",").map((b: string, i: number) => (
+              <span key={i} className="px-5 py-2.5 rounded-full bg-teal/10 text-teal font-semibold text-sm whitespace-nowrap">{b.trim()}</span>
+            ))}
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-5 lg:px-8 mt-14 grid md:grid-cols-3 gap-5">
+          {(props.cards || []).map((c: any, i: number) => (
+            <div key={i} className="relative h-44 rounded-xl overflow-hidden group cursor-pointer">
+              <Placeholder label={c.img} className="absolute inset-0" />
+              <div className="absolute inset-0 bg-linear-to-t from-navy/90 via-navy/50 to-transparent" />
+              <div className="absolute bottom-0 left-0 p-5">
+                <div className="text-white font-semibold text-lg">{c.title}</div>
+                <div className="text-teal text-xs mt-1 inline-flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">Explore <ArrowRight size={12}/></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+
+    case "home-badges": return (
+      <section className="bg-white py-16 border-t border-border-silver">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8 grid md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+          {(props.items || []).map((b: any, i: number) => (
+            <div key={i}>
+              <div className="w-14 h-14 rounded-full bg-teal/10 text-teal flex items-center justify-center mx-auto mb-3"><CheckCircle2 size={26}/></div>
+              <div className="font-bold">{b.title}</div>
+              <div className="text-sm text-muted-grey mt-1">{b.desc}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+
+    case "home-cta": return (
+      <section className="py-20" style={{background:"linear-gradient(135deg, var(--teal), var(--teal-dark))"}}>
+        <div className="max-w-5xl mx-auto px-5 lg:px-8 text-center text-white">
+          <h2 className="text-3xl md:text-4xl font-bold">{props.heading}</h2>
+          <p className="mt-4 text-white/85 max-w-2xl mx-auto">{props.subheading}</p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {props.btn1 && <Link to={props.btn1Link || "#"} className="inline-flex items-center gap-2 bg-white text-teal font-semibold px-6 py-3 rounded-lg hover:scale-[1.02] transition">{props.btn1} <ArrowRight size={16}/></Link>}
+            {props.btn2 && <a href={props.btn2Link || "#"} className="btn-outline-white"><MessageCircle size={16}/> {props.btn2}</a>}
+          </div>
+        </div>
+      </section>
+    );
+
+    case "home-news": return (
+      <section className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-5 lg:px-8">
+          <div className="flex items-end justify-between mb-10">
+            <h2 className="text-3xl md:text-4xl font-semibold">{props.heading}</h2>
+            {props.linkText && <Link to={props.linkHref || "#"} className="text-teal font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all">{props.linkText} <ArrowRight size={16}/></Link>}
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {(props.articles || []).map((a: any, i: number) => (
+              <article key={i} className="rounded-xl overflow-hidden bg-white border border-border-silver hover:shadow-[0_8px_28px_rgba(0,0,0,.08)] transition-all hover:-translate-y-1">
+                <div className="relative h-44">
+                  {a.img && <img src={a.img} alt={a.category} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />}
+                  <div className="absolute inset-0 bg-linear-to-t from-navy/70 to-transparent"/>
+                  <span className="absolute top-3 left-3 text-[10px] uppercase tracking-[0.12em] font-medium text-white bg-teal px-2 py-1 rounded">{a.category}</span>
+                </div>
+                <div className="p-5">
+                  <div className="text-xs text-muted-grey">{a.date}</div>
+                  <h3 className="font-semibold mt-2 leading-snug">{a.title}</h3>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
 
     default:
       return <div className="p-4 rounded-xl bg-gray-50 text-sm text-gray-400">[{type}] block</div>;

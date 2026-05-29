@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/Reveal";
 import {
   Cpu, Printer, Box, ScanLine, Flame, Sparkles, ArrowRight,
 } from "lucide-react";
+import { PageBlocks } from "@/components/site/PageBlocks";
 
 export const Route = createFileRoute("/_marketing/technology/")({
   head: () => ({
@@ -30,8 +32,25 @@ const TECH = [
 ];
 
 function TechPage() {
+  const [cmsBlocks, setCmsBlocks] = useState<any[]>([]);
+  const [cmsLoaded, setCmsLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/pages/technology")
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(d => { setCmsBlocks(d.page?.blocks || []); })
+      .catch(() => {})
+      .finally(() => setCmsLoaded(true));
+  }, []);
+
+  const hasSavedBlocks = cmsLoaded && cmsBlocks.length > 0;
+
   return (
     <div>
+      {hasSavedBlocks ? (
+        <PageBlocks blocks={cmsBlocks} />
+      ) : (
+    <>
       <section className="bg-navy text-white py-20 relative overflow-hidden">
         <div className="absolute inset-0">
           <img src="https://cdn.pixabay.com/photo/2020/08/27/18/31/teeth-5522653_1280.jpg?w=1600&q=80&auto=format&fit=crop" alt="Digital dental technology" className="w-full h-full object-cover opacity-20" loading="lazy" />
@@ -78,6 +97,8 @@ function TechPage() {
           ))}
         </div>
       </section>
+    </>
+  )}
     </div>
   );
 }

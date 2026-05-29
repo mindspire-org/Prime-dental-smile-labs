@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { ArrowRight, Smile, Wrench, Layers, Frame, Shield, PencilRuler } from "lucide-react";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/Reveal";
+import { PageBlocks } from "@/components/site/PageBlocks";
 
 export const Route = createFileRoute("/_marketing/services/")({
   head: () => ({
@@ -44,8 +46,25 @@ const MATERIAL_TILES = [
 ];
 
 function ServicesPage() {
+  const [cmsBlocks, setCmsBlocks] = useState<any[]>([]);
+  const [cmsLoaded, setCmsLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/pages/services")
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(d => { setCmsBlocks(d.page?.blocks || []); })
+      .catch(() => {})
+      .finally(() => setCmsLoaded(true));
+  }, []);
+
+  const hasSavedBlocks = cmsLoaded && cmsBlocks.length > 0;
+
   return (
     <div>
+      {hasSavedBlocks ? (
+        <PageBlocks blocks={cmsBlocks} />
+      ) : (
+    <>
       {/* Hero */}
       <section className="relative bg-navy text-white overflow-hidden">
         <div className="absolute inset-0">
@@ -107,6 +126,8 @@ function ServicesPage() {
           </div>
         </div>
       </section>
+    </>
+  )}
     </div>
   );
 }

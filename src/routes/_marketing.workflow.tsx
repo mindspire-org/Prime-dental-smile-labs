@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/Reveal";
 import { CheckCircle2, Truck, ArrowRight } from "lucide-react";
+import { PageBlocks } from "@/components/site/PageBlocks";
 
 export const Route = createFileRoute("/_marketing/workflow")({
   head: () => ({
@@ -23,8 +25,25 @@ export const Route = createFileRoute("/_marketing/workflow")({
 const STEPS = ["Submitted","File Review","Awaiting Information","Design Stage","Dentist Approval","In Production","Finishing","Quality Control","Ready for Dispatch","Dispatched","Completed"];
 
 function WorkflowPage() {
+  const [cmsBlocks, setCmsBlocks] = useState<any[]>([]);
+  const [cmsLoaded, setCmsLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/pages/workflow")
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(d => { setCmsBlocks(d.page?.blocks || []); })
+      .catch(() => {})
+      .finally(() => setCmsLoaded(true));
+  }, []);
+
+  const hasSavedBlocks = cmsLoaded && cmsBlocks.length > 0;
+
   return (
     <div>
+      {hasSavedBlocks ? (
+        <PageBlocks blocks={cmsBlocks} />
+      ) : (
+    <>
       <section className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-5 lg:px-8">
           <Reveal>
@@ -112,6 +131,8 @@ function WorkflowPage() {
       <section className="bg-white py-16 text-center">
         <Link to="/portal" className="btn-teal">Login to Portal <ArrowRight size={16}/></Link>
       </section>
+    </>
+  )}
     </div>
   );
 }

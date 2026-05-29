@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/Reveal";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { PageBlocks } from "@/components/site/PageBlocks";
 
 export const Route = createFileRoute("/_marketing/about/")({
   head: () => ({
@@ -30,8 +32,25 @@ const GALLERY = [
 ];
 
 function AboutPage() {
+  const [cmsBlocks, setCmsBlocks] = useState<any[]>([]);
+  const [cmsLoaded, setCmsLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/pages/about")
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(d => { setCmsBlocks(d.page?.blocks || []); })
+      .catch(() => {})
+      .finally(() => setCmsLoaded(true));
+  }, []);
+
+  const hasSavedBlocks = cmsLoaded && cmsBlocks.length > 0;
+
   return (
     <div>
+      {hasSavedBlocks ? (
+        <PageBlocks blocks={cmsBlocks} />
+      ) : (
+    <>
       {/* Hero */}
       <section className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-5 lg:px-8 grid lg:grid-cols-2 gap-14 items-center">
@@ -113,6 +132,8 @@ function AboutPage() {
           </div>
         </div>
       </section>
+    </>
+  )}
     </div>
   );
 }
