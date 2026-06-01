@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Download, Upload, FileText, ChevronLeft, Send, Paperclip, CheckCheck, Trash2, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { apiFetch, getCurrentUser, openRealtimeConnection, type AuthUser } from "@/lib/api";
+import { generateCasePdf } from "@/lib/case-pdf";
 
 export const Route = createFileRoute("/admin/cases/$id")({
   component: AdminCaseDetail,
@@ -179,6 +180,13 @@ function AdminCaseDetail() {
               <div className="text-xs text-slate-400">
                 Submitted {new Date(dentalCase.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
               </div>
+              <button
+                onClick={() => generateCasePdf(dentalCase)}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors mt-1"
+                title="Download case PDF"
+              >
+                <Download size={13}/> Download PDF
+              </button>
             </div>
           </div>
           <div className="mt-4">
