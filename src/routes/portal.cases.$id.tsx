@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Download, Upload, FileText, ChevronLeft, Send, Paperclip, CheckCheck, Trash2, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { apiFetch, getCurrentUser, openRealtimeConnection, type AuthUser } from "@/lib/api";
+import { CaseFileList } from "@/components/site/CaseFiles";
 
 export const Route = createFileRoute("/portal/cases/$id")({
   component: CaseDetail,
@@ -227,37 +228,13 @@ function CaseDetail() {
               <span className="w-1 h-5 rounded-full bg-teal inline-block"/>
               Uploaded Files
             </h2>
-            {(!dentalCase.files || dentalCase.files.length === 0) ? (
-              <div className="text-center py-6 text-slate-300 text-sm flex flex-col items-center gap-2">
-                <FileText size={30} strokeWidth={1}/>
-                No files attached yet.
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {dentalCase.files.map((f: any) => (
-                  <div key={f._id}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-cyan-50 transition-colors border border-slate-100 group">
-                    <div className="w-9 h-9 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0 border border-slate-100">
-                      <FileText size={16} className="text-teal"/>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-slate-700 truncate">{f.originalName}</div>
-                      {f.size && <div className="text-[10px] text-slate-400">{(f.size / 1024).toFixed(0)} KB</div>}
-                    </div>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => download(f._id)}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-teal px-2.5 py-1.5 rounded-lg hover:bg-teal hover:text-white transition-colors">
-                        <Download size={11}/> Download
-                      </button>
-                      <button onClick={() => deleteFile(f._id)} disabled={deletingId === f._id}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40">
-                        {deletingId === f._id ? <Loader2 size={13} className="animate-spin"/> : <Trash2 size={13}/>}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <CaseFileList
+              files={dentalCase.files || []}
+              theme="teal"
+              onDelete={deleteFile}
+              deletingId={deletingId}
+              allowDelete={true}
+            />
           </section>
 
           {/* Messages */}
