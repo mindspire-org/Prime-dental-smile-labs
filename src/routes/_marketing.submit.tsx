@@ -20,6 +20,7 @@ import {
   FileCheck
 } from "lucide-react";
 import { ToothChart, type ToothRole } from "@/components/site/ToothChart";
+import { ModernDatePicker } from "@/components/site/ModernDatePicker";
 import { Reveal } from "@/components/site/Reveal";
 import { analytics } from "@/components/analytics/GoogleAnalytics";
 import { getCurrentUser } from "@/lib/api";
@@ -133,6 +134,7 @@ function SubmitPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [drag, setDrag] = useState(false);
   const [decl, setDecl] = useState({ a: false, b: false, c: false });
+  const [requestedCompletion, setRequestedCompletion] = useState("");
   const [hoveredStep, setHoveredStep] = useState<number | null>(null);
 
   const next = () => {
@@ -399,7 +401,15 @@ function SubmitPage() {
                 <input type="date" className={inputCls} />
               </Field>
               <Field label="Requested Completion" required tooltip="When do you need this case back?">
-                <input type="date" className={inputCls} />
+                <ModernDatePicker
+                  value={requestedCompletion}
+                  onChange={setRequestedCompletion}
+                  placeholder="Pick a date"
+                />
+                <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed flex items-start gap-1">
+                  <Info size={12} className="text-teal shrink-0 mt-0.5" />
+                  Production of your dental prosthesis is usually completed within 3 working days after case approval, although complex cases may require additional time.
+                </p>
               </Field>
               <Field label="Urgency" tooltip="Select urgency level">
                 <select className={inputCls}>

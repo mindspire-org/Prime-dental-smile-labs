@@ -123,6 +123,28 @@ function AdminLayout() {
     setChecking(false);
   }, [navigate, path]);
 
+  // Inactivity auto-logout (10 minutes)
+  useEffect(() => {
+    const IDLE_MS = 10 * 60 * 1000;
+    let timer: ReturnType<typeof setTimeout>;
+    const logout = async () => {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" }).catch(() => {});
+      clearSession();
+      navigate({ to: "/login" as any });
+    };
+    const reset = () => {
+      clearTimeout(timer);
+      timer = setTimeout(logout, IDLE_MS);
+    };
+    const events = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"];
+    events.forEach((e) => window.addEventListener(e, reset, { passive: true }));
+    timer = setTimeout(logout, IDLE_MS);
+    return () => {
+      clearTimeout(timer);
+      events.forEach((e) => window.removeEventListener(e, reset));
+    };
+  }, [navigate]);
+
   if (checking) {
     return <AuthLoading />;
   }
@@ -142,7 +164,7 @@ function AdminLayout() {
         {/* Logo */}
         <div className="px-5 pt-5 pb-4 border-b border-white/8 relative">
           <Link to="/" className="flex items-center gap-2.5">
-            <img src={logoUrl} alt="Prime Smiles" className="h-9 w-auto object-contain brightness-0 invert" />
+            <img src={logoUrl} alt="Prime Smiles" className="h-9 w-auto object-contain" />
             <div className="text-white/30 text-[9px] uppercase tracking-[0.15em] mt-0.5 self-end pb-0.5">Admin</div>
           </Link>
         </div>

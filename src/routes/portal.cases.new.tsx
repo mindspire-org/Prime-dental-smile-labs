@@ -6,6 +6,7 @@ import {
   Wrench, Truck, FileCheck, Zap, Upload, Sparkles, Info, ArrowLeft,
 } from "lucide-react";
 import { ToothChart, type ToothRole } from "@/components/site/ToothChart";
+import { ModernDatePicker } from "@/components/site/ModernDatePicker";
 
 export const Route = createFileRoute("/portal/cases/new")({
   component: NewCasePage,
@@ -293,7 +294,15 @@ function NewCasePage() {
             <input type="number" min={1} max={120} className={inp} value={patientForm.patientAge} onChange={e => setPatientForm(f => ({ ...f, patientAge: e.target.value }))} placeholder="e.g. 45" />
           </Field>
           <Field label="Requested Completion Date" required tooltip="When do you need this case returned?">
-            <input type="date" className={inp} value={patientForm.requestedCompletion} onChange={e => setPatientForm(f => ({ ...f, requestedCompletion: e.target.value }))} />
+            <ModernDatePicker
+              value={patientForm.requestedCompletion}
+              onChange={(val) => setPatientForm(f => ({ ...f, requestedCompletion: val }))}
+              placeholder="Pick a date"
+            />
+            <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed flex items-start gap-1">
+              <Info size={12} className="text-teal shrink-0 mt-0.5" />
+              Production of your dental prosthesis is usually completed within 3 working days after case approval, although complex cases may require additional time.
+            </p>
           </Field>
           <Field label="Urgency">
             <select className={inp} value={patientForm.urgency} onChange={e => setPatientForm(f => ({ ...f, urgency: e.target.value }))}>

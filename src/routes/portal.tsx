@@ -96,6 +96,28 @@ function PortalLayout() {
     setChecking(false);
   }, [navigate]);
 
+  // Inactivity auto-logout (10 minutes)
+  useEffect(() => {
+    const IDLE_MS = 10 * 60 * 1000; // 10 minutes
+    let timer: ReturnType<typeof setTimeout>;
+    const logout = async () => {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" }).catch(() => {});
+      clearSession();
+      navigate({ to: "/login" as any });
+    };
+    const reset = () => {
+      clearTimeout(timer);
+      timer = setTimeout(logout, IDLE_MS);
+    };
+    const events = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"];
+    events.forEach((e) => window.addEventListener(e, reset, { passive: true }));
+    timer = setTimeout(logout, IDLE_MS);
+    return () => {
+      clearTimeout(timer);
+      events.forEach((e) => window.removeEventListener(e, reset));
+    };
+  }, [navigate]);
+
   if (checking) {
     return <AuthLoading />;
   }
@@ -117,7 +139,7 @@ function PortalLayout() {
         {/* Logo */}
         <div className="relative px-6 pt-5 pb-4 border-b border-white/8">
           <Link to="/">
-            <img src={logoUrl} alt="Prime Smiles" className="h-10 w-auto object-contain brightness-0 invert" />
+            <img src={logoUrl} alt="Prime Smiles" className="h-10 w-auto object-contain" />
           </Link>
         </div>
 

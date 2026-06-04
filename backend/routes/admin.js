@@ -134,8 +134,15 @@ adminRouter.post("/users", requireRole("admin"), async (req, res) => {
 });
 
 adminRouter.patch("/users/:id", requireRole("admin"), async (req, res) => {
-  const allowed = ["name", "role", "phone", "gdcNumber", "active", "clinic"];
+  const allowed = ["name", "email", "role", "phone", "gdcNumber", "active", "clinic"];
   const update = Object.fromEntries(Object.entries(req.body).filter(([k]) => allowed.includes(k)));
+
+  if (update.email) {
+    update.email = update.email.toLowerCase().trim();
+    const existing = await User.findOne({ email: update.email, _id: { $ne: req.params.id } });
+    if (existing) return res.status(409).json({ error: "A user with this email already exists" });
+  }
+
   const user = await User.findByIdAndUpdate(req.params.id, update, { returnDocument: "after" }).select("-passwordHash -refreshTokens").populate("clinic", "name");
   if (!user) return res.status(404).json({ error: "Not found" });
   res.json({ user });
@@ -156,6 +163,17 @@ adminRouter.post("/users/:id/reset-password", requireRole("admin"), async (req, 
   await user.save();
   await sendWelcomeEmail({ to: user.email, name: user.name, temporaryPassword: pw });
   res.json({ temporaryPassword: pw });
+});
+
+adminRouter.post("/users/:id/set-password", requireRole("admin"), async (req, res) => {
+  const { password } = req.body;
+  if (!password || password.length < 6) return res.status(400).json({ error: "Password must be at least 6 characters" });
+  const user = await User.findById(req.params.id);
+  if (!user) return res.status(404).json({ error: "Not found" });
+  user.passwordHash = await User.hashPassword(password);
+  user.refreshTokens = [];
+  await user.save();
+  res.json({ ok: true });
 });
 
 /* ── Clinics management ─────────────────────────────────── */
