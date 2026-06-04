@@ -3,6 +3,7 @@ import { Download, Upload, FileText, ChevronLeft, Send, Paperclip, CheckCheck, T
 import { useEffect, useRef, useState } from "react";
 import { apiFetch, getCurrentUser, openRealtimeConnection, type AuthUser } from "@/lib/api";
 import { CaseFileList } from "@/components/site/CaseFiles";
+import { shadeFields } from "@/lib/shade";
 
 export const Route = createFileRoute("/portal/cases/$id")({
   component: CaseDetail,
@@ -208,7 +209,7 @@ function CaseDetail() {
                 ["Patient Ref",  dentalCase.patientRef],
                 ["Service",      dentalCase.services?.join(", ") || "Not specified"],
                 ["Material",     dentalCase.material || "—"],
-                ["Shade",        [dentalCase.shade?.body, dentalCase.shade?.system].filter(Boolean).join(" · ") || "—"],
+                ...shadeFields(dentalCase.shade),
                 ["Teeth",        Object.keys(dentalCase.teeth || {}).join(", ") || "—"],
                 ["Urgency",      dentalCase.urgency || "Standard"],
                 ["Submitted",    new Date(dentalCase.createdAt).toLocaleDateString("en-GB")],

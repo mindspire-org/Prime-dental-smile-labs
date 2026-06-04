@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { shadeFields } from "./shade";
 
 const PRIMARY = "#4f46e5";
 const PRIMARY_LIGHT = "#eef2ff";
@@ -180,9 +181,7 @@ export function generateCasePdf(caseData: any, filename?: string) {
   y = sectionHeader(doc, "Prescription Summary", y);
 
   const teeth = caseData.teeth ? Object.keys(caseData.teeth).join(", ") : "—";
-  const shade = [caseData.shade?.body, caseData.shade?.system, caseData.shade?.cervical, caseData.shade?.incisal]
-    .filter(Boolean)
-    .join(" · ") || "—";
+  const shadeRows = shadeFields(caseData.shade);
 
   autoTable(doc, {
     startY: y,
@@ -199,7 +198,7 @@ export function generateCasePdf(caseData: any, filename?: string) {
     body: [
       ["Services", caseData.services?.join(", ") || "Not specified"],
       ["Material", caseData.material || "—"],
-      ["Shade", shade],
+      ...(shadeRows.length ? shadeRows : [["Shade", "—"] as [string, string]]),
       ["Teeth", teeth],
       ["Urgency", caseData.urgency || "Standard"],
       ["Requested Completion", caseData.requestedCompletion ? new Date(caseData.requestedCompletion).toLocaleDateString("en-GB") : "—"],
