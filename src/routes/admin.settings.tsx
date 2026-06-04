@@ -38,25 +38,25 @@ function ImageUploadField({ value, onChange }: { value: string; onChange: (v: st
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-col sm:flex-row gap-3">
       {value ? (
-        <div className="relative group">
+        <div className="relative group shrink-0">
           <img src={value} alt="Preview" className="w-12 h-12 rounded-lg object-cover border border-slate-200" />
           <button onClick={() => onChange("")} className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <Trash2 size={9} />
           </button>
         </div>
       ) : (
-        <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-slate-300">
+        <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-slate-300 shrink-0">
           <Image size={18} />
         </div>
       )}
-      <div className="flex-1 flex items-center gap-2">
+      <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 min-w-0">
         <input type="text" value={value || ""} onChange={e => onChange(e.target.value)} placeholder="https://... or upload"
-          className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-400" />
+          className="flex-1 min-w-0 px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-400" />
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
         <button onClick={() => fileRef.current?.click()} disabled={uploading}
-          className="px-3 py-2 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors disabled:opacity-50 inline-flex items-center gap-1">
+          className="px-3 py-2 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-1 shrink-0">
           {uploading ? <><Save size={12} className="animate-spin"/> Uploading</> : <><Upload size={12}/> Upload</>}
         </button>
       </div>
@@ -133,27 +133,30 @@ function AdminSettings() {
   const groupSettings = settings.filter(s => s.group === activeGroup);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Settings</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Settings</h1>
           <p className="text-sm text-slate-400 mt-0.5">Configure your site, email, appearance and features</p>
         </div>
         <button onClick={save} disabled={saving}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-60"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-60 w-full sm:w-auto"
           style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)" }}>
           {saved ? <><CheckCircle2 size={15}/> Saved!</> : saving ? <><Save size={15} className="animate-spin"/> Saving…</> : <><Save size={15}/> Save All</>}
         </button>
       </div>
 
-      <div className="flex gap-6">
-        {/* Sidebar */}
-        <nav className="w-48 shrink-0 space-y-1">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+        {/* Group tabs — horizontal scroll on mobile, vertical sidebar on desktop */}
+        <nav className="flex lg:flex-col gap-2 overflow-x-auto pb-1 lg:pb-0 lg:w-48 shrink-0 -mx-1 px-1 lg:mx-0 lg:px-0 scrollbar-hide"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
           {groups.map(g => {
             const m = GROUP_META[g];
             return (
               <button key={g} onClick={() => setActiveGroup(g)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left ${activeGroup === g ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-50"}`}>
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left whitespace-nowrap shrink-0
+                  ${activeGroup === g ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-50"}`}>
                 <span className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${activeGroup === g ? m.color : "bg-slate-100"}`}>
                   <m.icon size={12} className={activeGroup === g ? "text-white" : "text-slate-400"}/>
                 </span>
@@ -164,21 +167,21 @@ function AdminSettings() {
         </nav>
 
         {/* Fields */}
-        <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <div className="flex items-center gap-2 mb-6">
+        <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6 min-w-0">
+          <div className="flex items-center gap-2 mb-4 sm:mb-6">
             {GROUP_META[activeGroup] && (
-              <span className={`w-8 h-8 rounded-xl flex items-center justify-center ${GROUP_META[activeGroup].color}`}>
+              <span className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${GROUP_META[activeGroup].color}`}>
                 {(() => { const Icon = GROUP_META[activeGroup].icon; return <Icon size={15} className="text-white"/>; })()}
               </span>
             )}
-            <h2 className="font-bold text-slate-800">{GROUP_META[activeGroup]?.label ?? activeGroup}</h2>
+            <h2 className="font-bold text-slate-800 text-sm sm:text-base">{GROUP_META[activeGroup]?.label ?? activeGroup}</h2>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-4 sm:space-y-5">
             {groupSettings.map(s => (
-              <div key={s.key}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-sm font-medium text-slate-700">{s.label}</label>
+              <div key={s.key} className="min-w-0">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-2 mb-1.5">
+                  <label className="text-sm font-medium text-slate-700 shrink-0">{s.label}</label>
                   {s.type === "boolean" && (
                     <SettingField s={s} value={values[s.key]} onChange={v => setValues(p => ({ ...p, [s.key]: v }))}/>
                   )}
@@ -186,13 +189,13 @@ function AdminSettings() {
                 {s.type !== "boolean" && (
                   <SettingField s={s} value={values[s.key]} onChange={v => setValues(p => ({ ...p, [s.key]: v }))}/>
                 )}
-                <p className="text-[11px] text-slate-400 mt-1 font-mono">{s.key}</p>
+                <p className="text-[11px] text-slate-400 mt-1 font-mono truncate">{s.key}</p>
               </div>
             ))}
             {activeGroup === "smtp" && (
               <div className="pt-2">
                 <button onClick={sendTestEmail} disabled={testEmailStatus === "Sending…"}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-orange-50 text-orange-600 hover:bg-orange-100 transition-colors disabled:opacity-50">
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-orange-50 text-orange-600 hover:bg-orange-100 transition-colors disabled:opacity-50 w-full sm:w-auto justify-center sm:justify-start">
                   <Send size={13}/> Send Test Email
                 </button>
                 {testEmailStatus && (
