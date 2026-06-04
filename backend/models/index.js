@@ -18,3 +18,4 @@ export { EmailTemplate } from "./EmailTemplate.js";
 export { Permission } from "./Permission.js";
 export { RoleConfiguration } from "./RoleConfiguration.js";
 export { ContactEnquiry } from "./ContactEnquiry.js";
+export { Backup } from "./Backup.js";

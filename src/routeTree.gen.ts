@@ -39,6 +39,7 @@ import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminClinicsRouteImport } from './routes/admin.clinics'
 import { Route as AdminCasesRouteImport } from './routes/admin.cases'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminBackupsRouteImport } from './routes/admin.backups'
 import { Route as AdminActivityRouteImport } from './routes/admin.activity'
 import { Route as MarketingWorkflowRouteImport } from './routes/_marketing.workflow'
 import { Route as MarketingTermsOfServiceRouteImport } from './routes/_marketing.terms-of-service'
@@ -218,6 +219,11 @@ const AdminCasesRoute = AdminCasesRouteImport.update({
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBackupsRoute = AdminBackupsRouteImport.update({
+  id: '/backups',
+  path: '/backups',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminActivityRoute = AdminActivityRouteImport.update({
@@ -404,6 +410,7 @@ export interface FileRoutesByFullPath {
   '/workflow': typeof MarketingWorkflowRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/backups': typeof AdminBackupsRoute
   '/admin/cases': typeof AdminCasesRouteWithChildren
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/content': typeof AdminContentRoute
@@ -461,6 +468,7 @@ export interface FileRoutesByTo {
   '/workflow': typeof MarketingWorkflowRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/backups': typeof AdminBackupsRoute
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/email-templates': typeof AdminEmailTemplatesRoute
@@ -523,6 +531,7 @@ export interface FileRoutesById {
   '/_marketing/workflow': typeof MarketingWorkflowRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/backups': typeof AdminBackupsRoute
   '/admin/cases': typeof AdminCasesRouteWithChildren
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/content': typeof AdminContentRoute
@@ -588,6 +597,7 @@ export interface FileRouteTypes {
     | '/workflow'
     | '/admin/activity'
     | '/admin/analytics'
+    | '/admin/backups'
     | '/admin/cases'
     | '/admin/clinics'
     | '/admin/content'
@@ -645,6 +655,7 @@ export interface FileRouteTypes {
     | '/workflow'
     | '/admin/activity'
     | '/admin/analytics'
+    | '/admin/backups'
     | '/admin/clinics'
     | '/admin/content'
     | '/admin/email-templates'
@@ -706,6 +717,7 @@ export interface FileRouteTypes {
     | '/_marketing/workflow'
     | '/admin/activity'
     | '/admin/analytics'
+    | '/admin/backups'
     | '/admin/cases'
     | '/admin/clinics'
     | '/admin/content'
@@ -970,6 +982,13 @@ declare module '@tanstack/react-router' {
       path: '/analytics'
       fullPath: '/admin/analytics'
       preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/backups': {
+      id: '/admin/backups'
+      path: '/backups'
+      fullPath: '/admin/backups'
+      preLoaderRoute: typeof AdminBackupsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/activity': {
@@ -1290,6 +1309,7 @@ const AdminCasesRouteWithChildren = AdminCasesRoute._addFileChildren(
 interface AdminRouteChildren {
   AdminActivityRoute: typeof AdminActivityRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminBackupsRoute: typeof AdminBackupsRoute
   AdminCasesRoute: typeof AdminCasesRouteWithChildren
   AdminClinicsRoute: typeof AdminClinicsRoute
   AdminContentRoute: typeof AdminContentRoute
@@ -1314,6 +1334,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminActivityRoute: AdminActivityRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminBackupsRoute: AdminBackupsRoute,
   AdminCasesRoute: AdminCasesRouteWithChildren,
   AdminClinicsRoute: AdminClinicsRoute,
   AdminContentRoute: AdminContentRoute,

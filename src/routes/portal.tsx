@@ -193,6 +193,17 @@ function PortalLayout() {
           <ToothIllustration />
         </div>
 
+        {/* Return to original portal (admin / lab staff) */}
+        {user && (user.role === "admin" || user.role === "lab_staff") && (
+          <div className="px-3 pb-2">
+            <a href={user.role === "admin" ? "/admin" : "/admin/cases"}
+              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-white/40 hover:text-white hover:bg-white/5 transition-all duration-200 font-medium border border-white/8">
+              <LayoutDashboard size={15}/>
+              <span>{user.role === "admin" ? "Admin Portal" : "Lab Portal"}</span>
+            </a>
+          </div>
+        )}
+
         {/* Logout */}
         <div className="p-3 border-t border-white/8">
           <button

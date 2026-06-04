@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Layers, Cpu, PhoneCall, User, FilePlus, Folder, MessageSquare, LayoutDashboard, FileText, Settings, Briefcase, Users } from "lucide-react";
+import { Home, Layers, Cpu, PhoneCall, User, FilePlus, Folder, MessageSquare, LayoutDashboard, FileText, Settings, Briefcase, Users, Database } from "lucide-react";
 import { getCurrentUser } from "@/lib/api";
 
 /* ── Marketing bottom nav ─────────────────────────────── */
@@ -26,6 +26,7 @@ const ADMIN_TABS = [
   { to: "/admin/cases",    label: "Cases",     icon: Briefcase,       exact: false },
   { to: "/admin/messages", label: "Messages",  icon: MessageSquare,   exact: false },
   { to: "/admin/users",    label: "Users",     icon: Users,           exact: false, adminOnly: true },
+  { to: "/admin/backups",  label: "Backups",   icon: Database,        exact: false, adminOnly: true },
   { to: "/admin/settings", label: "Settings",  icon: Settings,        exact: false, adminOnly: true },
 ];
 

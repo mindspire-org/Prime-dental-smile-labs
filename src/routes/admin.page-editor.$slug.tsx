@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import {
   ChevronLeft, Plus, Trash2, GripVertical, Settings2, Eye,
-  Save, CheckCircle2, Type, Image, LayoutGrid, MessageSquare,
+  Save, CheckCircle2, Type, Image, LayoutGrid, MessageSquare, Upload,
   Star, Zap, Minus, PlayCircle, ChevronDown, Users, Search,
   Monitor, Tablet, Smartphone, Palette, Layers, Copy, RefreshCw,
   Info, Lock, Unlock, Globe, Code, Sparkles, ArrowUpRight, ArrowRight,
@@ -1064,6 +1064,80 @@ function TextArea({ label, value, onChange }: { label: string; value: string; on
   );
 }
 
+function ImageField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append("files", file);
+      const r = await apiFetch<{ items: { url: string }[] }>("/api/admin/media", { method: "POST", body: form });
+      if (r.items?.[0]?.url) onChange(r.items[0].url);
+    } catch (err: any) {
+      alert(err.message || "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+
+  return (
+    <div>
+      <label className="text-xs font-medium text-slate-600 block mb-1">{label}</label>
+      <div className="flex gap-2">
+        <input value={value || ""} onChange={e => onChange(e.target.value)} placeholder="https://..."
+          className="flex-1 min-w-0 px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-400"/>
+        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+        <button onClick={() => fileRef.current?.click()} disabled={uploading}
+          className="px-3 py-2 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors disabled:opacity-50 inline-flex items-center gap-1 shrink-0">
+          {uploading ? <><Save size={12} className="animate-spin"/> Uploading</> : <><Upload size={12}/> Upload</>}
+        </button>
+      </div>
+      {value && (
+        <div className="mt-2 rounded-lg overflow-hidden border border-slate-100 h-20 w-full bg-slate-50">
+          <img src={value} alt="Preview" className="h-full w-full object-contain" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function InlineImageField({ value, onChange, placeholder = "Image URL" }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append("files", file);
+      const r = await apiFetch<{ items: { url: string }[] }>("/api/admin/media", { method: "POST", body: form });
+      if (r.items?.[0]?.url) onChange(r.items[0].url);
+    } catch (err: any) {
+      alert(err.message || "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+  return (
+    <div className="flex gap-2 items-center">
+      <input value={value || ""} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+        className="flex-1 min-w-0 px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+      <button onClick={() => fileRef.current?.click()} disabled={uploading}
+        className="px-2 py-1.5 rounded-lg text-[10px] font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors disabled:opacity-50 inline-flex items-center gap-1 shrink-0">
+        {uploading ? <Save size={10} className="animate-spin"/> : <Upload size={10}/>}
+      </button>
+    </div>
+  );
+}
+
 function BlockPropsEditor({ type, props, onChange }: { type: string; props: any; onChange: (p: any) => void }) {
   function set(key: string, val: any) { onChange({ ...props, [key]: val }); }
 
@@ -1078,7 +1152,7 @@ function BlockPropsEditor({ type, props, onChange }: { type: string; props: any;
         <TextField label="CTA 1 Link"  value={props.cta1Link}   onChange={v => set("cta1Link", v)}/>
         <TextField label="CTA 2 Text"  value={props.cta2}       onChange={v => set("cta2", v)}/>
         <TextField label="CTA 2 Link"  value={props.cta2Link}   onChange={v => set("cta2Link", v)}/>
-        <TextField label="Image URL"  value={props.image}      onChange={v => set("image", v)}/>
+        <ImageField label="Image"       value={props.image}      onChange={v => set("image", v)}/>
         <div>
           <label className="text-xs font-medium text-slate-600 block mb-1">Alignment</label>
           <div className="flex gap-2">
@@ -1111,7 +1185,7 @@ function BlockPropsEditor({ type, props, onChange }: { type: string; props: any;
         {(props.gallery || []).map((img: any, i: number) => (
           <div key={i} className="border border-slate-100 rounded-xl p-3 space-y-2">
             <div className="flex justify-between"><span className="text-xs text-slate-400">Image {i + 1}</span><button onClick={() => set("gallery", props.gallery.filter((_: any, j: number) => j !== i))} className="text-red-400"><Trash2 size={12}/></button></div>
-            <input value={img.src} onChange={e => { const g = [...props.gallery]; g[i] = { ...g[i], src: e.target.value }; set("gallery", g); }} placeholder="Image URL" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+            <InlineImageField value={img.src} onChange={v => { const g = [...props.gallery]; g[i] = { ...g[i], src: v }; set("gallery", g); }}/>
             <input value={img.alt} onChange={e => { const g = [...props.gallery]; g[i] = { ...g[i], alt: e.target.value }; set("gallery", g); }} placeholder="Alt text" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
             <input value={img.span} onChange={e => { const g = [...props.gallery]; g[i] = { ...g[i], span: e.target.value }; set("gallery", g); }} placeholder="Span class (e.g. col-span-2 row-span-2)" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
           </div>
@@ -1135,7 +1209,7 @@ function BlockPropsEditor({ type, props, onChange }: { type: string; props: any;
     );
     case "image": return (
       <div className="space-y-3">
-        <TextField label="Image URL" value={props.src}     onChange={v => set("src", v)}/>
+        <ImageField label="Image"     value={props.src}     onChange={v => set("src", v)}/>
         <TextField label="Alt Text"  value={props.alt}     onChange={v => set("alt", v)}/>
         <TextField label="Caption"   value={props.caption} onChange={v => set("caption", v)}/>
       </div>
@@ -1144,7 +1218,7 @@ function BlockPropsEditor({ type, props, onChange }: { type: string; props: any;
       <div className="space-y-3">
         <TextField label="Heading"   value={props.heading}  onChange={v => set("heading", v)}/>
         <TextArea  label="Text"      value={props.text}     onChange={v => set("text", v)}/>
-        <TextField label="Image URL" value={props.image}    onChange={v => set("image", v)}/>
+        <ImageField label="Image"    value={props.image}    onChange={v => set("image", v)}/>
         <TextField label="CTA Text"  value={props.cta}      onChange={v => set("cta", v)}/>
         <TextField label="CTA Link"  value={props.ctaLink}  onChange={v => set("ctaLink", v)}/>
         <div className="flex items-center gap-2">
@@ -1263,7 +1337,7 @@ function BlockPropsEditor({ type, props, onChange }: { type: string; props: any;
         <TextField label="Heading" value={props.heading} onChange={v => set("heading", v)}/>
         <TextField label="Highlight Word" value={props.highlight} onChange={v => set("highlight", v)}/>
         <TextArea label="Subheading" value={props.subheading} onChange={v => set("subheading", v)}/>
-        <TextField label="Background Image URL" value={props.image} onChange={v => set("image", v)}/>
+        <ImageField label="Background Image" value={props.image} onChange={v => set("image", v)}/>
         <TextField label="CTA 1 Text" value={props.cta1} onChange={v => set("cta1", v)}/>
         <TextField label="CTA 1 Link" value={props.cta1Link} onChange={v => set("cta1Link", v)}/>
         <TextField label="CTA 2 Text" value={props.cta2} onChange={v => set("cta2", v)}/>
@@ -1351,7 +1425,7 @@ function BlockPropsEditor({ type, props, onChange }: { type: string; props: any;
             <div className="flex justify-between"><span className="text-xs text-slate-400">Tile {i + 1}</span><button onClick={() => set("tiles", props.tiles.filter((_: any, j: number) => j !== i))} className="text-red-400"><Trash2 size={12}/></button></div>
             <input value={tile.label} onChange={e => { const t = [...props.tiles]; t[i] = { ...t[i], label: e.target.value }; set("tiles", t); }} placeholder="Label (leave empty for image-only)" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
             <textarea value={tile.sub} onChange={e => { const t = [...props.tiles]; t[i] = { ...t[i], sub: e.target.value }; set("tiles", t); }} placeholder="Subtitle" rows={2} className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none resize-none"/>
-            <input value={tile.img} onChange={e => { const t = [...props.tiles]; t[i] = { ...t[i], img: e.target.value }; set("tiles", t); }} placeholder="Image URL" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+            <InlineImageField value={tile.img} onChange={v => { const t = [...props.tiles]; t[i] = { ...t[i], img: v }; set("tiles", t); }}/>
             <div className="flex items-center gap-2">
               <input type="checkbox" checked={!!tile.text} onChange={e => { const t = [...props.tiles]; t[i] = { ...t[i], text: e.target.checked }; set("tiles", t); }} className="rounded"/>
               <span className="text-xs text-slate-500">Show text overlay</span>
@@ -1430,10 +1504,74 @@ function BlockPropsEditor({ type, props, onChange }: { type: string; props: any;
             <input value={a.category} onChange={e => { const ar = [...props.articles]; ar[i] = { ...ar[i], category: e.target.value }; set("articles", ar); }} placeholder="Category" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
             <input value={a.title} onChange={e => { const ar = [...props.articles]; ar[i] = { ...ar[i], title: e.target.value }; set("articles", ar); }} placeholder="Title" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
             <input value={a.date} onChange={e => { const ar = [...props.articles]; ar[i] = { ...ar[i], date: e.target.value }; set("articles", ar); }} placeholder="Date" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
-            <input value={a.img} onChange={e => { const ar = [...props.articles]; ar[i] = { ...ar[i], img: e.target.value }; set("articles", ar); }} placeholder="Image URL" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+            <InlineImageField value={a.img} onChange={v => { const ar = [...props.articles]; ar[i] = { ...ar[i], img: v }; set("articles", ar); }}/>
           </div>
         ))}
         <button onClick={() => set("articles", [...(props.articles || []), { category: "", title: "", date: "", img: "" }])} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800">+ Add article</button>
+      </div>
+    );
+    case "team": return (
+      <div className="space-y-3">
+        <TextField label="Section Heading" value={props.heading} onChange={v => set("heading", v)}/>
+        <div>
+          <label className="text-xs font-medium text-slate-600 block mb-1">Columns</label>
+          <div className="flex gap-2">
+            {[2,3,4].map(c => (
+              <button key={c} onClick={() => set("columns", c)}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-medium border ${props.columns === c ? "bg-indigo-500 text-white border-indigo-500" : "border-slate-200 text-slate-600"}`}>{c}</button>
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={() => set("showBio", !props.showBio)}
+            className={`w-10 h-6 rounded-full transition-colors ${props.showBio ? "bg-indigo-500" : "bg-slate-200"}`}>
+            <span className={`block w-5 h-5 bg-white rounded-full shadow m-0.5 transition-transform ${props.showBio ? "translate-x-4" : ""}`}/>
+          </button>
+          <span className="text-xs text-slate-600">Show bio</span>
+        </div>
+        <div className="text-xs font-medium text-slate-600 mb-1">Members</div>
+        {(props.members || []).map((m: any, i: number) => (
+          <div key={i} className="border border-slate-100 rounded-xl p-3 space-y-2">
+            <div className="flex justify-between"><span className="text-xs text-slate-400">Member {i + 1}</span><button onClick={() => set("members", props.members.filter((_: any, j: number) => j !== i))} className="text-red-400"><Trash2 size={12}/></button></div>
+            <input value={m.name} onChange={e => { const mem = [...props.members]; mem[i] = { ...mem[i], name: e.target.value }; set("members", mem); }} placeholder="Name" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+            <input value={m.title} onChange={e => { const mem = [...props.members]; mem[i] = { ...mem[i], title: e.target.value }; set("members", mem); }} placeholder="Role / Title" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+            <InlineImageField value={m.photo} onChange={v => { const mem = [...props.members]; mem[i] = { ...mem[i], photo: v }; set("members", mem); }}/>
+            <textarea value={m.bio} onChange={e => { const mem = [...props.members]; mem[i] = { ...mem[i], bio: e.target.value }; set("members", mem); }} placeholder="Bio" rows={2} className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none resize-none"/>
+          </div>
+        ))}
+        <button onClick={() => set("members", [...(props.members || []), { name: "", title: "", photo: "", bio: "" }])} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800">+ Add member</button>
+      </div>
+    );
+    case "divider": return (
+      <div className="space-y-3">
+        <div>
+          <label className="text-xs font-medium text-slate-600 block mb-1">Style</label>
+          <div className="flex gap-2">
+            {["solid","dashed","dotted"].map(s => (
+              <button key={s} onClick={() => set("style", s)}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-medium border capitalize ${props.style === s ? "bg-indigo-500 text-white border-indigo-500" : "border-slate-200 text-slate-600"}`}>{s}</button>
+            ))}
+          </div>
+        </div>
+        <TextField label="Color" value={props.color} onChange={v => set("color", v)}/>
+        <div>
+          <label className="text-xs font-medium text-slate-600 block mb-1">Thickness</label>
+          <div className="flex gap-2">
+            {["1px","2px","4px"].map(t => (
+              <button key={t} onClick={() => set("thickness", t)}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-medium border ${props.thickness === t ? "bg-indigo-500 text-white border-indigo-500" : "border-slate-200 text-slate-600"}`}>{t}</button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <label className="text-xs font-medium text-slate-600 block mb-1">Margin</label>
+          <div className="flex gap-2">
+            {["sm","md","lg"].map(m => (
+              <button key={m} onClick={() => set("margin", m)}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-medium border capitalize ${props.margin === m ? "bg-indigo-500 text-white border-indigo-500" : "border-slate-200 text-slate-600"}`}>{m}</button>
+            ))}
+          </div>
+        </div>
       </div>
     );
     default: return <div className="text-xs text-slate-400 text-center py-4">No props for this block type</div>;
@@ -1718,6 +1856,48 @@ const DEFAULT_WORKFLOW_BLOCKS: Block[] = [
   }},
 ];
 
+const DEFAULT_CONTACT_BLOCKS: Block[] = [
+  { id: "c-hero", type: "hero", order: 0, props: { eyebrow: "Get in Touch", heading: "Contact Prime Smile Dental Lab", highlight: "", subheading: "Reach out for case submissions, partnerships or general enquiries. We respond within one business day.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", image: "", align: "center" } },
+  { id: "c-info", type: "text", order: 1, props: { content: "Email: info@primesmile.co.uk\nPhone: +44 20 0000 0000\nAddress: London, UK", align: "left", size: "base", textColor: "#374151", backgroundColor: "#ffffff", padding: "medium" } },
+  { id: "c-cta", type: "cta", order: 2, props: { heading: "Ready to partner with us?", text: "Create a dentist account and start submitting cases through our digital workflow.", buttonText: "Create Account", buttonLink: "/portal", bgColor: "#0aabbd", textAlign: "center" } },
+];
+
+const DEFAULT_FIXED_RESTORATIONS_BLOCKS: Block[] = [
+  { id: "fr-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Fixed Restorations", highlight: "", subheading: "Crowns, bridges, veneers, inlays and onlays in zirconia and lithium disilicate — crafted with digital precision.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
+  { id: "fr-text", type: "image-text", order: 1, props: { heading: "Precision Fit & Aesthetics", text: "Every fixed restoration is designed in CAD software, milled on 5-axis equipment and finished under magnification. We validate marginal fit before dispatch.", image: "", imageLeft: true, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
+  { id: "fr-cta", type: "cta", order: 2, props: { heading: "Request a consultation", text: "Not sure which material suits your case? Our technicians can advise.", buttonText: "Contact Us", buttonLink: "/contact", bgColor: "#0aabbd", textAlign: "center" } },
+];
+
+const DEFAULT_IMPLANT_BLOCKS: Block[] = [
+  { id: "ip-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Implant Prosthetics", highlight: "", subheading: "Custom abutments, screw-retained crowns, bars and full-arch restorations with validated implant workflows.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
+  { id: "ip-text", type: "image-text", order: 1, props: { heading: "Integrated Digital Workflow", text: "We accept implant scans, design abutments in CAD and validate connections on model before production. Every case is tracked from scan to dispatch.", image: "", imageLeft: true, cta: "Our Workflow", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
+  { id: "ip-cta", type: "cta", order: 2, props: { heading: "Have an implant case?", text: "Send us your scan and prescription for a free feasibility review.", buttonText: "Get Started", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
+];
+
+const DEFAULT_REMOVABLE_BLOCKS: Block[] = [
+  { id: "rp-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Removable Prosthetics", highlight: "", subheading: "Full and partial dentures with digital design and high-precision fit for optimal comfort and function.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
+  { id: "rp-text", type: "image-text", order: 1, props: { heading: "Digital Denture Design", text: "Our removable prosthetics are designed digitally from validated scans, ensuring consistent base fit and tooth arrangement. Every denture goes through a trial stage when required.", image: "", imageLeft: true, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
+  { id: "rp-cta", type: "cta", order: 2, props: { heading: "Need a denture quote?", text: "Upload your scan and we will assess the case at no charge.", buttonText: "Submit Case", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
+];
+
+const DEFAULT_METAL_BLOCKS: Block[] = [
+  { id: "mf-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Metal Frameworks", highlight: "", subheading: "Cobalt-chrome frameworks via SLM metal printing for unmatched accuracy, strength and passive fit.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
+  { id: "mf-text", type: "image-text", order: 1, props: { heading: "SLM Metal Printing", text: "Our VENEA SLM printer produces cobalt-chrome frameworks with layer accuracy down to 30 microns. Every framework is inspected for distortion and fit before ceramic application.", image: "", imageLeft: true, cta: "Learn More", ctaLink: "/technology", backgroundColor: "#ffffff", padding: "large" } },
+  { id: "mf-cta", type: "cta", order: 2, props: { heading: "Need a metal framework?", text: "Upload your scan and prescription for a free assessment.", buttonText: "Submit Case", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
+];
+
+const DEFAULT_SPLINTS_BLOCKS: Block[] = [
+  { id: "sg-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Splints & Guards", highlight: "", subheading: "Night guards, bruxism splints and surgical guides from validated digital workflows.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
+  { id: "sg-text", type: "image-text", order: 1, props: { heading: "Validated Guard Production", text: "Splints are designed from intraoral scans with calibrated bite data, then 3D printed or milled depending on material selection. Thickness and occlusion are checked on articulator.", image: "", imageLeft: true, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
+  { id: "sg-cta", type: "cta", order: 2, props: { heading: "Order a splint or guard?", text: "Send us your scan and we will confirm material options and turnaround.", buttonText: "Submit Case", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
+];
+
+const DEFAULT_DIGITAL_DESIGN_BLOCKS: Block[] = [
+  { id: "dd-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Digital Design Support", highlight: "", subheading: "STL design, smile design and treatment planning collaboration for complex cases.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
+  { id: "dd-text", type: "image-text", order: 1, props: { heading: "Collaborative Design", text: "Our technicians work directly with your scan data to produce validated designs before production. We support smile design, full-arch planning and implant restorative design.", image: "", imageLeft: true, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
+  { id: "dd-cta", type: "cta", order: 2, props: { heading: "Need design support?", text: "Upload your case and our team will review and advise on the best approach.", buttonText: "Get Started", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
+];
+
 const PAGE_DEFAULTS: Record<string, Block[]> = {
   home: DEFAULT_HOME_BLOCKS,
   about: DEFAULT_ABOUT_BLOCKS,
@@ -1725,6 +1905,13 @@ const PAGE_DEFAULTS: Record<string, Block[]> = {
   quality: DEFAULT_QUALITY_BLOCKS,
   technology: DEFAULT_TECHNOLOGY_BLOCKS,
   workflow: DEFAULT_WORKFLOW_BLOCKS,
+  contact: DEFAULT_CONTACT_BLOCKS,
+  "fixed-restorations": DEFAULT_FIXED_RESTORATIONS_BLOCKS,
+  "implant-prosthetics": DEFAULT_IMPLANT_BLOCKS,
+  "removable-prosthetics": DEFAULT_REMOVABLE_BLOCKS,
+  "metal-frameworks": DEFAULT_METAL_BLOCKS,
+  "splints-guards": DEFAULT_SPLINTS_BLOCKS,
+  "digital-design": DEFAULT_DIGITAL_DESIGN_BLOCKS,
 };
 
 /* ─── Main editor component ───────────────────────────── */

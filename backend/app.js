@@ -18,6 +18,7 @@ import { mediaRouter } from "./routes/media.js";
 import { analyticsRouter } from "./routes/analytics.js";
 import { pagesRouter } from "./routes/pages.js";
 import { postsRouter } from "./routes/posts.js";
+import { backupsRouter } from "./routes/backups.js";
 import { cmsRouter } from "./routes/cms.js";
 import { contactRouter } from "./routes/contact.js";
 import { emailTemplatesRouter } from "./routes/email-templates.js";
@@ -96,6 +97,7 @@ export async function createApiApp() {
   app.use("/api/admin/email-templates", emailTemplatesRouter);
   app.use("/api/admin/roles", rolesRouter);
   app.use("/api/admin/cms", cmsRouter);
+  app.use("/api/admin/backups", backupsRouter);
 
   // Serve locally uploaded files (fallback when S3 is not configured)
   app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
