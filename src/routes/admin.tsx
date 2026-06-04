@@ -184,7 +184,11 @@ function AdminLayout() {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-2 space-y-4 overflow-y-auto">
+        <nav className="flex-1 px-3 py-2 space-y-4 overflow-y-auto"
+          style={{
+            scrollbarWidth: "thin",
+            scrollbarColor: "rgba(255,255,255,0.15) transparent",
+          }}>
           {NAV_GROUPS.map((group) => {
             const visibleItems = group.items.filter(n => !n.adminOnly || user?.role === "admin");
             if (visibleItems.length === 0) return null;
