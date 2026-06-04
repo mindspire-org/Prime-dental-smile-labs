@@ -73,7 +73,7 @@ contactRouter.post("/", validateRecaptcha, async (req, res) => {
 });
 
 // GET /api/contact - List all enquiries (admin/lab_staff only)
-contactRouter.get("/", requireAuth, requireRole("admin", "lab_staff"), async (req, res) => {
+contactRouter.get("/", requireAuth, requireRole("admin"), async (req, res) => {
   try {
     const page = Math.max(Number(req.query.page || 1), 1);
     const limit = Math.min(Number(req.query.limit || 50), 100);
@@ -92,7 +92,7 @@ contactRouter.get("/", requireAuth, requireRole("admin", "lab_staff"), async (re
 });
 
 // PUT /api/contact/:id/status - Update enquiry status (admin/lab_staff only)
-contactRouter.put("/:id/status", requireAuth, requireRole("admin", "lab_staff"), async (req, res) => {
+contactRouter.put("/:id/status", requireAuth, requireRole("admin"), async (req, res) => {
   try {
     const { status } = req.body;
     const allowed = ["new", "read", "replied", "archived"];

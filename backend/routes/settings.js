@@ -4,7 +4,7 @@ import { requireAuth, requireRole } from "../middleware/auth.js";
 import { invalidateSmtpCache, sendEmail } from "../services/email.js";
 
 export const settingsRouter = express.Router();
-settingsRouter.use(requireAuth, requireRole("admin", "lab_staff"));
+settingsRouter.use(requireAuth, requireRole("admin"));
 
 const DEFAULTS = [
   { key:"site.name",         value:"Prime Smile Dental Lab",  type:"text",     group:"general", label:"Site Name" },

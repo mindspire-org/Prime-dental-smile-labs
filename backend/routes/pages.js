@@ -40,7 +40,7 @@ pagesRouter.get("/:slug", async (req, res) => {
   res.json({ page });
 });
 
-pagesRouter.use(requireAuth, requireRole("admin", "lab_staff"));
+pagesRouter.use(requireAuth, requireRole("admin"));
 
 pagesRouter.put("/:slug", requireRole("admin"), async (req, res) => {
   const { blocks, title, published } = req.body;

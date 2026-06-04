@@ -66,7 +66,7 @@ function Field({ label, required, tooltip, half, children }: {
         {required && <span className="text-red-400 text-xs leading-none">*</span>}
         {tooltip && (
           <div className="relative group/tip">
-            <Info size={11} className="text-slate-300 cursor-help" />
+            <Info size={14} className="text-teal cursor-help" />
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 bg-slate-900 text-white text-[10px] rounded-lg opacity-0 group-hover/tip:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none shadow-lg">
               {tooltip}
             </div>
@@ -144,6 +144,7 @@ function NewCasePage() {
 
   async function handleSubmit() {
     if (!patientForm.patientRef.trim()) { setError("Patient Reference is required."); return; }
+    if (!patientForm.requestedCompletion) { setError("Requested Completion Date is required."); return; }
     if (!decl.a || !decl.b || !decl.c) { setError("Please confirm all three declarations."); return; }
     setSubmitting(true);
     setError("");
@@ -291,7 +292,7 @@ function NewCasePage() {
           <Field label="Patient Age" tooltip="Approximate age in years">
             <input type="number" min={1} max={120} className={inp} value={patientForm.patientAge} onChange={e => setPatientForm(f => ({ ...f, patientAge: e.target.value }))} placeholder="e.g. 45" />
           </Field>
-          <Field label="Requested Completion Date" tooltip="When do you need this case returned?">
+          <Field label="Requested Completion Date" required tooltip="When do you need this case returned?">
             <input type="date" className={inp} value={patientForm.requestedCompletion} onChange={e => setPatientForm(f => ({ ...f, requestedCompletion: e.target.value }))} />
           </Field>
           <Field label="Urgency">

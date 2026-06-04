@@ -10,7 +10,7 @@ export const adminRouter = express.Router();
 adminRouter.use(requireAuth, requireRole("admin", "lab_staff"));
 
 /* ── Overview stats ─────────────────────────────────────── */
-adminRouter.get("/stats", async (req, res) => {
+adminRouter.get("/stats", requireRole("admin"), async (req, res) => {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -159,7 +159,7 @@ adminRouter.post("/users/:id/reset-password", requireRole("admin"), async (req, 
 });
 
 /* ── Clinics management ─────────────────────────────────── */
-adminRouter.get("/clinics", async (req, res) => {
+adminRouter.get("/clinics", requireRole("admin"), async (req, res) => {
   const clinics = await Clinic.find().sort({ name: 1 });
   const counts = await Case.aggregate([{ $group: { _id: "$clinic", count: { $sum: 1 } } }]);
   const caseMap = Object.fromEntries(counts.map(({ _id, count }) => [String(_id), count]));
@@ -184,7 +184,7 @@ adminRouter.delete("/clinics/:id", requireRole("admin"), async (req, res) => {
 });
 
 /* ── Content CMS ────────────────────────────────────────── */
-adminRouter.get("/content", async (req, res) => {
+adminRouter.get("/content", requireRole("admin"), async (req, res) => {
   const filter = {};
   if (req.query.page) filter.page = req.query.page;
   const items = await Content.find(filter).sort({ page: 1, section: 1, key: 1 });
@@ -208,7 +208,7 @@ adminRouter.delete("/content/:id", requireRole("admin"), async (req, res) => {
 });
 
 /* ── SEO Meta ───────────────────────────────────────────── */
-adminRouter.get("/seo", async (req, res) => {
+adminRouter.get("/seo", requireRole("admin"), async (req, res) => {
   const items = await SeoMeta.find().sort({ page: 1 });
   res.json({ items });
 });
@@ -224,7 +224,7 @@ adminRouter.put("/seo/:page", requireRole("admin"), async (req, res) => {
 });
 
 /* ── Finance / Reports ──────────────────────────────────── */
-adminRouter.get("/finance", async (req, res) => {
+adminRouter.get("/finance", requireRole("admin"), async (req, res) => {
   let from, to;
   if (req.query.from && req.query.to) {
     from = new Date(req.query.from);
@@ -273,7 +273,7 @@ adminRouter.get("/finance", async (req, res) => {
 });
 
 /* ── Activity Log ───────────────────────────────────────── */
-adminRouter.get("/activity", async (req, res) => {
+adminRouter.get("/activity", requireRole("admin"), async (req, res) => {
   const page = Math.max(Number(req.query.page || 1), 1);
   const limit = Math.min(Number(req.query.limit || 50), 200);
   const filter = {};

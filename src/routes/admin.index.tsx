@@ -4,6 +4,14 @@ import { apiFetch, clearSession } from "@/lib/api";
 import { Briefcase, Users, Building2, TrendingUp, Clock, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/admin/")({
+  beforeLoad: async () => {
+    if (typeof window === "undefined") return;
+    const { getCurrentUser } = await import("@/lib/api");
+    const user = getCurrentUser();
+    if (user?.role === "lab_staff") {
+      throw redirect({ to: "/admin/cases" as any });
+    }
+  },
   component: AdminDashboard,
 });
 

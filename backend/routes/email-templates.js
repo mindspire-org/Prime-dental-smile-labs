@@ -4,7 +4,7 @@ import { requireAuth, requireRole } from "../middleware/auth.js";
 import { logActivity } from "../services/activity.js";
 
 export const emailTemplatesRouter = express.Router();
-emailTemplatesRouter.use(requireAuth, requireRole("admin", "lab_staff"));
+emailTemplatesRouter.use(requireAuth, requireRole("admin"));
 
 // Get all email templates
 emailTemplatesRouter.get("/", async (req, res) => {

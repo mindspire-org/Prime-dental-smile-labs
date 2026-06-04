@@ -4,7 +4,7 @@ import { requireAuth, requireRole } from "../middleware/auth.js";
 import { clients } from "../services/realtime.js";
 
 export const analyticsRouter = express.Router();
-analyticsRouter.use(requireAuth, requireRole("admin", "lab_staff"));
+analyticsRouter.use(requireAuth, requireRole("admin"));
 
 analyticsRouter.get("/realtime", async (req, res) => {
   const now = new Date();

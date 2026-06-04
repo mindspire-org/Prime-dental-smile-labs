@@ -79,25 +79,25 @@ roleConfigurationSchema.statics.initializeDefaultConfigurations = async function
         { status: "Delivered", canSet: true, canView: true }
       ]
     },
-    // Lab Staff - general access
+    // Lab Staff - general access (cases only)
     {
       role: "lab_staff",
       permissions: [
         "cases.view", "cases.update.all",
         "cases.status.review", "cases.status.approved", "cases.status.rejected",
-        "analytics.view",
-        "content.media.view", "content.media.upload"
+        "cases.status.in_production", "cases.status.quality_check", "cases.status.ready",
+        "cases.status.dispatched", "cases.status.delivered"
       ],
       statusPermissions: [
         { status: "Submitted", canSet: false, canView: true },
         { status: "Under Review", canSet: true, canView: true },
         { status: "Approved", canSet: true, canView: true },
         { status: "Rejected", canSet: true, canView: true },
-        { status: "In Production", canSet: false, canView: true },
-        { status: "Quality Check", canSet: false, canView: true },
-        { status: "Ready for Dispatch", canSet: false, canView: true },
-        { status: "Dispatched", canSet: false, canView: true },
-        { status: "Delivered", canSet: false, canView: true }
+        { status: "In Production", canSet: true, canView: true },
+        { status: "Quality Check", canSet: true, canView: true },
+        { status: "Ready for Dispatch", canSet: true, canView: true },
+        { status: "Dispatched", canSet: true, canView: true },
+        { status: "Delivered", canSet: true, canView: true }
       ]
     },
     // Lab Staff - Production sub-role

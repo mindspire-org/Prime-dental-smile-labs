@@ -6,7 +6,7 @@ export const clinicsRouter = express.Router();
 
 clinicsRouter.use(requireAuth);
 
-clinicsRouter.get("/", requireRole("admin", "lab_staff"), async (req, res) => {
+clinicsRouter.get("/", requireRole("admin"), async (req, res) => {
   const clinics = await Clinic.find().sort({ name: 1 });
   res.json({ clinics });
 });

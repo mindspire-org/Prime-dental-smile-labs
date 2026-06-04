@@ -4,7 +4,7 @@ import { requireAuth, requireRole } from "../middleware/auth.js";
 import { logActivity } from "../services/activity.js";
 
 export const cmsRouter = express.Router();
-cmsRouter.use(requireAuth, requireRole("admin", "lab_staff"));
+cmsRouter.use(requireAuth, requireRole("admin"));
 
 /* ── Testimonials ─────────────────────────────────────── */
 cmsRouter.get("/testimonials", async (_req, res) => {

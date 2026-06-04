@@ -53,9 +53,9 @@ const NAV_GROUPS = [
   {
     label: "Overview",
     items: [
-      { to: "/admin",           label: "Dashboard",     icon: LayoutDashboard, exact: true },
-      { to: "/admin/analytics", label: "Analytics",     icon: BarChart2,       exact: false },
-      { to: "/admin/activity",  label: "Activity Log",  icon: Activity,        exact: false },
+      { to: "/admin",           label: "Dashboard",     icon: LayoutDashboard, exact: true, adminOnly: true },
+      { to: "/admin/analytics", label: "Analytics",     icon: BarChart2,       exact: false, adminOnly: true },
+      { to: "/admin/activity",  label: "Activity Log",  icon: Activity,        exact: false, adminOnly: true },
     ],
   },
   {
@@ -63,38 +63,40 @@ const NAV_GROUPS = [
     items: [
       { to: "/admin/cases",    label: "Cases",            icon: Briefcase,      exact: false },
       { to: "/admin/messages", label: "Messages",         icon: MessageSquare,  exact: false },
-      { to: "/admin/users",   label: "Users & Dentists", icon: Users,          exact: false },
-      { to: "/admin/clinics", label: "Clinics",          icon: Building2,      exact: false },
-      { to: "/admin/finance", label: "Finance Reports",  icon: BarChart3,      exact: false },
+      { to: "/admin/users",   label: "Users & Dentists", icon: Users,          exact: false, adminOnly: true },
+      { to: "/admin/clinics", label: "Clinics",          icon: Building2,      exact: false, adminOnly: true },
+      { to: "/admin/finance", label: "Finance Reports",  icon: BarChart3,      exact: false, adminOnly: true },
     ],
   },
   {
     label: "Website",
     items: [
-      { to: "/admin/pages",   label: "Page Editor",    icon: Layout,    exact: false },
-      { to: "/admin/posts",   label: "Blog Posts",     icon: BookOpen,  exact: false },
-      { to: "/admin/media",   label: "Media Library",  icon: Image,     exact: false },
-      { to: "/admin/content", label: "Content Keys",    icon: FileText,  exact: false },
-      { to: "/admin/seo",     label: "SEO Manager",    icon: Search,    exact: false },
+      { to: "/admin/pages",   label: "Page Editor",    icon: Layout,    exact: false, adminOnly: true },
+      { to: "/admin/posts",   label: "Blog Posts",     icon: BookOpen,  exact: false, adminOnly: true },
+      { to: "/admin/media",   label: "Media Library",  icon: Image,     exact: false, adminOnly: true },
+      { to: "/admin/content", label: "Content Keys",    icon: FileText,  exact: false, adminOnly: true },
+      { to: "/admin/seo",     label: "SEO Manager",    icon: Search,    exact: false, adminOnly: true },
     ],
   },
   {
     label: "CMS",
     items: [
-      { to: "/admin/services",      label: "Services",       icon: Wrench, exact: false },
-      { to: "/admin/testimonials",  label: "Testimonials",   icon: Star,   exact: false },
-      { to: "/admin/notifications", label: "Announcements",  icon: Bell,   exact: false },
+      { to: "/admin/services",      label: "Services",       icon: Wrench, exact: false, adminOnly: true },
+      { to: "/admin/testimonials",  label: "Testimonials",   icon: Star,   exact: false, adminOnly: true },
+      { to: "/admin/notifications", label: "Announcements",  icon: Bell,   exact: false, adminOnly: true },
     ],
   },
   {
     label: "System",
     items: [
-      { to: "/admin/settings", label: "Settings", icon: Settings, exact: false },
-      { to: "/admin/roles", label: "Roles & Permissions", icon: ShieldCheck, exact: false },
-      { to: "/admin/email-templates", label: "Email Templates", icon: Mail, exact: false },
+      { to: "/admin/settings", label: "Settings", icon: Settings, exact: false, adminOnly: true },
+      { to: "/admin/roles", label: "Roles & Permissions", icon: ShieldCheck, exact: false, adminOnly: true },
+      { to: "/admin/email-templates", label: "Email Templates", icon: Mail, exact: false, adminOnly: true },
     ],
   },
 ];
+
+const ADMIN_ONLY_PATHS = ["/admin/analytics", "/admin/activity", "/admin/users", "/admin/clinics", "/admin/finance", "/admin/pages", "/admin/posts", "/admin/media", "/admin/content", "/admin/seo", "/admin/services", "/admin/testimonials", "/admin/notifications", "/admin/settings", "/admin/roles", "/admin/email-templates"];
 
 function AdminLayout() {
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -112,9 +114,14 @@ function AdminLayout() {
       navigate({ to: "/portal" as any });
       return;
     }
+    // Redirect lab staff away from admin-only pages
+    if (current.role === "lab_staff" && ADMIN_ONLY_PATHS.some(p => path === p || path.startsWith(p + "/"))) {
+      navigate({ to: "/admin/cases" as any });
+      return;
+    }
     setUser(current);
     setChecking(false);
-  }, [navigate]);
+  }, [navigate, path]);
 
   if (checking) {
     return <AuthLoading />;
@@ -156,28 +163,32 @@ function AdminLayout() {
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-2 space-y-4 overflow-y-auto">
-          {NAV_GROUPS.map((group) => (
-            <div key={group.label}>
-              <div className="px-2 mb-1">
-                <span className="text-white/20 text-[8px] uppercase tracking-[0.22em] font-semibold">{group.label}</span>
+          {NAV_GROUPS.map((group) => {
+            const visibleItems = group.items.filter(n => !n.adminOnly || user?.role === "admin");
+            if (visibleItems.length === 0) return null;
+            return (
+              <div key={group.label}>
+                <div className="px-2 mb-1">
+                  <span className="text-white/20 text-[8px] uppercase tracking-[0.22em] font-semibold">{group.label}</span>
+                </div>
+                <div className="space-y-0.5">
+                  {visibleItems.map((n) => {
+                    const active = n.exact ? path === n.to : path.startsWith(n.to);
+                    return (
+                      <a key={n.to} href={n.to}
+                        className={`group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 relative
+                          ${active ? "text-white" : "text-white/45 hover:text-white/80 hover:bg-white/5"}`}
+                        style={active ? { background: "rgba(99,102,241,0.2)", borderLeft: "2px solid #6366f1" } : {}}>
+                        <n.icon size={14} className={active ? "text-indigo-400" : ""}/>
+                        <span className="flex-1">{n.label}</span>
+                        {active && <ChevronRight size={11} className="text-indigo-400/60"/>}
+                      </a>
+                    );
+                  })}
+                </div>
               </div>
-              <div className="space-y-0.5">
-                {group.items.map((n) => {
-                  const active = n.exact ? path === n.to : path.startsWith(n.to);
-                  return (
-                    <a key={n.to} href={n.to}
-                      className={`group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 relative
-                        ${active ? "text-white" : "text-white/45 hover:text-white/80 hover:bg-white/5"}`}
-                      style={active ? { background: "rgba(99,102,241,0.2)", borderLeft: "2px solid #6366f1" } : {}}>
-                      <n.icon size={14} className={active ? "text-indigo-400" : ""}/>
-                      <span className="flex-1">{n.label}</span>
-                      {active && <ChevronRight size={11} className="text-indigo-400/60"/>}
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </nav>
 
         {/* Dentist portal link */}

@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Layers, Cpu, PhoneCall, User, FilePlus, Folder, MessageSquare, LayoutDashboard, FileText, Settings, Briefcase, Users } from "lucide-react";
+import { getCurrentUser } from "@/lib/api";
 
 /* ── Marketing bottom nav ─────────────────────────────── */
 const MARKETING_TABS = [
@@ -21,14 +22,14 @@ const PORTAL_TABS = [
 
 /* ── Admin bottom nav ─────────────────────────────────── */
 const ADMIN_TABS = [
-  { to: "/admin",          label: "Dashboard", icon: LayoutDashboard, exact: true  },
+  { to: "/admin",          label: "Dashboard", icon: LayoutDashboard, exact: true,  adminOnly: true },
   { to: "/admin/cases",    label: "Cases",     icon: Briefcase,       exact: false },
   { to: "/admin/messages", label: "Messages",  icon: MessageSquare,   exact: false },
-  { to: "/admin/users",    label: "Users",     icon: Users,           exact: false },
-  { to: "/admin/settings", label: "Settings",  icon: Settings,        exact: false },
+  { to: "/admin/users",    label: "Users",     icon: Users,           exact: false, adminOnly: true },
+  { to: "/admin/settings", label: "Settings",  icon: Settings,        exact: false, adminOnly: true },
 ];
 
-type Tab = { to: string; label: string; icon: React.ElementType; exact?: boolean; exclude?: string };
+type Tab = { to: string; label: string; icon: React.ElementType; exact?: boolean; exclude?: string; adminOnly?: boolean };
 
 function BottomNav({ tabs, accent = "#0aabbd" }: { tabs: Tab[]; accent?: string }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -106,5 +107,7 @@ export function PortalMobileNav() {
 }
 
 export function AdminMobileNav() {
-  return <BottomNav tabs={ADMIN_TABS} accent="#6366f1" />;
+  const user = getCurrentUser();
+  const tabs = ADMIN_TABS.filter(t => !t.adminOnly || user?.role === "admin");
+  return <BottomNav tabs={tabs} accent="#6366f1" />;
 }

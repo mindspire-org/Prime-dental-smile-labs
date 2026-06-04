@@ -4,7 +4,7 @@ import { requireAuth, requireRole } from "../middleware/auth.js";
 import { logActivity } from "../services/activity.js";
 
 export const postsRouter = express.Router();
-postsRouter.use(requireAuth, requireRole("admin", "lab_staff"));
+postsRouter.use(requireAuth, requireRole("admin"));
 
 function slugify(str) {
   return str.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");

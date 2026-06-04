@@ -17,6 +17,9 @@ const clinic = await Clinic.findOneAndUpdate(
 for (const account of [
   { name: "Prime Smile Admin", email: adminEmail, role: "admin" },
   { name: "Dr. Demo Dentist", email: dentistEmail, role: "dentist", clinic: clinic._id },
+  { name: "Gokan", email: "gokan@primesmile.local", role: "lab_staff" },
+  { name: "Abdurahman", email: "abdurahman@primesmile.local", role: "lab_staff" },
+  { name: "Lab Technician", email: "labtech@primesmile.local", role: "lab_staff" },
 ]) {
   const existing = await User.findOne({ email: account.email });
   if (!existing) {

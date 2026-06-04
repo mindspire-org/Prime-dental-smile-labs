@@ -110,7 +110,7 @@ function Field({ label, children, required, tooltip }: {
         {required && <span className="text-red-500 text-xs">*</span>}
         {tooltip && (
           <div className="relative group/tooltip">
-            <Info size={14} className="text-muted-grey cursor-help" />
+            <Info size={14} className="text-teal cursor-help" />
             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap z-10">
               {tooltip}
             </div>
@@ -398,7 +398,7 @@ function SubmitPage() {
               <Field label="Submitted Date">
                 <input type="date" className={inputCls} />
               </Field>
-              <Field label="Requested Completion" tooltip="When do you need this case back?">
+              <Field label="Requested Completion" required tooltip="When do you need this case back?">
                 <input type="date" className={inputCls} />
               </Field>
               <Field label="Urgency" tooltip="Select urgency level">

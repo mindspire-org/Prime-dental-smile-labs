@@ -6,7 +6,7 @@ import { Media } from "../models/index.js";
 import { requireAuth, requireRole } from "../middleware/auth.js";
 
 export const mediaRouter = express.Router();
-mediaRouter.use(requireAuth, requireRole("admin", "lab_staff"));
+mediaRouter.use(requireAuth, requireRole("admin"));
 
 const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });

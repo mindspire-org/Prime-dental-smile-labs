@@ -4,7 +4,7 @@ import { requireAuth, requireRole } from "../middleware/auth.js";
 import { logActivity } from "../services/activity.js";
 
 export const rolesRouter = express.Router();
-rolesRouter.use(requireAuth, requireRole("admin", "lab_staff"));
+rolesRouter.use(requireAuth, requireRole("admin"));
 
 // Get all permissions
 rolesRouter.get("/permissions", async (req, res) => {

@@ -335,8 +335,8 @@ function CaseDetail() {
                 const current = i === active;
                 const future = i > active;
                 return (
-                  <li key={s} className="flex items-center gap-3 py-1.5 relative">
-                    <span className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 z-10 transition-all text-[10px] font-bold
+                  <li key={s} className="flex items-start gap-3 py-1.5 relative">
+                    <span className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 z-10 transition-all text-[10px] font-bold mt-0.5
                       ${done    ? "bg-teal text-white shadow-[0_0_0_3px_rgba(10,171,189,0.15)]" : ""}
                       ${current ? "text-white shadow-[0_0_0_4px_rgba(10,171,189,0.25)] scale-110" : ""}
                       ${future  ? "bg-white border-2 border-slate-200 text-slate-400" : ""}
@@ -348,14 +348,23 @@ function CaseDetail() {
                         </svg>
                       ) : i + 1}
                     </span>
-                    <span className={`text-sm leading-tight
-                      ${current ? "font-semibold text-teal" : ""}
-                      ${done    ? "text-slate-600 line-through decoration-slate-300" : ""}
-                      ${future  ? "text-slate-400" : ""}
-                    `}>{s}</span>
-                    {current && (
-                      <span className="ml-auto text-[9px] font-semibold bg-cyan-50 text-teal px-1.5 py-0.5 rounded-full shrink-0">Now</span>
-                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm leading-tight
+                          ${current ? "font-semibold text-teal" : ""}
+                          ${done    ? "text-slate-600 line-through decoration-slate-300" : ""}
+                          ${future  ? "text-slate-400" : ""}
+                        `}>{s}</span>
+                        {current && (
+                          <span className="ml-auto text-[9px] font-semibold bg-cyan-50 text-teal px-1.5 py-0.5 rounded-full shrink-0">Now</span>
+                        )}
+                      </div>
+                      {current && (
+                        <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                          Production of your dental prosthesis is usually completed within 3 working days after case approval, although complex cases may require additional time.
+                        </p>
+                      )}
+                    </div>
                   </li>
                 );
               })}
