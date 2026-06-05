@@ -3,14 +3,21 @@
 This app runs as **one Node process** (`server.mjs`) that serves the SPA
 client, the Express API (`/api`), static uploads (`/uploads`) and the
 WebSocket endpoint (`/ws`) — all on **port 8080**. nginx sits in front for
-TLS. The Cloudflare Worker build (`dist/server/`, `wrangler.jsonc`) is **not
-used** in this deployment — ignore it.
+TLS. The build's `dist/server/` (TanStack Node server) is only used at
+**build time** to prerender the SPA shell — it is **not run** at runtime.
 
 > Why not the Cloudflare/TanStack SSR worker? The backend uses MongoDB
 > (mongoose), disk uploads (multer) and `ws` WebSockets — none of which run
-> on Cloudflare Workers. Self-hosting the single Express process is the
-> correct, simplest model here. Trade-off: marketing pages render
-> client-side (no SSR), which is fine for this app.
+> on Cloudflare Workers. So `vite.config.ts` sets `cloudflare: false` and
+> enables `spa: { enabled: true }`. Self-hosting the single Express process
+> is the correct, simplest model here. Trade-off: pages render client-side
+> (no per-route SSR); the prerendered shell carries homepage SEO meta.
+
+> **SPA shell (important):** the build prerenders `dist/client/_shell.html`
+> containing TanStack's bootstrap (`$_TSR.router` manifest + entry script).
+> `server.mjs` serves that file for all routes. Without it, the client
+> throws `Invariant failed`. This is why the build MUST run with SPA mode
+> (already configured) — never hand-edit `dist/`.
 
 ---
 
@@ -80,6 +87,7 @@ and serve path always match. Don't delete that symlink.
 |---|---|
 | 502 from nginx | `systemctl status primesmile`; is it listening on 8080? |
 | Blank page / no JS | Did `npm run build` succeed? `ls dist/client/assets/index-*.js` |
+| `Invariant failed` in console | Missing `dist/client/_shell.html` — rebuild (SPA mode must be on) |
 | Uploaded images 404 | Is the `uploads` symlink present? `ls -l uploads` |
 | WebSocket won't connect | nginx `Upgrade`/`Connection` headers + the `map` block |
 | DB errors on boot | `MONGODB_URI` in `.env`; is mongod running/reachable? |

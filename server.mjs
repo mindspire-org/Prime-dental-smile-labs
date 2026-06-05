@@ -33,8 +33,19 @@ async function discoverAssets() {
 
 const assets = await discoverAssets();
 
-// ── Generate SPA shell HTML ────────────────────────────────────────────
-function spaHtml() {
+// ── SPA shell HTML ─────────────────────────────────────────────────────
+// TanStack Start is an SSR framework, not a plain SPA: its client entry
+// (StartClient) needs the bootstrap markup the framework injects into the
+// HTML. A hand-rolled empty <div id="root"> shell makes the client throw
+// "Invariant failed". So we serve the real shell that `vite build`
+// prerenders into dist/client/_shell.html (enabled via spa:{enabled:true}
+// in vite.config.ts). That file already has the correct hashed asset tags.
+const SHELL_FILE = path.join(CLIENT_DIR, "_shell.html");
+
+// Legacy hand-rolled fallback — only used if the prerendered shell is
+// missing (i.e. the build wasn't run with SPA mode). It will NOT hydrate
+// a TanStack app correctly; it exists purely to surface a clear message.
+function fallbackHtml() {
   const cssTags = assets.cssFiles
     .map((f) => `<link rel="stylesheet" href="/assets/${f}">`)
     .join("\n    ");
@@ -57,7 +68,21 @@ function spaHtml() {
 </html>`;
 }
 
-const SHELL = spaHtml();
+async function loadShell() {
+  try {
+    const html = await readFile(SHELL_FILE, "utf8");
+    console.log(`Serving prerendered shell: ${SHELL_FILE}`);
+    return html;
+  } catch {
+    console.error(
+      `WARNING: ${SHELL_FILE} not found. Build with SPA mode (spa:{enabled:true}) ` +
+        `and re-run \`npm run build\`. Falling back to a non-hydrating shell.`,
+    );
+    return fallbackHtml();
+  }
+}
+
+const SHELL = await loadShell();
 
 // ── MIME map ───────────────────────────────────────────────────────────
 const MIME = {
