@@ -59,6 +59,7 @@ export async function createApiApp() {
   await seedTestimonials();
 
   const app = express();
+  app.set("trust proxy", 1);
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(cors({ origin: process.env.CORS_ORIGIN?.split(",") || true, credentials: true }));
   app.use(express.json({ limit: "10mb" }));
@@ -116,6 +117,7 @@ export async function createApiApp() {
 
   app.use((err, req, res, next) => {
     console.error(err);
+    if (res.headersSent) return next(err);
     res.status(err.status || 500).json({ error: err.message || "Server error" });
   });
 

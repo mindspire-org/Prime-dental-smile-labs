@@ -5,6 +5,7 @@ const SKIP = ["/api", "/_", "/uploads", "/favicon", ".js", ".css", ".map", ".ico
 
 export function pageviewMiddleware(req, res, next) {
   next();
+  if (res.headersSent) return;
   if (req.method !== "GET") return;
   if (SKIP.some(s => req.path.startsWith(s) || req.path.endsWith(s))) return;
 
