@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-// FDI permanent dentition — occlusal-view layout (matches standard dental chart)
+// FDI permanent dentition — occlusal-view layout
 const UPPER = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
 const LOWER = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
 
@@ -11,10 +11,16 @@ interface ToothItem {
   n: number;
   x: number;
   y: number;
-  lx: number; // label x
-  ly: number; // label y
+  lx: number;
+  ly: number;
+  rot: number;
+  rw: number; // ellipse radius x
+  rh: number; // ellipse radius y
 }
 
+/* Position teeth along a wide flat elliptical arc.
+   The arch is very wide (large rx) and relatively flat (small ry)
+   so it resembles a real dental arch viewed from above. */
 function archPositions(
   teeth: number[],
   cx: number,
@@ -27,17 +33,27 @@ function archPositions(
   const count = teeth.length;
   return teeth.map((n, i) => {
     const t = Math.PI - (i * Math.PI) / (count - 1); // π → 0 (left → right)
+
     const x = cx + rx * Math.cos(t);
     const y = isUpper ? cy - ry * Math.sin(t) : cy + ry * Math.sin(t);
 
-    // Label pushed radially outward
-    const lr = labelOffset;
-    const lx = cx + (rx + lr) * Math.cos(t);
+    // Labels pushed radially outward
+    const lx = cx + (rx + labelOffset) * Math.cos(t);
     const ly = isUpper
-      ? cy - (ry + lr) * Math.sin(t)
-      : cy + (ry + lr) * Math.sin(t);
+      ? cy - (ry + labelOffset) * Math.sin(t)
+      : cy + (ry + labelOffset) * Math.sin(t);
 
-    return { n, x, y, lx, ly };
+    // Rotation so the tooth follows the arch tangent
+    const dx = -rx * Math.sin(t);
+    const dy = isUpper ? -ry * Math.cos(t) : ry * Math.cos(t);
+    const rot = (Math.atan2(dy, dx) * 180) / Math.PI - 90;
+
+    // Tooth size: back molars are biggest, front incisors smallest
+    const distFromCenter = Math.abs(i - (count - 1) / 2);
+    const rw = distFromCenter < 2 ? 11 : distFromCenter < 5 ? 13 : 15;
+    const rh = distFromCenter < 2 ? 14 : distFromCenter < 5 ? 17 : 20;
+
+    return { n, x, y, lx, ly, rot, rw, rh };
   });
 }
 
@@ -50,12 +66,13 @@ export function ToothChart({
 }) {
   const [active, setActive] = useState<number | null>(null);
 
+  /* Wide flat dental arch */
   const upper = useMemo(
-    () => archPositions(UPPER, 200, 88, 148, 58, true, 22),
+    () => archPositions(UPPER, 350, 130, 280, 48, true, 32),
     []
   );
   const lower = useMemo(
-    () => archPositions(LOWER, 200, 228, 148, 58, false, 22),
+    () => archPositions(LOWER, 350, 320, 280, 48, false, 32),
     []
   );
 
@@ -75,42 +92,41 @@ export function ToothChart({
     [selected]
   );
 
-  const tw = 17;
-  const th = 22;
-
   const renderTooth = (t: ToothItem) => {
     const sel = selected[t.n];
     const isActive = active === t.n;
+    const fill = isActive ? "#0aabbd" : sel ? "#c9a227" : "#ffffff";
+    const stroke = isActive ? "#078a99" : sel ? "#a37e1a" : "#94a3b8";
+
     return (
       <g key={t.n} className="cursor-pointer" style={{ pointerEvents: "all" }}>
-        {/* Click target (invisible, larger) */}
+        {/* Click target */}
         <circle
           cx={t.x}
           cy={t.y}
-          r={16}
+          r={22}
           fill="transparent"
           onClick={() => setActive(t.n)}
         />
-        {/* Tooth shape — upright rounded capsule */}
-        <rect
-          x={t.x - tw / 2}
-          y={t.y - th / 2}
-          width={tw}
-          height={th}
-          rx={8}
-          ry={10}
-          fill={isActive ? "#0aabbd" : sel ? "#c9a227" : "#ffffff"}
-          stroke={isActive ? "#078a99" : sel ? "#a37e1a" : "#cbd5e1"}
+        {/* Tooth: rotated ellipse, wider than tall */}
+        <ellipse
+          cx={t.x}
+          cy={t.y}
+          rx={t.rw}
+          ry={t.rh}
+          fill={fill}
+          stroke={stroke}
           strokeWidth={1.5}
+          transform={`rotate(${t.rot}, ${t.x}, ${t.y})`}
           style={{ pointerEvents: "none" }}
         />
-        {/* Number label outside arch */}
+        {/* Number label outside the arch */}
         <text
           x={t.lx}
           y={t.ly + 1}
           textAnchor="middle"
           dominantBaseline="middle"
-          fontSize={8}
+          fontSize={11}
           fontWeight={700}
           fontFamily="system-ui, -apple-system, sans-serif"
           fill="#475569"
@@ -122,38 +138,38 @@ export function ToothChart({
     );
   };
 
-  // Arch outline paths
   const archPath = (arr: ToothItem[], isUpper: boolean) => {
     const s = arr[0];
     const e = arr[arr.length - 1];
-    const cy = isUpper ? 88 : 228;
-    return `M ${s.x} ${s.y} Q 200 ${isUpper ? cy - 75 : cy + 75} ${e.x} ${e.y}`;
+    const cy = isUpper ? 130 : 320;
+    const controlY = isUpper ? cy - 115 : cy + 115;
+    return `M ${s.x} ${s.y} Q 350 ${controlY} ${e.x} ${e.y}`;
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto select-none">
-      <svg viewBox="0 0 400 320" className="w-full h-auto">
-        {/* Soft arch outlines */}
+    <div className="w-full mx-auto select-none">
+      <svg viewBox="0 0 700 450" className="w-full h-auto">
+        {/* Soft background fill between arches */}
+        <path
+          d={`M ${upper[0].x} ${upper[0].y} Q 350 ${upper[0].y - 100} ${upper[upper.length - 1].x} ${upper[upper.length - 1].y} L ${lower[lower.length - 1].x} ${lower[lower.length - 1].y} Q 350 ${lower[0].y + 100} ${lower[0].x} ${lower[0].y} Z`}
+          fill="#f8fafc"
+          stroke="none"
+        />
+
+        {/* Arch guide lines */}
         <path
           d={archPath(upper, true)}
           fill="none"
           stroke="#e2e8f0"
-          strokeWidth={1.5}
-          strokeDasharray="4 4"
+          strokeWidth={2}
+          strokeDasharray="6 6"
         />
         <path
           d={archPath(lower, false)}
           fill="none"
           stroke="#e2e8f0"
-          strokeWidth={1.5}
-          strokeDasharray="4 4"
-        />
-
-        {/* Subtle palate / tongue area */}
-        <path
-          d={`M ${upper[0].x} ${upper[0].y} Q 200 ${upper[0].y - 60} ${upper[upper.length - 1].x} ${upper[upper.length - 1].y} L ${lower[lower.length - 1].x} ${lower[lower.length - 1].y} Q 200 ${lower[0].y + 60} ${lower[0].x} ${lower[0].y} Z`}
-          fill="#f1f5f9"
-          stroke="none"
+          strokeWidth={2}
+          strokeDasharray="6 6"
         />
 
         {upper.map(renderTooth)}
