@@ -45,9 +45,26 @@ const BLOCK_TYPES: BlockType[] = [
       align: "center"
     } 
   },
-  
+  {
+    id: "page-header",
+    label: "Page Header",
+    icon: Type,
+    category: "Header",
+    description: "Clean page title section with eyebrow, heading and subheading",
+    defaultProps: {
+      eyebrow: "Section Label",
+      heading: "Page Heading",
+      highlight: "",
+      subheading: "Descriptive paragraph that explains the purpose of this page.",
+      align: "left",
+      backgroundColor: "#ffffff",
+      showAccent: true,
+      padding: "large",
+    }
+  },
+
   // Content Blocks
-  { 
+  {
     id: "text", 
     label: "Text Block", 
     icon: Type, 
@@ -548,6 +565,34 @@ function BlockPreview({ type, props }: { type: string; props: any }) {
                 </span>
               )}
             </div>
+          </div>
+        </div>
+      );
+    }
+
+    case "page-header": {
+      const align = props.align || "left";
+      const textAlign = align === "center" ? "text-center" : "text-left";
+      const mx = align === "center" ? "mx-auto" : "";
+      const py = props.padding === "large" ? "py-20" : props.padding === "medium" ? "py-14" : "py-10";
+      return (
+        <div className={`${py} px-8`} style={{ backgroundColor: props.backgroundColor || "#ffffff" }}>
+          <div className={`max-w-5xl ${mx} ${textAlign}`}>
+            {props.showAccent && <div className={`h-1 w-16 bg-teal-500 rounded-full mb-6 ${align === "center" ? "mx-auto" : ""}`} />}
+            {props.eyebrow && (
+              <span className="inline-block text-[11px] uppercase tracking-[0.2em] text-teal-600 font-bold mb-3">
+                {props.eyebrow}
+              </span>
+            )}
+            <h1 className={`text-3xl md:text-4xl font-bold text-slate-800 leading-tight ${mx} max-w-3xl`}>
+              {props.highlight ? (
+                <>
+                  {props.heading?.replace(props.highlight, "")}
+                  <span className="text-teal-500">{props.highlight}</span>
+                </>
+              ) : props.heading}
+            </h1>
+            <p className={`mt-5 text-slate-500 leading-relaxed text-lg max-w-2xl ${mx}`}>{props.subheading}</p>
           </div>
         </div>
       );

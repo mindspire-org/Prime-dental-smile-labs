@@ -64,8 +64,9 @@ function QualityPage() {
       <section className="bg-white py-20">
         <div className="max-w-5xl mx-auto px-5 lg:px-8">
           <Reveal>
+            <div className="h-1 w-16 bg-teal rounded-full mb-6" />
             <span className="eyebrow">Quality</span>
-            <h1 className="mt-3 text-4xl md:text-5xl font-bold inline-block border-b-4 border-teal pb-2">Quality & Compliance</h1>
+            <h1 className="mt-3 text-4xl md:text-5xl font-bold leading-tight">Quality & <span className="text-teal">Compliance</span></h1>
             <p className="mt-6 text-muted-grey max-w-3xl text-lg leading-relaxed">
               Every Prime Smile case is processed through a documented quality system with robust QC checkpoints to ensure patient safety and fit.
             </p>

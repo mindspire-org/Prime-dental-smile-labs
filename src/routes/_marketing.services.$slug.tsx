@@ -67,13 +67,15 @@ export const Route = createFileRoute("/_marketing/services/$slug")({
     const data = DATA[params.slug];
     if (!data) throw notFound();
     let pageBlocks: any[] = [];
-    try {
-      const r = await fetch(`/api/pages/${params.slug}`);
-      if (r.ok) {
-        const json = await r.json();
-        pageBlocks = json.page?.blocks || [];
-      }
-    } catch {}
+    if (typeof window !== "undefined") {
+      try {
+        const r = await fetch(`/api/admin/pages/${params.slug}`);
+        if (r.ok) {
+          const json = await r.json();
+          pageBlocks = json.page?.blocks || [];
+        }
+      } catch {}
+    }
     return { ...data, pageBlocks };
   },
   head: ({ loaderData }) => ({

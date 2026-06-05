@@ -84,6 +84,30 @@ function BlockRenderer({ type, props }: { type: string; props: any }) {
       );
     }
 
+    case "page-header": {
+      const align = props.align || "left";
+      const textAlign = align === "center" ? "text-center" : "text-left";
+      const mx = align === "center" ? "mx-auto" : "";
+      const py = props.padding === "large" ? "py-20" : props.padding === "medium" ? "py-14" : "py-10";
+      return (
+        <section className={`${py}`} style={{ backgroundColor: props.backgroundColor || "#ffffff" }}>
+          <div className={`max-w-7xl mx-auto px-5 lg:px-8 ${textAlign}`}>
+            {props.showAccent && <div className={`h-1 w-16 bg-teal rounded-full mb-6 ${align === "center" ? "mx-auto" : ""}`} />}
+            {props.eyebrow && <span className="eyebrow">{props.eyebrow}</span>}
+            <h1 className={`mt-3 text-4xl md:text-5xl font-bold leading-tight ${mx} max-w-4xl`}>
+              {props.highlight ? (
+                <>
+                  {props.heading?.replace(props.highlight, "")}
+                  <span className="text-teal">{props.highlight}</span>
+                </>
+              ) : props.heading}
+            </h1>
+            <p className={`mt-6 text-muted-grey text-lg max-w-3xl leading-relaxed ${mx}`}>{props.subheading}</p>
+          </div>
+        </section>
+      );
+    }
+
     case "about-hero":
       return (
         <section className="bg-white py-20">

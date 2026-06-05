@@ -47,9 +47,10 @@ function WorkflowPage() {
       <section className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-5 lg:px-8">
           <Reveal>
+            <div className="h-1 w-16 bg-teal rounded-full mb-6" />
             <span className="eyebrow">Modern Approach</span>
-            <h1 className="mt-3 text-4xl md:text-5xl font-bold">Our Digital Workflow</h1>
-            <p className="mt-6 text-muted-grey max-w-3xl text-lg">
+            <h1 className="mt-3 text-4xl md:text-5xl font-bold leading-tight">Our Digital Workflow</h1>
+            <p className="mt-6 text-muted-grey max-w-3xl text-lg leading-relaxed">
               From the moment you log in to the moment your case is delivered, every step is digital, traceable and tracked in real time.
             </p>
           </Reveal>
