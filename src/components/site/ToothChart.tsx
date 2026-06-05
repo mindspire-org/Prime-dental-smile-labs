@@ -1,181 +1,220 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useState } from "react";
 
-// FDI permanent dentition — occlusal-view layout
-const UPPER = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
-const LOWER = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
-
+type ToothType = "incisor" | "canine" | "premolar" | "molar";
+type Side = "right" | "left";
 export type ToothRole = "Crown" | "Veneer" | "Inlay" | "Pontic" | "Implant Crown" | "Custom Abutment" | "Missing" | "Other";
 export const ROLES: ToothRole[] = ["Crown","Veneer","Inlay","Pontic","Implant Crown","Custom Abutment","Missing","Other"];
 
-interface ToothItem {
-  n: number;
+type Jaw = "upper" | "lower";
+
+type Tooth = {
+  id: number;
   x: number;
   y: number;
-  rot: number;
-  hw: number;
-  hh: number;
-  shape: string;
+  w: number;
+  h: number;
+  rotate: number;
+  type: ToothType;
+};
+
+const LOWER_JAW_SHIFT_Y = -28;
+
+const baseTeeth: Tooth[] = [
+  // =========================
+  // UPPER JAW — RIGHT SIDE 11–18
+  // =========================
+  { id: 11, x: 474, y: 100, w: 44, h: 64, rotate: 0, type: "incisor" },
+  { id: 12, x: 421, y: 118, w: 50, h: 68, rotate: -18, type: "incisor" },
+  { id: 13, x: 365, y: 162, w: 56, h: 76, rotate: -28, type: "canine" },
+  { id: 14, x: 310, y: 226, w: 60, h: 74, rotate: -28, type: "premolar" },
+  { id: 15, x: 264, y: 305, w: 64, h: 76, rotate: -18, type: "premolar" },
+  { id: 16, x: 230, y: 396, w: 70, h: 80, rotate: -8, type: "molar" },
+  { id: 17, x: 216, y: 493, w: 72, h: 82, rotate: 0, type: "molar" },
+  { id: 18, x: 220, y: 590, w: 72, h: 82, rotate: -6, type: "molar" },
+
+  // =========================
+  // UPPER JAW — LEFT SIDE 21–28
+  // =========================
+  { id: 21, x: 526, y: 100, w: 44, h: 64, rotate: 0, type: "incisor" },
+  { id: 22, x: 579, y: 118, w: 50, h: 68, rotate: 18, type: "incisor" },
+  { id: 23, x: 635, y: 162, w: 56, h: 76, rotate: 28, type: "canine" },
+  { id: 24, x: 690, y: 226, w: 60, h: 74, rotate: 28, type: "premolar" },
+  { id: 25, x: 736, y: 305, w: 64, h: 76, rotate: 18, type: "premolar" },
+  { id: 26, x: 770, y: 396, w: 70, h: 80, rotate: 8, type: "molar" },
+  { id: 27, x: 784, y: 493, w: 72, h: 82, rotate: 0, type: "molar" },
+  { id: 28, x: 780, y: 590, w: 72, h: 82, rotate: 6, type: "molar" },
+
+  // =========================
+  // LOWER JAW — RIGHT SIDE 48–41
+  // =========================
+  { id: 48, x: 220, y: 710, w: 72, h: 82, rotate: 0, type: "molar" },
+  { id: 47, x: 216, y: 807, w: 72, h: 82, rotate: -4, type: "molar" },
+  { id: 46, x: 230, y: 894, w: 70, h: 80, rotate: -12, type: "molar" },
+  { id: 45, x: 264, y: 982, w: 64, h: 76, rotate: -28, type: "premolar" },
+  { id: 44, x: 315, y: 1056, w: 60, h: 74, rotate: -38, type: "premolar" },
+  { id: 43, x: 375, y: 1112, w: 56, h: 76, rotate: -30, type: "canine" },
+  { id: 42, x: 435, y: 1148, w: 40, h: 60, rotate: -16, type: "incisor" },
+  { id: 41, x: 482, y: 1163, w: 36, h: 58, rotate: -4, type: "incisor" },
+
+  // =========================
+  // LOWER JAW — LEFT SIDE 31–38
+  // =========================
+  { id: 31, x: 518, y: 1163, w: 36, h: 58, rotate: 4, type: "incisor" },
+  { id: 32, x: 565, y: 1148, w: 40, h: 60, rotate: 16, type: "incisor" },
+  { id: 33, x: 625, y: 1112, w: 56, h: 76, rotate: 30, type: "canine" },
+  { id: 34, x: 685, y: 1056, w: 60, h: 74, rotate: 38, type: "premolar" },
+  { id: 35, x: 736, y: 982, w: 64, h: 76, rotate: 28, type: "premolar" },
+  { id: 36, x: 770, y: 894, w: 70, h: 80, rotate: 12, type: "molar" },
+  { id: 37, x: 784, y: 807, w: 72, h: 82, rotate: 4, type: "molar" },
+  { id: 38, x: 780, y: 710, w: 72, h: 82, rotate: 0, type: "molar" },
+];
+
+function getJaw(id: number): Jaw {
+  return id < 30 ? "upper" : "lower";
 }
 
-// Oval centre — all teeth orient/label radially from here.
-const OCX = 210;
-const OCY = 280;
-
-function toothSize(n: number): { hw: number; hh: number; shape: string } {
-  const f = n % 10;
-  const upper = n < 30;
-  if (f === 1) return upper ? { hw: 10, hh: 12, shape: "incisor" } : { hw: 7, hh: 10, shape: "incisor" };
-  if (f === 2) return upper ? { hw: 9, hh: 11, shape: "incisor" } : { hw: 7, hh: 10, shape: "incisor" };
-  if (f === 3) return { hw: 9, hh: 12, shape: "canine" };
-  if (f <= 5) return { hw: 9, hh: 9, shape: "premolar" };
-  if (f <= 7) return { hw: 11, hh: 10, shape: "molar" };
-  return { hw: 10, hh: 9, shape: "wisdom" };
+function getSide(id: number): Side {
+  const secondDigit = id % 10;
+  const quadrant = Math.floor(id / 10);
+  if (quadrant === 1 || quadrant === 4) return "right";
+  if (quadrant === 2 || quadrant === 3) return "left";
+  return secondDigit <= 4 ? "right" : "left";
 }
 
-// 4-point occlusal star (concave diamond) — the fissure pattern.
-function star(s: number): string {
-  const k = 0.2 * s;
-  return `M 0,${-s} Q ${k},${-k} ${s},0 Q ${k},${k} 0,${s} Q ${-k},${k} ${-s},0 Q ${-k},${-k} 0,${-s} Z`;
+function applyFinalLayout(tooth: Tooth): Tooth {
+  if (getJaw(tooth.id) === "lower") {
+    return { ...tooth, y: tooth.y + LOWER_JAW_SHIFT_Y };
+  }
+  return tooth;
 }
 
-/* ────────────────────────────────
-   Anatomical crown shapes (FDI
-   chart style) with refined paths.
-   ──────────────────────────────── */
-function Tooth3D({
-  x, y, rot, hw, hh, shape, fill, isMissing, isActive,
-}: {
-  x: number; y: number; rot: number; hw: number; hh: number;
-  shape: string; fill: string; isMissing: boolean; isActive: boolean;
-}) {
-  const stroke = isActive ? "#2563eb" : "#1a1a1a";
-  const sw = isActive ? 2.0 : 1.3;
-  const mk = "#1a1a1a";
-  const mkw = 1.0;
+const teeth: Tooth[] = baseTeeth.map(applyFinalLayout);
 
-  let outline: ReactNode;
-  let occ: ReactNode = null;
+function getLabelPosition(tooth: Tooth) {
+  const jaw = getJaw(tooth.id);
+  const side = getSide(tooth.id);
 
-  const w = hw, h = hh;
+  const sign = side === "right" ? -1 : 1;
 
-  if (shape === "molar" || shape === "wisdom") {
-    // Rounded rectangle with slight buccal/lingual bulge
-    const r = Math.min(w, h) * 0.35;
-    outline = (
-      <path
-        d={`M ${-w + r},${-h}
-            Q 0,${-h * 1.04} ${w - r},${-h}
-            L ${w},${-h + r}
-            Q ${w * 1.02},0 ${w},${h - r}
-            L ${w - r},${h}
-            Q 0,${h * 1.04} ${-w + r},${h}
-            L ${-w},${h - r}
-            Q ${-w * 1.02},0 ${-w},${-h + r} Z`}
-        fill={fill} stroke={stroke} strokeWidth={sw}
-      />
-    );
-    // 4-point star fissure — exactly like reference
-    const s = Math.min(w, h) * 0.58;
-    occ = (
-      <path
-        d={star(s)}
-        fill="none" stroke={mk} strokeWidth={mkw} opacity={0.55}
-      />
-    );
-  } else if (shape === "premolar") {
-    // Clean ellipse — matches reference perfectly
-    outline = (
-      <ellipse
-        cx={0} cy={0} rx={w} ry={h}
-        fill={fill} stroke={stroke} strokeWidth={sw}
-      />
-    );
-    // Simple Y-fissure
-    const c = Math.min(w, h) * 0.55;
-    occ = (
-      <g opacity={0.5}>
-        <path d={`M 0,${-c} L 0,${c * 0.1}`} stroke={mk} strokeWidth={mkw} />
-        <path d={`M 0,${c * 0.1} L ${-c * 0.42},${c * 0.42}`} stroke={mk} strokeWidth={mkw} />
-        <path d={`M 0,${c * 0.1} L ${c * 0.42},${c * 0.42}`} stroke={mk} strokeWidth={mkw} />
-      </g>
-    );
-  } else if (shape === "canine") {
-    // Pointed oval — sharper than incisor, simpler than before
-    outline = (
-      <path
-        d={`M 0,${-h}
-            C ${w * 0.68},${-h * 0.62} ${w},${-h * 0.12} ${w * 0.82},${h * 0.28}
-            C ${w * 0.58},${h * 0.75} ${w * 0.25},${h * 0.95} 0,${h}
-            C ${-w * 0.25},${h * 0.95} ${-w * 0.58},${h * 0.75} ${-w * 0.82},${h * 0.28}
-            C ${-w},${-h * 0.12} ${-w * 0.68},${-h * 0.62} 0,${-h} Z`}
-        fill={fill} stroke={stroke} strokeWidth={sw}
-      />
-    );
-    // Single ridge line
-    occ = (
-      <path
-        d={`M 0,${-h * 0.58} Q ${w * 0.15},0 0,${h * 0.55}`}
-        fill="none" stroke={mk} strokeWidth={mkw} opacity={0.45}
-      />
-    );
+  let dx = 0;
+  let dy = 0;
+
+  if (jaw === "upper") {
+    if (tooth.type === "incisor") {
+      dx = tooth.id === 11 || tooth.id === 21 ? 0 : 24 * sign;
+      dy = -40;
+    } else if (tooth.type === "canine") {
+      dx = 30 * sign;
+      dy = -16;
+    } else if (tooth.type === "premolar") {
+      dx = 34 * sign;
+      dy = -4;
+    } else {
+      dx = 36 * sign;
+      dy = 8;
+    }
   } else {
-    // Incisor — shovel shape: wide flat incisal edge, rounded cervical
-    outline = (
-      <path
-        d={`M ${-w * 0.9},${-h * 0.18}
-            C ${-w * 0.9},${-h * 0.65} ${-w * 0.38},${-h * 0.98} 0,${-h}
-            C ${w * 0.38},${-h * 0.98} ${w * 0.9},${-h * 0.65} ${w * 0.9},${-h * 0.18}
-            C ${w * 0.95},${h * 0.28} ${w * 0.48},${h * 0.95} 0,${h}
-            C ${-w * 0.48},${h * 0.95} ${-w * 0.95},${h * 0.28} ${-w * 0.9},${-h * 0.18} Z`}
-        fill={fill} stroke={stroke} strokeWidth={sw}
-      />
-    );
-    // Incisal edge + two marginal ridges
-    occ = (
-      <g opacity={0.45}>
-        <path d={`M ${-w * 0.55},${-h * 0.52} Q 0,${-h * 0.78} ${w * 0.55},${-h * 0.52}`} fill="none" stroke={mk} strokeWidth={mkw} />
-        <path d={`M ${-w * 0.32},${-h * 0.22} L ${-w * 0.32},${h * 0.42}`} fill="none" stroke={mk} strokeWidth={mkw * 0.6} />
-        <path d={`M ${w * 0.32},${-h * 0.22} L ${w * 0.32},${h * 0.42}`} fill="none" stroke={mk} strokeWidth={mkw * 0.6} />
-      </g>
-    );
+    if (tooth.type === "incisor") {
+      dx = tooth.id === 41 || tooth.id === 31 ? 0 : 16 * sign;
+      dy = 56;
+    } else if (tooth.type === "canine") {
+      dx = 18 * sign;
+      dy = 56;
+    } else if (tooth.type === "premolar") {
+      dx = 30 * sign;
+      dy = 34;
+    } else {
+      dx = 34 * sign;
+      dy = 8;
+    }
   }
 
-  return (
-    <g transform={`translate(${x},${y}) rotate(${rot})`}>
-      {isMissing ? (
-        <g opacity={0.6}>
-          <rect x={-hw} y={-hh} width={hw * 2} height={hh * 2} rx={hw * 0.35} fill="none" stroke="#999" strokeWidth={1.2} strokeDasharray="3 3" />
-          <path d={`M ${-hw * 0.55},${-hh * 0.55} L ${hw * 0.55},${hh * 0.55} M ${hw * 0.55},${-hh * 0.55} L ${-hw * 0.55},${hh * 0.55}`} stroke="#b04030" strokeWidth={1.4} fill="none" />
-        </g>
-      ) : (
-        <>
-          {outline}
-          {occ}
-        </>
-      )}
-    </g>
-  );
+  return {
+    x: tooth.x + dx,
+    y: tooth.y + dy,
+    anchor:
+      dx === 0 ? "middle" : side === "right" ? "end" : "start",
+  } as const;
 }
 
-/* Parabolic horseshoe arch; teeth orient radially from the oval centre. */
-function archPositions(
-  teeth: number[], cx: number, vertexY: number,
-  Rx: number, Ry: number, phiMax: number, isUpper: boolean
-): ToothItem[] {
-  const n = teeth.length;
-  return teeth.map((tooth, i) => {
-    const phi = -phiMax + (i / (n - 1)) * (2 * phiMax);
-    const x = cx + Rx * Math.sin(phi);
-    const y = isUpper ? vertexY + Ry * (1 - Math.cos(phi)) : vertexY - Ry * (1 - Math.cos(phi));
-    const rot = (Math.atan2(y - OCY, x - OCX) * 180) / Math.PI + 90;
-    const sz = toothSize(tooth);
-    return { n: tooth, x, y, rot, hw: sz.hw, hh: sz.hh, shape: sz.shape };
-  });
+function toothPath(type: ToothType, w: number, h: number) {
+  const hw = w / 2;
+  const hh = h / 2;
+
+  if (type === "incisor") {
+    return `
+      M ${-hw * 0.72} ${-hh * 0.78}
+      C ${-hw * 0.4} ${-hh}, ${hw * 0.4} ${-hh}, ${hw * 0.72} ${-hh * 0.78}
+      C ${hw * 0.92} ${-hh * 0.18}, ${hw * 0.56} ${hh * 0.8}, 0 ${hh}
+      C ${-hw * 0.56} ${hh * 0.8}, ${-hw * 0.92} ${-hh * 0.18}, ${-hw * 0.72} ${-hh * 0.78}
+      Z
+    `;
+  }
+
+  if (type === "canine") {
+    return `
+      M 0 ${-hh}
+      C ${hw * 0.46} ${-hh * 0.96}, ${hw * 0.86} ${-hh * 0.54}, ${hw * 0.84} ${-hh * 0.04}
+      C ${hw * 0.82} ${hh * 0.42}, ${hw * 0.42} ${hh * 0.88}, 0 ${hh}
+      C ${-hw * 0.42} ${hh * 0.88}, ${-hw * 0.82} ${hh * 0.42}, ${-hw * 0.84} ${-hh * 0.04}
+      C ${-hw * 0.86} ${-hh * 0.54}, ${-hw * 0.46} ${-hh * 0.96}, 0 ${-hh}
+      Z
+    `;
+  }
+
+  if (type === "premolar") {
+    return `
+      M ${-hw * 0.76} ${-hh * 0.82}
+      C ${-hw * 0.25} ${-hh * 1.02}, ${hw * 0.66} ${-hh * 0.84}, ${hw * 0.88} ${-hh * 0.24}
+      C ${hw * 0.98} ${hh * 0.3}, ${hw * 0.56} ${hh * 0.96}, ${-hw * 0.06} ${hh}
+      C ${-hw * 0.72} ${hh * 0.96}, ${-hw * 0.98} ${hh * 0.3}, ${-hw * 0.92} ${-hh * 0.2}
+      C ${-hw * 0.88} ${-hh * 0.54}, ${-hw * 0.84} ${-hh * 0.74}, ${-hw * 0.76} ${-hh * 0.82}
+      Z
+    `;
+  }
+
+  return `
+    M ${-hw * 0.72} ${-hh * 0.9}
+    C ${-hw * 0.28} ${-hh * 1.02}, ${hw * 0.58} ${-hh * 1.02}, ${hw * 0.9} ${-hh * 0.58}
+    C ${hw * 1.03} ${-hh * 0.1}, ${hw} ${hh * 0.62}, ${hw * 0.54} ${hh * 0.88}
+    C ${hw * 0.06} ${hh * 1.02}, ${-hw * 0.7} ${hh}, ${-hw * 0.94} ${hh * 0.48}
+    C ${-hw * 1.04} ${hh * 0.02}, ${-hw} ${-hh * 0.56}, ${-hw * 0.72} ${-hh * 0.9}
+    Z
+  `;
 }
 
-/* ────────────────────────────────
-   Main Component
-   ──────────────────────────────── */
+function groovePaths(type: ToothType, w: number, h: number) {
+  const hw = w / 2;
+  const hh = h / 2;
+
+  if (type === "molar") {
+    return [
+      `M ${-hw * 0.34} ${-hh * 0.1} C ${-hw * 0.12} ${-hh * 0.02}, ${-hw * 0.08} ${hh * 0.16}, ${-hw * 0.26} ${hh * 0.34}`,
+      `M ${hw * 0.34} ${-hh * 0.1} C ${hw * 0.12} ${-hh * 0.02}, ${hw * 0.08} ${hh * 0.16}, ${hw * 0.26} ${hh * 0.34}`,
+      `M ${-hw * 0.2} ${hh * 0.02} C ${-hw * 0.04} ${-hh * 0.08}, ${hw * 0.04} ${-hh * 0.08}, ${hw * 0.2} ${hh * 0.02}`,
+      `M 0 ${-hh * 0.34} C ${-hw * 0.04} ${-hh * 0.12}, ${hw * 0.04} ${hh * 0.12}, 0 ${hh * 0.34}`,
+    ];
+  }
+
+  if (type === "premolar") {
+    return [
+      `M ${-hw * 0.26} ${-hh * 0.05} C ${-hw * 0.08} ${hh * 0.07}, ${hw * 0.08} ${hh * 0.07}, ${hw * 0.26} ${-hh * 0.05}`,
+      `M 0 ${-hh * 0.32} C ${-hw * 0.06} ${-hh * 0.08}, ${hw * 0.06} ${hh * 0.08}, 0 ${hh * 0.32}`,
+    ];
+  }
+
+  if (type === "canine") {
+    return [
+      `M 0 ${-hh * 0.42} C ${-hw * 0.06} ${-hh * 0.08}, ${hw * 0.06} ${hh * 0.16}, 0 ${hh * 0.42}`,
+      `M ${-hw * 0.22} ${hh * 0.1} C ${-hw * 0.06} ${hh * 0.25}, ${hw * 0.06} ${hh * 0.25}, ${hw * 0.22} ${hh * 0.1}`,
+    ];
+  }
+
+  return [
+    `M ${-hw * 0.34} ${-hh * 0.4} C ${-hw * 0.1} ${-hh * 0.56}, ${hw * 0.1} ${-hh * 0.56}, ${hw * 0.34} ${-hh * 0.4}`,
+  ];
+}
+
 export function ToothChart({
   selected,
   onChange,
@@ -184,114 +223,160 @@ export function ToothChart({
   onChange: (next: Record<number, ToothRole>) => void;
 }) {
   const [active, setActive] = useState<number | null>(null);
+  const [hovered, setHovered] = useState<number | null>(null);
 
-  // Upper opens downward, lower opens upward; mirror around OCY for a clean oval.
-  const upper = useMemo(() => archPositions(UPPER, OCX, 70, 155, 190, 1.48, true), []);
-  const lower = useMemo(() => archPositions(LOWER, OCX, 490, 155, 190, 1.48, false), []);
-
-  const setRole = (n: number, role: ToothRole) => onChange({ ...selected, [n]: role });
-  const remove = (n: number) => {
+  const setRole = (id: number, role: ToothRole) => onChange({ ...selected, [id]: role });
+  const clearTooth = (id: number) => {
     const next = { ...selected };
-    delete next[n];
+    delete next[id];
     onChange(next);
     setActive(null);
   };
 
-  const summary = useMemo(
-    () => Object.entries(selected).map(([n, r]) => `${n}:${r}`).join(", "),
-    [selected]
-  );
-
-  const getFill = (n: number) => {
-    if (active === n) return "#bfdbfe";
-    if (selected[n]) return "#fde68a";
+  const getFill = (id: number) => {
+    if (selected[id] === "Missing") return "#ffffff";
+    if (active === id) return "#bfdbfe";
+    if (selected[id]) return "#fde68a";
+    if (hovered === id) return "#f3f4f6";
     return "#ffffff";
   };
 
-  const renderTooth = (t: ToothItem) => {
-    const sel = selected[t.n];
-    const isActive = active === t.n;
-
-    const ndx = t.x - OCX;
-    const ndy = t.y - OCY;
-    const len = Math.hypot(ndx, ndy) || 1;
-    const rad = Math.max(t.hw, t.hh);
-    const lx = t.x + (ndx / len) * (rad + 14);
-    const ly = t.y + (ndy / len) * (rad + 14);
-
-    return (
-      <g key={t.n} style={{ pointerEvents: "all" }}>
-        <g style={{ pointerEvents: "none" }}>
-          <Tooth3D
-            x={t.x} y={t.y} rot={t.rot} hw={t.hw} hh={t.hh}
-            shape={t.shape} fill={getFill(t.n)}
-            isMissing={sel === "Missing"} isActive={isActive}
-          />
-        </g>
-        <text
-          x={lx} y={ly}
-          textAnchor="middle" dominantBaseline="middle"
-          fontSize={14}
-          fontWeight={700}
-          fontFamily="system-ui, -apple-system, sans-serif"
-          fill={isActive ? "#2563eb" : "#111111"}
-          style={{ pointerEvents: "none", userSelect: "none" }}
-        >
-          {t.n}
-        </text>
-        <ellipse
-          cx={t.x} cy={t.y} rx={rad + 5} ry={rad + 5}
-          fill="transparent"
-          style={{ pointerEvents: "all" }}
-          className="cursor-pointer"
-          onClick={() => setActive(t.n)}
-        />
-      </g>
-    );
-  };
+  const summary = Object.entries(selected)
+    .sort((a, b) => Number(a[0]) - Number(b[0]))
+    .map(([id, r]) => `${id}:${r}`)
+    .join(", ");
 
   return (
-    <div className="w-full mx-auto select-none" style={{ maxWidth: 340 }}>
-      <svg viewBox="0 0 420 560" className="w-full h-auto">
-        {/* Faint quadrant cross */}
-        <line x1={OCX} y1={20} x2={OCX} y2={540} stroke="#cbd5e1" strokeWidth={1} strokeDasharray="3 6" />
-        <line x1={24} y1={OCY} x2={396} y2={OCY} stroke="#cbd5e1" strokeWidth={1} strokeDasharray="3 6" />
+    <div
+      className="w-full select-none"
+      style={{ maxWidth: 650, margin: "0 auto" }}
+    >
+      <svg
+        viewBox="0 0 1000 1220"
+        width="100%"
+        height="auto"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-label="FDI dental tooth chart"
+      >
+        <rect width="1000" height="1220" rx="16" fill="#ffffff" />
 
-        {/* Teeth */}
-        {upper.map(renderTooth)}
-        {lower.map(renderTooth)}
+        {/* Jaw labels */}
+        <text x="500" y="252" textAnchor="middle" fontSize="24" fontWeight="700" fill="#9ca3af" letterSpacing="0.08em">
+          UPPER JAW
+        </text>
+        <text x="500" y="935" textAnchor="middle" fontSize="24" fontWeight="700" fill="#9ca3af" letterSpacing="0.08em">
+          LOWER JAW
+        </text>
+
+        {/* Divider lines */}
+        <line x1="500" y1="52" x2="500" y2="1192" stroke="#d1d5db" strokeWidth="1.8" strokeDasharray="8 8" />
+        <line x1="150" y1="620" x2="850" y2="620" stroke="#d1d5db" strokeWidth="1.8" strokeDasharray="8 8" />
+
+        {teeth.map((tooth) => {
+          const label = getLabelPosition(tooth);
+          const role = selected[tooth.id];
+          const isActive = active === tooth.id;
+          const isMissing = role === "Missing";
+          const hw = tooth.w / 2;
+          const hh = tooth.h / 2;
+
+          return (
+            <g key={tooth.id}>
+              <text
+                x={label.x}
+                y={label.y}
+                textAnchor={label.anchor}
+                fontSize="24"
+                fontWeight="800"
+                fill={isActive ? "#2563eb" : "#111827"}
+                style={{ userSelect: "none", pointerEvents: "none" }}
+              >
+                {tooth.id}
+              </text>
+
+              <g
+                transform={`translate(${tooth.x} ${tooth.y}) rotate(${tooth.rotate})`}
+                style={{ cursor: "pointer" }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActive((cur) => (cur === tooth.id ? null : tooth.id));
+                }}
+                onMouseEnter={() => setHovered(tooth.id)}
+                onMouseLeave={() => setHovered((h) => (h === tooth.id ? null : h))}
+              >
+                <path
+                  d={toothPath(tooth.type, tooth.w, tooth.h)}
+                  fill={getFill(tooth.id)}
+                  stroke={isActive ? "#2563eb" : "#111111"}
+                  strokeWidth={isActive ? 3.2 : 2.4}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeDasharray={isMissing ? "8 7" : undefined}
+                  opacity={isMissing ? 0.55 : 1}
+                />
+
+                {!isMissing &&
+                  groovePaths(tooth.type, tooth.w, tooth.h).map((d, index) => (
+                    <path
+                      key={index}
+                      d={d}
+                      fill="none"
+                      stroke="#111111"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  ))}
+
+                {isMissing && (
+                  <path
+                    d={`M ${-hw * 0.55} ${-hh * 0.55} L ${hw * 0.55} ${hh * 0.55} M ${hw * 0.55} ${-hh * 0.55} L ${-hw * 0.55} ${hh * 0.55}`}
+                    stroke="#b04030"
+                    strokeWidth="2.8"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                )}
+              </g>
+            </g>
+          );
+        })}
       </svg>
 
-      {/* Inline role selector */}
+      {/* Role selector */}
       {active !== null && (
         <div className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-teal">Tooth {active}</span>
+            <span className="text-xs font-semibold text-slate-900">Tooth {active}</span>
             {selected[active] && (
               <button
                 type="button"
-                onClick={() => remove(active)}
-                className="text-[11px] text-red-600 hover:text-red-700 font-medium"
+                onClick={() => clearTooth(active)}
+                className="text-[11px] text-red-600 hover:text-red-700 font-medium bg-transparent border-none cursor-pointer"
               >
                 Clear
               </button>
             )}
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {ROLES.map((r) => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => setRole(active, r)}
-                className={`text-[11px] px-2.5 py-1 rounded-md border transition ${
-                  selected[active] === r
-                    ? "bg-teal text-white border-teal"
-                    : "bg-white text-slate-600 border-slate-200 hover:border-teal"
-                }`}
-              >
-                {r}
-              </button>
-            ))}
+            {ROLES.map((r) => {
+              const on = selected[active] === r;
+              return (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRole(active, r)}
+                  className={`text-[11px] px-2.5 py-1 rounded-md border transition ${
+                    on
+                      ? "bg-slate-900 text-white border-slate-900"
+                      : "bg-white text-slate-600 border-slate-200 hover:border-slate-900"
+                  }`}
+                >
+                  {r}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
