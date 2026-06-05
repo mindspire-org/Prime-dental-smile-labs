@@ -21,6 +21,16 @@ src/routeTree.gen.ts
 .wrangler/
 .dev.vars
 
+# Production secrets & runtime (see deploy/.env.example)
+.env
+.env.*
+!.env.example
+# Root uploads symlink created by deploy/deploy.sh (-> backend/uploads)
+/uploads
+# Uploaded media (keep the dir tracked via .gitkeep, ignore contents)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

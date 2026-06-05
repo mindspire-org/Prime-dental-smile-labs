@@ -1,0 +1,47 @@
+[Unit]
+# Prime Smile Dental Laboratory — single Node process.
+# Serves the SPA client (dist/client), the Express API (/api), static
+# uploads (/uploads) and the WebSocket endpoint (/ws), all on one port.
+Description=Prime Smile Labs (Express + SPA + WS)
+After=network.target
+# If MongoDB runs on this same host, uncomment the next line:
+# After=network.target mongod.service
+# Wants=mongod.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+
+# Project root. server.mjs loads .env from here (dotenv/config) and the
+# `uploads` symlink created below makes process.cwd()/uploads resolve to
+# backend/uploads — keeping write path == serve path in production.
+WorkingDirectory=/var/www/Prime-dental-smile-labs
+
+# .env at the project root holds MONGODB_URI, JWT secret, CORS_ORIGIN,
+# PORT, S3 creds, SMTP, etc. dotenv reads it, but loading it here too
+# means systemctl show / journalctl reflect the real values.
+EnvironmentFile=/var/www/Prime-dental-smile-labs/.env
+Environment=NODE_ENV=production
+Environment=PORT=8080
+
+ExecStart=/usr/bin/node server.mjs
+
+# Resilience
+Restart=on-failure
+RestartSec=3
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+# Logs go to the journal: journalctl -u primesmile -f
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=primesmile
+
+# Light hardening (kept loose so disk uploads keep working)
+NoNewPrivileges=true
+ProtectSystem=full
+ReadWritePaths=/var/www/Prime-dental-smile-labs/backend/uploads
+
+[Install]
+WantedBy=multi-user.target

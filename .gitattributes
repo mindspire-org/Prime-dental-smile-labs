@@ -1,0 +1,6 @@
+# Deployment files target Linux — force LF so CRLF never breaks
+# shell shebangs, systemd units, or nginx configs on the server.
+*.sh            text eol=lf
+deploy/*.service text eol=lf
+deploy/*.conf    text eol=lf
+deploy/.env.example text eol=lf
