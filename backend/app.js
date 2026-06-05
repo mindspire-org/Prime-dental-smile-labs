@@ -88,11 +88,11 @@ export async function createApiApp() {
   app.use("/api/contact", contactRouter);
   app.use("/api/files", filesRouter);
   app.use("/api/dashboard", dashboardRouter);
+  app.use("/api/admin/pages", pagesRouter);
   app.use("/api/admin", adminRouter);
   app.use("/api/admin/settings", settingsRouter);
   app.use("/api/admin/media", mediaRouter);
   app.use("/api/admin/analytics", analyticsRouter);
-  app.use("/api/admin/pages", pagesRouter);
   app.use("/api/admin/posts", postsRouter);
   app.use("/api/admin/email-templates", emailTemplatesRouter);
   app.use("/api/admin/roles", rolesRouter);
