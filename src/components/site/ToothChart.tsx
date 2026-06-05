@@ -11,52 +11,144 @@ interface ToothItem {
   n: number;
   x: number;
   y: number;
-  lx: number;
-  ly: number;
   rot: number;
-  rw: number; // ellipse radius x
-  rh: number; // ellipse radius y
+  rx: number;
+  ry: number;
+  shape: string;
 }
 
-/* Position teeth along a wide flat elliptical arc.
-   The arch is very wide (large rx) and relatively flat (small ry)
-   so it resembles a real dental arch viewed from above. */
+function toothSize(n: number): { rx: number; ry: number; shape: string } {
+  const fdi = n % 10;
+  if (fdi <= 2) return { rx: 9, ry: 12, shape: "incisor" };
+  if (fdi === 3) return { rx: 8, ry: 10, shape: "canine" };
+  if (fdi <= 5) return { rx: 9, ry: 10, shape: "premolar" };
+  if (fdi <= 7) return { rx: 13, ry: 13, shape: "molar" };
+  return { rx: 11, ry: 11, shape: "wisdom" };
+}
+
+/* ────────────────────────────────
+   3D Tooth — Canvas-style ellipse
+   with radial gradient, occlusal
+   details, and white highlights.
+   ──────────────────────────────── */
+function Tooth3D({
+  x,
+  y,
+  rx,
+  ry,
+  shape,
+  fillId,
+  isMissing,
+  isActive,
+}: {
+  x: number;
+  y: number;
+  rx: number;
+  ry: number;
+  shape: string;
+  fillId: string;
+  isMissing: boolean;
+  isActive: boolean;
+}) {
+  return (
+    <g transform={`translate(${x},${y})`}>
+      {isMissing ? (
+        <g opacity={0.6}>
+          <ellipse cx={0} cy={0} rx={rx} ry={ry} fill="none" stroke="#888" strokeWidth={1} strokeDasharray="3 3" />
+          <path d={`M -${rx * 0.5},-${ry * 0.5} L ${rx * 0.5},${ry * 0.5} M ${rx * 0.5},-${ry * 0.5} L -${rx * 0.5},${ry * 0.5}`}
+            stroke="#a04030" strokeWidth={1.5} fill="none" />
+        </g>
+      ) : (
+        <>
+          {/* Main body */}
+          <ellipse cx={0} cy={0} rx={rx} ry={ry} fill={`url(#${fillId})`} />
+
+          {/* Occlusal details */}
+          {shape === "molar" || shape === "wisdom" ? (
+            <g opacity={0.5}>
+              <path d={`M -${rx * 0.25},-${ry * 0.5} L -${rx * 0.25},${ry * 0.5}`} stroke="#3a3028" strokeWidth={0.8} fill="none" />
+              <path d={`M ${rx * 0.25},-${ry * 0.5} L ${rx * 0.25},${ry * 0.5}`} stroke="#3a3028" strokeWidth={0.8} fill="none" />
+              <path d={`M -${rx * 0.6},0 L ${rx * 0.6},0`} stroke="#3a3028" strokeWidth={0.8} fill="none" />
+              <ellipse cx={-rx * 0.42} cy={-ry * 0.32} rx={rx * 0.14} ry={ry * 0.13} fill="rgba(0,0,0,0.12)" />
+              <ellipse cx={rx * 0.42} cy={-ry * 0.32} rx={rx * 0.14} ry={ry * 0.13} fill="rgba(0,0,0,0.12)" />
+              <ellipse cx={-rx * 0.42} cy={ry * 0.32} rx={rx * 0.14} ry={ry * 0.13} fill="rgba(0,0,0,0.12)" />
+              <ellipse cx={rx * 0.42} cy={ry * 0.32} rx={rx * 0.14} ry={ry * 0.13} fill="rgba(0,0,0,0.12)" />
+              <ellipse cx={0} cy={0} rx={rx * 0.14} ry={ry * 0.13} fill="rgba(0,0,0,0.12)" />
+            </g>
+          ) : shape === "premolar" ? (
+            <g opacity={0.5}>
+              <path d={`M 0,-${ry * 0.55} L 0,${ry * 0.55}`} stroke="#3a3028" strokeWidth={0.8} fill="none" />
+              <ellipse cx={-rx * 0.3} cy={0} rx={rx * 0.2} ry={ry * 0.18} fill="rgba(0,0,0,0.1)" />
+              <ellipse cx={rx * 0.3} cy={0} rx={rx * 0.2} ry={ry * 0.18} fill="rgba(0,0,0,0.1)" />
+            </g>
+          ) : shape === "canine" ? (
+            <ellipse cx={0} cy={ry * 0.1} rx={rx * 0.25} ry={ry * 0.3} fill="rgba(0,0,0,0.08)" />
+          ) : null}
+
+          {/* White highlight 1 */}
+          <ellipse
+            cx={-rx * 0.28}
+            cy={-ry * 0.35}
+            rx={rx * 0.42}
+            ry={ry * 0.28}
+            transform={`rotate(-36, ${-rx * 0.28}, ${-ry * 0.35})`}
+            fill="url(#tooth-hi1)"
+          />
+          {/* White highlight 2 */}
+          <ellipse
+            cx={rx * 0.25}
+            cy={-ry * 0.15}
+            rx={rx * 0.22}
+            ry={ry * 0.15}
+            fill="url(#tooth-hi2)"
+          />
+
+          {/* Outline */}
+          <ellipse cx={0} cy={0} rx={rx} ry={ry} fill="none" stroke="rgba(0,0,0,0.25)" strokeWidth={0.7} />
+
+          {/* Selection ring */}
+          {isActive && (
+            <ellipse cx={0} cy={0} rx={rx + 2} ry={ry + 2} fill="none" stroke="rgba(100,180,255,0.9)" strokeWidth={2} />
+          )}
+        </>
+      )}
+    </g>
+  );
+}
+
+/* ────────────────────────────────
+   Arch Positioning
+   True elliptical arc like the
+   Canvas reference code.
+   ──────────────────────────────── */
 function archPositions(
   teeth: number[],
   cx: number,
   cy: number,
   rx: number,
   ry: number,
-  isUpper: boolean,
-  labelOffset: number
+  startAngle: number,
+  endAngle: number
 ): ToothItem[] {
-  const count = teeth.length;
   return teeth.map((n, i) => {
-    const t = Math.PI - (i * Math.PI) / (count - 1); // π → 0 (left → right)
+    const t = i / (teeth.length - 1);
+    const a = startAngle + (endAngle - startAngle) * t;
+    const x = cx + rx * Math.cos(a);
+    const y = cy + ry * Math.sin(a);
 
-    const x = cx + rx * Math.cos(t);
-    const y = isUpper ? cy - ry * Math.sin(t) : cy + ry * Math.sin(t);
+    // Tangent angle for tooth rotation
+    const dx = -rx * Math.sin(a);
+    const dy = ry * Math.cos(a);
+    const rot = (Math.atan2(dy, dx) * 180) / Math.PI;
 
-    // Labels pushed radially outward
-    const lx = cx + (rx + labelOffset) * Math.cos(t);
-    const ly = isUpper
-      ? cy - (ry + labelOffset) * Math.sin(t)
-      : cy + (ry + labelOffset) * Math.sin(t);
-
-    // Rotation so the tooth follows the arch tangent
-    const dx = -rx * Math.sin(t);
-    const dy = isUpper ? -ry * Math.cos(t) : ry * Math.cos(t);
-    const rot = (Math.atan2(dy, dx) * 180) / Math.PI - 90;
-
-    // Tooth size: back molars are biggest, front incisors smallest
-    const distFromCenter = Math.abs(i - (count - 1) / 2);
-    const rw = distFromCenter < 2 ? 11 : distFromCenter < 5 ? 13 : 15;
-    const rh = distFromCenter < 2 ? 14 : distFromCenter < 5 ? 17 : 20;
-
-    return { n, x, y, lx, ly, rot, rw, rh };
+    const sz = toothSize(n);
+    return { n, x, y, rot, rx: sz.rx, ry: sz.ry, shape: sz.shape };
   });
 }
 
+/* ────────────────────────────────
+   Main Component
+   ──────────────────────────────── */
 export function ToothChart({
   selected,
   onChange,
@@ -66,13 +158,12 @@ export function ToothChart({
 }) {
   const [active, setActive] = useState<number | null>(null);
 
-  /* Wide flat dental arch */
   const upper = useMemo(
-    () => archPositions(UPPER, 350, 130, 280, 48, true, 32),
+    () => archPositions(UPPER, 330, 195, 230, 130, Math.PI * 1.08, Math.PI * 1.92),
     []
   );
   const lower = useMemo(
-    () => archPositions(LOWER, 350, 320, 280, 48, false, 32),
+    () => archPositions(LOWER, 330, 530, 230, 130, Math.PI * 0.08, Math.PI * 0.92),
     []
   );
 
@@ -92,88 +183,175 @@ export function ToothChart({
     [selected]
   );
 
-  const renderTooth = (t: ToothItem) => {
+  // Determine fill color based on state
+  const getFillId = (n: number) => {
+    if (active === n) return "grad-active";
+    if (selected[n]) return "grad-selected";
+    return "grad-default";
+  };
+
+  const renderTooth = (t: ToothItem, isUpperArch: boolean) => {
     const sel = selected[t.n];
     const isActive = active === t.n;
-    const fill = isActive ? "#0aabbd" : sel ? "#c9a227" : "#ffffff";
-    const stroke = isActive ? "#078a99" : sel ? "#a37e1a" : "#94a3b8";
 
     return (
-      <g key={t.n} className="cursor-pointer" style={{ pointerEvents: "all" }}>
-        {/* Click target */}
-        <circle
-          cx={t.x}
-          cy={t.y}
-          r={22}
-          fill="transparent"
-          onClick={() => setActive(t.n)}
-        />
-        {/* Tooth: rotated ellipse, wider than tall */}
-        <ellipse
-          cx={t.x}
-          cy={t.y}
-          rx={t.rw}
-          ry={t.rh}
-          fill={fill}
-          stroke={stroke}
-          strokeWidth={1.5}
-          transform={`rotate(${t.rot}, ${t.x}, ${t.y})`}
-          style={{ pointerEvents: "none" }}
-        />
-        {/* Number label outside the arch */}
+      <g key={t.n} style={{ pointerEvents: "all" }}>
+        {/* 3D tooth ellipse — pointer-events: none so clicks pass through to target below */}
+        <g style={{ pointerEvents: "none" }}>
+          <Tooth3D
+            x={t.x}
+            y={t.y}
+            rx={t.rx}
+            ry={t.ry}
+            shape={t.shape}
+            fillId={getFillId(t.n)}
+            isMissing={sel === "Missing"}
+            isActive={isActive}
+          />
+        </g>
+        {/* Number label */}
         <text
-          x={t.lx}
-          y={t.ly + 1}
+          x={t.x}
+          y={t.y + (isUpperArch ? t.ry + 13 : -t.ry - 4)}
           textAnchor="middle"
           dominantBaseline="middle"
-          fontSize={11}
-          fontWeight={700}
+          fontSize={10}
+          fontWeight={isActive ? 700 : 600}
           fontFamily="system-ui, -apple-system, sans-serif"
-          fill="#475569"
+          fill={isActive ? "#88ccff" : "rgba(200,180,160,0.85)"}
           style={{ pointerEvents: "none", userSelect: "none" }}
         >
           {t.n}
         </text>
+        {/* Invisible click target — rendered last so it sits on top */}
+        <ellipse
+          cx={t.x}
+          cy={t.y}
+          rx={Math.max(t.rx, t.ry) + 8}
+          ry={Math.max(t.rx, t.ry) + 8}
+          fill="transparent"
+          className="cursor-pointer"
+          onClick={() => setActive(t.n)}
+        />
       </g>
     );
   };
 
-  const archPath = (arr: ToothItem[], isUpper: boolean) => {
-    const s = arr[0];
-    const e = arr[arr.length - 1];
-    const cy = isUpper ? 130 : 320;
-    const controlY = isUpper ? cy - 115 : cy + 115;
-    return `M ${s.x} ${s.y} Q 350 ${controlY} ${e.x} ${e.y}`;
-  };
-
   return (
     <div className="w-full mx-auto select-none">
-      <svg viewBox="0 0 700 450" className="w-full h-auto">
-        {/* Soft background fill between arches */}
+      <svg viewBox="0 0 660 820" className="w-full h-auto">
+        <defs>
+          {/* Drop shadow for depth */}
+          <filter id="tooth-shadow" x="-40%" y="-40%" width="180%" height="180%">
+            <feDropShadow dx="2" dy="3" stdDeviation="4" floodColor="#000000" floodOpacity="0.35" />
+          </filter>
+
+          {/* White highlight gradients */}
+          <radialGradient id="tooth-hi1" cx="40%" cy="40%" r="60%">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.72)" />
+            <stop offset="50%" stopColor="rgba(255,255,255,0.22)" />
+            <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+          </radialGradient>
+          <radialGradient id="tooth-hi2" cx="40%" cy="40%" r="60%">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.38)" />
+            <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+          </radialGradient>
+
+          {/* Default tooth: realistic cream enamel */}
+          <radialGradient id="grad-default" cx="32%" cy="28%" r="72%">
+            <stop offset="0%" stopColor="#f8f4ec" />
+            <stop offset="35%" stopColor="#e0d8c4" />
+            <stop offset="75%" stopColor="#c8c0a8" />
+            <stop offset="100%" stopColor="#888070" />
+          </radialGradient>
+
+          {/* Selected tooth: gold highlight */}
+          <radialGradient id="grad-selected" cx="32%" cy="28%" r="72%">
+            <stop offset="0%" stopColor="#fef3c7" />
+            <stop offset="35%" stopColor="#fde68a" />
+            <stop offset="75%" stopColor="#fbbf24" />
+            <stop offset="100%" stopColor="#d97706" />
+          </radialGradient>
+
+          {/* Active tooth: blue selection ring (matches Canvas) */}
+          <radialGradient id="grad-active" cx="32%" cy="28%" r="72%">
+            <stop offset="0%" stopColor="#cce8ff" />
+            <stop offset="35%" stopColor="#88bbee" />
+            <stop offset="75%" stopColor="#5599cc" />
+            <stop offset="100%" stopColor="#2266aa" />
+          </radialGradient>
+
+          {/* Gum tissue radial gradient */}
+          <radialGradient id="gum-grad" cx="50%" cy="40%" r="60%">
+            <stop offset="0%" stopColor="#c8706a" />
+            <stop offset="40%" stopColor="#b05a55" />
+            <stop offset="80%" stopColor="#8a3a35" />
+            <stop offset="100%" stopColor="#5a2020" />
+          </radialGradient>
+
+          {/* Palate highlight */}
+          <radialGradient id="palate-grad" cx="50%" cy="40%" r="50%">
+            <stop offset="0%" stopColor="rgba(220,160,150,0.35)" />
+            <stop offset="100%" stopColor="rgba(80,20,20,0)" />
+          </radialGradient>
+
+          {/* Gum inner shadow */}
+          <filter id="gum-shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="blur" />
+            <feOffset dx="0" dy="3" result="offsetBlur" />
+            <feComponentTransfer>
+              <feFuncA type="linear" slope="0.35" />
+            </feComponentTransfer>
+            <feMerge>
+              <feMergeNode in="offsetBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Upper gum — exact Canvas bezier path */}
         <path
-          d={`M ${upper[0].x} ${upper[0].y} Q 350 ${upper[0].y - 100} ${upper[upper.length - 1].x} ${upper[upper.length - 1].y} L ${lower[lower.length - 1].x} ${lower[lower.length - 1].y} Q 350 ${lower[0].y + 100} ${lower[0].x} ${lower[0].y} Z`}
-          fill="#f8fafc"
+          d="M 68,320 C 40,290 28,230 50,180 C 80,100 160,55 280,42 C 320,38 370,38 380,42 C 500,55 580,100 610,180 C 632,230 620,290 592,320 C 560,350 500,370 330,372 C 160,370 100,350 68,320 Z"
+          fill="url(#gum-grad)"
           stroke="none"
-        />
-
-        {/* Arch guide lines */}
-        <path
-          d={archPath(upper, true)}
-          fill="none"
-          stroke="#e2e8f0"
-          strokeWidth={2}
-          strokeDasharray="6 6"
+          filter="url(#gum-shadow)"
         />
         <path
-          d={archPath(lower, false)}
+          d="M 68,320 C 40,290 28,230 50,180 C 80,100 160,55 280,42 C 320,38 370,38 380,42 C 500,55 580,100 610,180 C 632,230 620,290 592,320 C 560,350 500,370 330,372 C 160,370 100,350 68,320 Z"
           fill="none"
-          stroke="#e2e8f0"
-          strokeWidth={2}
-          strokeDasharray="6 6"
+          stroke="#8a3a35"
+          strokeWidth={1.2}
+        />
+        {/* Palate highlight */}
+        <ellipse cx={330} cy={225} rx={130} ry={95} fill="url(#palate-grad)" />
+
+        {/* Lower gum — exact Canvas bezier path */}
+        <path
+          d="M 68,455 C 40,470 28,510 50,570 C 80,640 160,688 280,700 C 320,705 370,705 380,700 C 500,688 580,640 610,570 C 632,510 620,470 592,455 C 560,440 500,432 330,430 C 160,432 100,440 68,455 Z"
+          fill="url(#gum-grad)"
+          stroke="none"
+          filter="url(#gum-shadow)"
+        />
+        <path
+          d="M 68,455 C 40,470 28,510 50,570 C 80,640 160,688 280,700 C 320,705 370,705 380,700 C 500,688 580,640 610,570 C 632,510 620,470 592,455 C 560,440 500,432 330,430 C 160,432 100,440 68,455 Z"
+          fill="none"
+          stroke="#8a3a35"
+          strokeWidth={1.2}
         />
 
-        {upper.map(renderTooth)}
-        {lower.map(renderTooth)}
+        {/* Divider between arches */}
+        <path
+          d="M 50,398 C 150,392 480,392 610,398"
+          fill="none"
+          stroke="rgba(100,60,40,0.3)"
+          strokeWidth={1}
+        />
+
+        {/* Render all teeth with shadow filter */}
+        <g filter="url(#tooth-shadow)">
+          {upper.map((t) => renderTooth(t, true))}
+          {lower.map((t) => renderTooth(t, false))}
+        </g>
       </svg>
 
       {/* Inline role selector */}

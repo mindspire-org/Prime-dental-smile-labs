@@ -38,8 +38,8 @@ import { Route as AdminEmailTemplatesRouteImport } from './routes/admin.email-te
 import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminClinicsRouteImport } from './routes/admin.clinics'
 import { Route as AdminCasesRouteImport } from './routes/admin.cases'
-import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminBackupsRouteImport } from './routes/admin.backups'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminActivityRouteImport } from './routes/admin.activity'
 import { Route as MarketingWorkflowRouteImport } from './routes/_marketing.workflow'
 import { Route as MarketingTermsOfServiceRouteImport } from './routes/_marketing.terms-of-service'
@@ -216,14 +216,14 @@ const AdminCasesRoute = AdminCasesRouteImport.update({
   path: '/cases',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminBackupsRoute = AdminBackupsRouteImport.update({
   id: '/backups',
   path: '/backups',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminActivityRoute = AdminActivityRouteImport.update({
@@ -977,18 +977,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCasesRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/analytics': {
-      id: '/admin/analytics'
-      path: '/analytics'
-      fullPath: '/admin/analytics'
-      preLoaderRoute: typeof AdminAnalyticsRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/backups': {
       id: '/admin/backups'
       path: '/backups'
       fullPath: '/admin/backups'
       preLoaderRoute: typeof AdminBackupsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/activity': {
