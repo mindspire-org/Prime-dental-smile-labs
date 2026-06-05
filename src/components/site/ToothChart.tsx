@@ -230,6 +230,7 @@ export function ToothChart({
           rx={Math.max(t.rx, t.ry) + 8}
           ry={Math.max(t.rx, t.ry) + 8}
           fill="transparent"
+          style={{ pointerEvents: "all" }}
           className="cursor-pointer"
           onClick={() => setActive(t.n)}
         />
