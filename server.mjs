@@ -93,6 +93,7 @@ async function loadShell() {
 const SHELL = await loadShell();
 
 // ── Startup sanity checks ──────────────────────────────────────────────
+let missingAssets = [];
 try {
   const clientStat = await stat(CLIENT_DIR);
   if (!clientStat.isDirectory()) {
@@ -102,6 +103,30 @@ try {
     const assetStat = await stat(assetDir).catch(() => null);
     if (!assetStat?.isDirectory()) {
       console.error(`CRITICAL: ${assetDir} not found. Run \`npm run build\` before starting the server.`);
+    }
+
+    // Validate that every asset referenced by _shell.html actually exists.
+    // Hash mismatches happen when the build is updated but the server wasn't restarted.
+    const hrefSrcRe = /(?:href|src)="\/([^"]+)"/g;
+    let m;
+    while ((m = hrefSrcRe.exec(SHELL)) !== null) {
+      const relPath = m[1];
+      const fullPath = path.join(CLIENT_DIR, relPath);
+      const exists = await stat(fullPath).then(s => s.isFile()).catch(() => false);
+      if (!exists) missingAssets.push(relPath);
+    }
+
+    if (missingAssets.length > 0) {
+      console.error("=".repeat(70));
+      console.error("CRITICAL: The prerendered HTML shell references assets that do NOT exist.");
+      console.error("This causes 502 Bad Gateway because the browser requests .js/.css files");
+      console.error("that the server cannot find.");
+      console.error("");
+      console.error("Missing files:");
+      missingAssets.forEach(f => console.error(`  - ${f}`));
+      console.error("");
+      console.error("Fix: run `npm run build` on this machine, then restart the server.");
+      console.error("=".repeat(70));
     }
   }
 } catch {
@@ -145,7 +170,7 @@ app.get("/favicon.ico", async (req, res) => {
 // which prevents reverse proxies (nginx, Cloudflare) from returning 502.
 const STATIC_EXT_RE = /\.(js|mjs|css|json|svg|png|jpg|jpeg|webp|ico|woff|woff2|ttf|map)$/i;
 
-app.use((req, res) => {
+app.use(async (req, res) => {
   const pathname = decodeURIComponent(req.path);
 
   // If it looks like a static file request but wasn't found by express.static,
@@ -155,10 +180,21 @@ app.use((req, res) => {
     return;
   }
 
+  // In development, re-read the shell on every request so builds don't
+  // require a server restart. In production, use the cached SHELL.
+  let shellHtml = SHELL;
+  if (process.env.NODE_ENV !== "production") {
+    try {
+      shellHtml = await readFile(SHELL_FILE, "utf8");
+    } catch {
+      shellHtml = fallbackHtml();
+    }
+  }
+
   res.status(200).set({
     "content-type": "text/html; charset=utf-8",
     "cache-control": "no-cache",
-  }).end(SHELL);
+  }).end(shellHtml);
 });
 
 const server = app.listen(PORT, "0.0.0.0", () => {
