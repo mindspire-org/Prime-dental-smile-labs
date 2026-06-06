@@ -143,7 +143,7 @@ function NewCasePage() {
 
   const toggle = (arr: string[], v: string, set: (a: string[]) => void) =>
     set(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
-  const MAX_FILE_SIZE = 200 * 1024 * 1024; // 200 MB per file
+  const MAX_FILE_SIZE = 250 * 1024 * 1024; // 250 MB per file
   const onFiles = (list: FileList | null) => {
     if (!list) return;
     const incoming = Array.from(list);

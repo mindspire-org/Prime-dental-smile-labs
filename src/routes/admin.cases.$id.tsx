@@ -84,7 +84,7 @@ function AdminCaseDetail() {
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !data?.case?._id) return;
-    const MAX_MB = 50;
+    const MAX_MB = 250;
     if (file.size > MAX_MB * 1024 * 1024) { alert(`File must be under ${MAX_MB} MB`); return; }
     setUploading(true);
     setUploadProgress("Requesting upload URL…");

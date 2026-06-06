@@ -603,7 +603,7 @@ function SubmitPage() {
             <div>
               <div className="mb-6 p-4 bg-linear-to-r from-teal/5 to-gold/5 rounded-xl border border-teal/20">
                 <p className="text-sm text-muted-grey">
-                  <strong>Supported formats:</strong> STL, PLY, OBJ, DICOM, ZIP, RAR, JPG, PNG, PDF. Maximum file size: 50MB per file.
+                  <strong>Supported formats:</strong> STL, PLY, OBJ, DICOM, ZIP, RAR, JPG, PNG, PDF. Maximum file size: 250MB per file.
                 </p>
               </div>
               
