@@ -30,20 +30,25 @@ export function pageviewMiddleware(req, res, next) {
   const ua = req.headers["user-agent"] || "";
   if (isBot(ua)) return next();
 
+  // Ensure a session id and set the cookie BEFORE the response is sent.
+  // (Setting it inside the "finish" handler throws ERR_HTTP_HEADERS_SENT —
+  // headers are already flushed by then — which crashed the process.)
+  let sessionId = req.cookies?.psSession;
+  if (!sessionId) {
+    sessionId = crypto.randomBytes(12).toString("hex");
+    res.cookie("psSession", sessionId, {
+      maxAge: 30 * 60 * 1000,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+  }
+
+  // Record the pageview after the response finishes — DB write only,
+  // no header mutations here.
   res.on("finish", () => {
     // Only track successful responses (2xx / 3xx)
     if (res.statusCode >= 400) return;
-
-    let sessionId = req.cookies?.psSession;
-    if (!sessionId) {
-      sessionId = crypto.randomBytes(12).toString("hex");
-      res.cookie("psSession", sessionId, {
-        maxAge: 30 * 60 * 1000,
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-      });
-    }
 
     PageView.create({
       path: req.path,
