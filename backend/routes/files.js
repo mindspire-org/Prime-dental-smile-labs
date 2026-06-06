@@ -7,7 +7,7 @@ import { logActivity } from "../services/activity.js";
 export const filesRouter = express.Router();
 
 // Local file upload endpoint (no auth — URL is only given to authenticated callers via upload-url)
-filesRouter.put("/upload-local", express.raw({ type: "*/*", limit: "50mb" }), async (req, res) => {
+filesRouter.put("/upload-local", express.raw({ type: "*/*", limit: "500mb" }), async (req, res) => {
   try {
     const key = req.query.key;
     if (!key) return res.status(400).json({ error: "key required" });

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { apiFetch, getCurrentUser, openRealtimeConnection, type AuthUser } from "@/lib/api";
 import { CaseFileList } from "@/components/site/CaseFiles";
 import { shadeFields } from "@/lib/shade";
+import { generateCasePdf } from "@/lib/case-pdf";
 
 export const Route = createFileRoute("/portal/cases/$id")({
   component: CaseDetail,
@@ -381,7 +382,9 @@ function CaseDetail() {
               style={{ background: "linear-gradient(90deg, #0aabbd, #078a99)" }}>
               {uploading ? <><Loader2 size={15} className="animate-spin"/> {uploadProgress || "Uploading…"}</> : <><Upload size={15}/> Upload Additional Files</>}
             </button>
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all hover:scale-[1.02] shadow-[0_2px_12px_rgba(201,162,39,0.25)]"
+            <button
+              onClick={() => generateCasePdf(dentalCase)}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all hover:scale-[1.02] shadow-[0_2px_12px_rgba(201,162,39,0.25)]"
               style={{ background: "linear-gradient(90deg, #c9a227, #a37e1a)", color: "#fff" }}>
               <Download size={15}/> Download Prescription PDF
             </button>

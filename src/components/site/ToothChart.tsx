@@ -228,18 +228,20 @@ const textCommon: CSSProperties = {
 export function ToothChart({
   selected,
   onChange,
+  readOnly = false,
 }: {
   selected: Record<number, ToothRole>;
-  onChange: (next: Record<number, ToothRole>) => void;
+  onChange?: (next: Record<number, ToothRole>) => void;
+  readOnly?: boolean;
 }) {
   const [active, setActive] = useState<number | null>(null);
   const [hovered, setHovered] = useState<number | null>(null);
 
-  const setRole = (id: number, role: ToothRole) => onChange({ ...selected, [id]: role });
+  const setRole = (id: number, role: ToothRole) => onChange?.({ ...selected, [id]: role });
   const clearTooth = (id: number) => {
     const next = { ...selected };
     delete next[id];
-    onChange(next);
+    onChange?.(next);
     setActive(null);
   };
 
@@ -287,7 +289,7 @@ export function ToothChart({
         role="img"
         aria-label="FDI dental tooth chart"
       >
-        <rect width="1000" height="1145" rx="18" fill={COLORS.chartBg} onClick={() => setActive(null)} />
+        <rect width="1000" height="1145" rx="18" fill={COLORS.chartBg} onClick={() => !readOnly && setActive(null)} />
 
         <line
           x1="500"
@@ -387,13 +389,14 @@ export function ToothChart({
 
               <g
                 transform={`translate(${tooth.x} ${tooth.y}) rotate(${tooth.rotate})`}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: readOnly ? "default" : "pointer" }}
                 onClick={(e) => {
+                  if (readOnly) return;
                   e.stopPropagation();
                   setActive((cur) => (cur === tooth.id ? null : tooth.id));
                 }}
-                onMouseEnter={() => setHovered(tooth.id)}
-                onMouseLeave={() => setHovered((h) => (h === tooth.id ? null : h))}
+                onMouseEnter={() => !readOnly && setHovered(tooth.id)}
+                onMouseLeave={() => !readOnly && setHovered((h) => (h === tooth.id ? null : h))}
               >
                 <path
                   d={toothPath(tooth.type, tooth.w, tooth.h)}
@@ -434,7 +437,7 @@ export function ToothChart({
         })}
       </svg>
 
-      {active !== null && (
+      {!readOnly && active !== null && (
         <div
           className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl"
           style={{ width: "100%", maxWidth: 600 }}
@@ -473,9 +476,11 @@ export function ToothChart({
         </div>
       )}
 
-      <p className="text-xs text-muted-grey mt-3 text-center">
-        Click a tooth to select. Selected: {Object.keys(selected).length || "none"}.
-      </p>
+      {!readOnly && (
+        <p className="text-xs text-muted-grey mt-3 text-center">
+          Click a tooth to select. Selected: {Object.keys(selected).length || "none"}.
+        </p>
+      )}
       {summary && (
         <p className="text-xs text-text-slate mt-1 font-medium text-center">{summary}</p>
       )}

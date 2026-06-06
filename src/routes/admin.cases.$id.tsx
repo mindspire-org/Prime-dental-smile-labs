@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { apiFetch, getCurrentUser, openRealtimeConnection, type AuthUser } from "@/lib/api";
 import { generateCasePdf } from "@/lib/case-pdf";
 import { CaseFileList } from "@/components/site/CaseFiles";
+import { ToothChart } from "@/components/site/ToothChart";
 import { shadeFields } from "@/lib/shade";
 
 export const Route = createFileRoute("/admin/cases/$id")({
@@ -257,6 +258,23 @@ function AdminCaseDetail() {
               </div>
             )}
           </section>
+
+          {/* Tooth Chart */}
+          {dentalCase.teeth && Object.keys(dentalCase.teeth).length > 0 && (
+            <section className="bg-white rounded-2xl p-6 shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
+              <h2 className="font-bold text-slate-800 mb-5 flex items-center gap-2">
+                <span className="w-1 h-5 rounded-full bg-indigo-500 inline-block"/>
+                Dental Chart
+              </h2>
+              <ToothChart
+                selected={Object.entries(dentalCase.teeth as Record<string, string> || {}).reduce((acc, [k, v]) => {
+                  acc[Number(k)] = v as any;
+                  return acc;
+                }, {} as Record<number, any>)}
+                readOnly
+              />
+            </section>
+          )}
 
           {/* Files */}
           <section className="bg-white rounded-2xl p-6 shadow-[0_2px_16px_rgba(0,0,0,0.05)]">

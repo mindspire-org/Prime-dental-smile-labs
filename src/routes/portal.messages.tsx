@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { apiFetch, getCurrentUser, openRealtimeConnection, type AuthUser } from "@/lib/api";
 import { logoUrl } from "@/lib/logo";
 import { Send, CheckCheck, MessageSquare, Search, Circle, Paperclip, X, FileText, ChevronLeft } from "lucide-react";
+import { formatBytes } from "@/lib/utils";
 
 export const Route = createFileRoute("/portal/messages")({
   component: PortalMessages,
@@ -434,7 +435,7 @@ function PortalMessages() {
                   <div className="mb-2 flex items-center gap-2 px-3 py-2 bg-teal/5 border border-teal/20 rounded-xl">
                     <FileText size={13} className="text-teal shrink-0" />
                     <span className="text-xs text-slate-600 flex-1 truncate">{attachment.name}</span>
-                    <span className="text-[10px] text-slate-400">{(attachment.size / 1024).toFixed(1)} KB</span>
+                    <span className="text-[10px] text-slate-400">{formatBytes(attachment.size)}</span>
                     <button onClick={() => setAttachment(null)} className="text-slate-400 hover:text-red-500 transition-colors"><X size={13} /></button>
                   </div>
                 )}

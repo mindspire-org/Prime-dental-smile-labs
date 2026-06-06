@@ -4,6 +4,7 @@ import {
   Download, Eye, Trash2, Loader2, X, FileCode, File,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
+import { formatBytes } from "@/lib/utils";
 
 export type CaseFile = {
   _id: string;
@@ -172,7 +173,7 @@ export function CaseFileList({
                 <div className="text-sm font-medium text-slate-700 truncate">{f.originalName}</div>
                 {f.size && (
                   <div className="text-[10px] text-slate-400">
-                    {(f.size / 1024).toFixed(0)} KB · {type.charAt(0).toUpperCase() + type.slice(1)}
+                    {formatBytes(f.size)} · {type.charAt(0).toUpperCase() + type.slice(1)}
                   </div>
                 )}
               </div>

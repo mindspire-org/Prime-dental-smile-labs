@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { FileText, CheckCircle2, UploadCloud, X } from "lucide-react";
+import { formatBytes } from "@/lib/utils";
 
 export type UploadFile = {
   name: string;
@@ -15,11 +16,6 @@ type Props = {
   onCancel?: () => void;
 };
 
-function formatBytes(b: number) {
-  if (b < 1024) return `${b} B`;
-  if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`;
-  return `${(b / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 export function UploadProgressModal({ open, files, title = "Uploading Files", onCancel }: Props) {
   const [mounted, setMounted] = useState(false);

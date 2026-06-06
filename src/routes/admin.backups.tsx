@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
+import { formatBytes } from "@/lib/utils";
 import {
   Database, Download, Upload, Save, Trash2, RotateCcw,
   Clock, Calendar, CheckCircle2, AlertTriangle, FileArchive,
@@ -271,7 +272,7 @@ export default function BackupsPage() {
                         <span className="text-slate-300">|</span>
                         {s.createdBy?.name || "System"}
                         <span className="text-slate-300">|</span>
-                        {(s.size ? (s.size / 1024).toFixed(1) : "0")} KB
+                        {formatBytes(s.size || 0)}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">

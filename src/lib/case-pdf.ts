@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { shadeFields } from "./shade";
+import { formatBytes } from "./utils";
 
 const PRIMARY = "#4f46e5";
 const PRIMARY_LIGHT = "#eef2ff";
@@ -448,7 +449,7 @@ export function generateCasePdf(caseData: any, filename?: string) {
       },
       body: caseData.files.map((f: any) => [
         f.originalName || f.name || "—",
-        f.size ? `${(f.size / 1024).toFixed(0)} KB` : "—",
+        f.size ? formatBytes(f.size) : "—",
       ]),
       columnStyles: {
         0: { fontSize: 9, textColor: SLATE_800 },

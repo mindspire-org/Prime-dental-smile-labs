@@ -24,6 +24,7 @@ import { ModernDatePicker } from "@/components/site/ModernDatePicker";
 import { Reveal } from "@/components/site/Reveal";
 import { analytics } from "@/components/analytics/GoogleAnalytics";
 import { getCurrentUser } from "@/lib/api";
+import { formatBytes } from "@/lib/utils";
 
 export const Route = createFileRoute("/_marketing/submit")({
   beforeLoad: async () => {
@@ -640,7 +641,7 @@ function SubmitPage() {
                         </div>
                         <div className="flex-1">
                           <p className="text-sm font-medium text-text-slate truncate">{f.name}</p>
-                          <p className="text-xs text-muted-grey">{(f.size / 1024).toFixed(1)} KB</p>
+                          <p className="text-xs text-muted-grey">{formatBytes(f.size)}</p>
                         </div>
                         <div className="w-32 h-2 bg-white rounded-full overflow-hidden">
                           <div className="h-full bg-linear-to-r from-teal to-teal/80" style={{width: "100%"}}/>

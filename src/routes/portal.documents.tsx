@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { Download, FileText, File } from "lucide-react";
+import { formatBytes } from "@/lib/utils";
 
 export const Route = createFileRoute("/portal/documents")({
   component: PortalDocuments,
@@ -52,7 +53,7 @@ function PortalDocuments() {
               </div>
               {f.size && (
                 <span className="text-xs text-slate-400 shrink-0 hidden sm:block">
-                  {(f.size / 1024).toFixed(0)} KB
+                  {formatBytes(f.size)}
                 </span>
               )}
               <button onClick={() => download(f._id)}

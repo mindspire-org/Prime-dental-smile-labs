@@ -8,6 +8,7 @@ import {
 import { ToothChart, type ToothRole } from "@/components/site/ToothChart";
 import { ModernDatePicker } from "@/components/site/ModernDatePicker";
 import { UploadProgressModal, type UploadFile } from "@/components/site/UploadProgressModal";
+import { formatBytes } from "@/lib/utils";
 
 export const Route = createFileRoute("/portal/cases/new")({
   component: NewCasePage,
@@ -142,8 +143,16 @@ function NewCasePage() {
 
   const toggle = (arr: string[], v: string, set: (a: string[]) => void) =>
     set(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
+  const MAX_FILE_SIZE = 200 * 1024 * 1024; // 200 MB per file
   const onFiles = (list: FileList | null) => {
-    if (list) setFiles((f) => [...f, ...Array.from(list)]);
+    if (!list) return;
+    const incoming = Array.from(list);
+    const tooLarge = incoming.find((f) => f.size > MAX_FILE_SIZE);
+    if (tooLarge) {
+      setError(`File "${tooLarge.name}" exceeds the ${formatBytes(MAX_FILE_SIZE)} limit.`);
+      return;
+    }
+    setFiles((f) => [...f, ...incoming]);
   };
 
   async function handleSubmit() {
@@ -485,7 +494,7 @@ function NewCasePage() {
 
       {/* ── Section 7: File Upload ── */}
       <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.05)] p-6">
-        <SectionHeader icon={Upload} title="Files & Scans" subtitle="STL, PLY, OBJ, DICOM, ZIP, JPG, PNG, PDF — max 50 MB each" />
+        <SectionHeader icon={Upload} title="Files & Scans" subtitle={`STL, PLY, OBJ, DICOM, ZIP, JPG, PNG, PDF — max ${formatBytes(MAX_FILE_SIZE)} each`} />
         <div onDragOver={e => { e.preventDefault(); setDrag(true); }}
           onDragLeave={() => setDrag(false)}
           onDrop={e => { e.preventDefault(); setDrag(false); onFiles(e.dataTransfer.files); }}
@@ -505,7 +514,7 @@ function NewCasePage() {
                 <FileText size={14} className="text-teal shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-slate-700 truncate">{f.name}</div>
-                  <div className="text-xs text-slate-400">{(f.size / 1024).toFixed(1)} KB</div>
+                  <div className="text-xs text-slate-400">{formatBytes(f.size)}</div>
                 </div>
                 <button type="button" onClick={() => setFiles(fs => fs.filter((_, j) => j !== i))}
                   className="text-slate-400 hover:text-red-500 text-xs transition-colors">Remove</button>
