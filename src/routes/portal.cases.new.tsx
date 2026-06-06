@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { ToothChart, type ToothRole } from "@/components/site/ToothChart";
 import { ModernDatePicker } from "@/components/site/ModernDatePicker";
+import { UploadProgressModal, type UploadFile } from "@/components/site/UploadProgressModal";
 
 export const Route = createFileRoute("/portal/cases/new")({
   component: NewCasePage,
@@ -118,6 +119,8 @@ function NewCasePage() {
   const [shipping, setShipping] = useState({ method: "DHL Express (1-2 days)", returnAddress: "Same as clinic address", notes: "" });
   const [files, setFiles] = useState<File[]>([]);
   const [drag, setDrag] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadFile[]>([]);
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const [decl, setDecl] = useState({ a: false, b: false, c: false });
 
   useEffect(() => {
@@ -168,25 +171,70 @@ function NewCasePage() {
           notes: patientForm.notes || undefined,
         }),
       });
-      // Upload all attached files to the newly created case
+      // Upload all attached files to the newly created case with progress tracking
       const caseId = result.case._id;
       if (files.length > 0 && caseId) {
-        for (const file of files) {
+        const progressInit: UploadFile[] = files.map((f) => ({
+          name: f.name,
+          size: f.size,
+          progress: 0,
+          status: "pending" as const,
+        }));
+        setUploadProgress(progressInit);
+        setShowUploadModal(true);
+
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          setUploadProgress((prev) =>
+            prev.map((p, idx) => (idx === i ? { ...p, status: "uploading" as const } : p))
+          );
           try {
             const { uploadUrl } = await apiFetch<{ uploadUrl: string }>("/api/files/upload-url", {
               method: "POST",
               body: JSON.stringify({ caseId, fileName: file.name, contentType: file.type || "application/octet-stream", size: file.size }),
             });
-            await fetch(uploadUrl, { method: "PUT", body: file, headers: { "content-type": file.type || "application/octet-stream" } });
+
+            // Upload with XMLHttpRequest for progress tracking
+            await new Promise<void>((resolve, reject) => {
+              const xhr = new XMLHttpRequest();
+              xhr.upload.addEventListener("progress", (event) => {
+                if (event.lengthComputable) {
+                  const pct = Math.round((event.loaded / event.total) * 100);
+                  setUploadProgress((prev) =>
+                    prev.map((p, idx) => (idx === i ? { ...p, progress: pct } : p))
+                  );
+                }
+              });
+              xhr.addEventListener("load", () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                  setUploadProgress((prev) =>
+                    prev.map((p, idx) => (idx === i ? { ...p, progress: 100, status: "done" as const } : p))
+                  );
+                  resolve();
+                } else {
+                  reject(new Error(`Upload failed: ${xhr.status}`));
+                }
+              });
+              xhr.addEventListener("error", () => reject(new Error("Network error")));
+              xhr.open("PUT", uploadUrl);
+              xhr.setRequestHeader("content-type", file.type || "application/octet-stream");
+              xhr.send(file);
+            });
           } catch (uploadErr) {
             console.error("File upload failed:", uploadErr);
+            setUploadProgress((prev) =>
+              prev.map((p, idx) => (idx === i ? { ...p, status: "error" as const } : p))
+            );
           }
         }
+        // Hide modal after a brief delay so users see "complete"
+        setTimeout(() => setShowUploadModal(false), 1200);
       }
       setDone(result.case);
     } catch (e: any) {
       setError(e.message || "Submission failed. Please try again.");
       setSubmitting(false);
+      setShowUploadModal(false);
     }
   }
 
@@ -546,6 +594,13 @@ function NewCasePage() {
         </button>
         <p className="text-center text-xs text-slate-400 mt-3">You'll receive a confirmation email once submitted.</p>
       </div>
+
+      {/* Upload Progress Modal */}
+      <UploadProgressModal
+        open={showUploadModal}
+        files={uploadProgress}
+        onCancel={() => { /* uploads can't be cancelled mid-flight easily */ }}
+      />
     </div>
   );
 }

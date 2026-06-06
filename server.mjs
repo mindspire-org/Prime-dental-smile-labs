@@ -164,6 +164,19 @@ app.get("/favicon.ico", async (req, res) => {
   }
 });
 
+// Serve uploaded files directly from disk (local storage fallback when S3 is not configured)
+// This MUST be before the SPA catch-all so binary files don't get served as HTML.
+const UPLOADS_DIR = path.join(__dirname, "uploads");
+app.use("/uploads", express.static(UPLOADS_DIR, {
+  maxAge: "1d",
+  index: false,
+  dotfiles: "ignore",
+  setHeaders: (res, filepath) => {
+    const filename = path.basename(filepath);
+    res.setHeader("content-disposition", `attachment; filename="${encodeURIComponent(filename)}"`);
+  },
+}));
+
 // ── SPA catch-all ────────────────────────────────────────────────────────
 // Only serve the prerendered shell for page routes (no file extension).
 // Requests for missing .js / .css / .png etc. get 404 instead of HTML,
