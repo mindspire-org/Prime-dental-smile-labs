@@ -180,15 +180,14 @@ app.use(async (req, res) => {
     return;
   }
 
-  // In development, re-read the shell on every request so builds don't
-  // require a server restart. In production, use the cached SHELL.
-  let shellHtml = SHELL;
-  if (process.env.NODE_ENV !== "production") {
-    try {
-      shellHtml = await readFile(SHELL_FILE, "utf8");
-    } catch {
-      shellHtml = fallbackHtml();
-    }
+  // ALWAYS re-read the shell from disk. Reading a ~6KB file is essentially
+  // free compared to network I/O, and this completely eliminates the
+  // stale-shell problem where the cached SHELL references old asset hashes.
+  let shellHtml;
+  try {
+    shellHtml = await readFile(SHELL_FILE, "utf8");
+  } catch {
+    shellHtml = fallbackHtml();
   }
 
   res.status(200).set({
