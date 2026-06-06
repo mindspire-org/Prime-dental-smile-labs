@@ -59,6 +59,7 @@ function fallbackHtml() {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Prime Smile Dental Laboratory</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     ${cssTags}
   </head>
   <body>
@@ -70,7 +71,14 @@ function fallbackHtml() {
 
 async function loadShell() {
   try {
-    const html = await readFile(SHELL_FILE, "utf8");
+    let html = await readFile(SHELL_FILE, "utf8");
+    // Inject favicon link if missing — stops browsers from auto-requesting /favicon.ico
+    if (!html.includes('rel="icon"') && !html.includes("rel='icon'")) {
+      html = html.replace(
+        /<head[^>]*>/i,
+        (match) => `${match}\n    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />`
+      );
+    }
     console.log(`Serving prerendered shell: ${SHELL_FILE}`);
     return html;
   } catch {
@@ -108,6 +116,19 @@ function safeJoin(base, reqPath) {
 }
 
 const app = await createApiApp();
+
+// Serve /favicon.ico from the SVG asset so browsers don't hit the SPA catch-all
+app.get("/favicon.ico", async (req, res) => {
+  const svgPath = path.join(CLIENT_DIR, "favicon.svg");
+  try {
+    const data = await readFile(svgPath);
+    res.setHeader("content-type", "image/svg+xml");
+    res.setHeader("cache-control", "public, max-age=86400");
+    res.status(200).end(data);
+  } catch {
+    res.status(404).end();
+  }
+});
 
 app.use(async (req, res) => {
   try {

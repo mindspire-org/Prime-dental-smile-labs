@@ -73,6 +73,19 @@ export function SEOHead({
     if (ogDescription || description) updateMetaTag("twitter:description", ogDescription || description!);
     if (ogImage) updateMetaTag("twitter:image", ogImage);
 
+    // Favicon (SVG) — prevents automatic /favicon.ico requests
+    {
+      const selector = 'link[rel="icon"][type="image/svg+xml"]';
+      let favicon = document.querySelector(selector) as HTMLLinkElement;
+      if (!favicon) {
+        favicon = document.createElement("link");
+        favicon.setAttribute("rel", "icon");
+        favicon.setAttribute("type", "image/svg+xml");
+        favicon.setAttribute("href", "/favicon.svg");
+        document.head.appendChild(favicon);
+      }
+    }
+
     // Canonical URL
     if (canonicalUrl) {
       let link = document.querySelector("link[rel='canonical']") as HTMLLinkElement;
