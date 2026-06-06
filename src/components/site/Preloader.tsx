@@ -2,93 +2,68 @@ import { logoUrl } from "@/lib/logo";
 
 export function Preloader() {
   return (
-    <div className="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-[#f0f4f8]">
-      <div className="relative w-28 h-28">
-        {/* Outer ring — teal dots orbiting on Y axis */}
-        <div className="absolute inset-0" style={{ perspective: 600 }}>
-          <div style={{ transformStyle: "preserve-3d", animation: "orbit3d 3s linear infinite" }}>
-            {Array.from({ length: 8 }).map((_, i) => {
-              const angle = (i / 8) * 360;
-              return (
-                <div
-                  key={`o-${i}`}
-                  className="absolute left-1/2 top-1/2"
-                  style={{ transform: `rotateY(${angle}deg) translateZ(50px)` }}
-                >
-                  <span
-                    className="block w-2.5 h-2.5 rounded-full bg-[#0aabbd]"
-                    style={{
-                      marginLeft: -5,
-                      marginTop: -5,
-                      opacity: 0.55 + (i % 3) * 0.15,
-                      animation: `pulseScale 1.4s ease-in-out ${i * 0.12}s infinite alternate`,
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </div>
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#f0f4f8]"
+      style={{ zIndex: 9999 }}>
+      <div className="relative w-24 h-24">
+        {/* Pulsing rings */}
+        <span className="absolute inset-0 rounded-full border-2 border-teal-500/30"
+          style={{ animation: "ringPulse 2s ease-out infinite" }} />
+        <span className="absolute inset-0 rounded-full border-2 border-teal-500/20"
+          style={{ animation: "ringPulse 2s ease-out 0.6s infinite" }} />
+        <span className="absolute inset-0 rounded-full border-2 border-teal-500/10"
+          style={{ animation: "ringPulse 2s ease-out 1.2s infinite" }} />
+
+        {/* Rotating spinner arc */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <svg className="w-full h-full" viewBox="0 0 96 96">
+            <circle cx="48" cy="48" r="42" fill="none" stroke="#e2e8f0" strokeWidth="4" />
+            <circle cx="48" cy="48" r="42" fill="none" stroke="#0aabbd" strokeWidth="4"
+              strokeLinecap="round" strokeDasharray="200" strokeDashoffset="80"
+              style={{ transformOrigin: "center", animation: "spin 1.2s linear infinite" }} />
+          </svg>
         </div>
 
-        {/* Inner ring — gold dots orbiting on X axis, counter-rotating */}
-        <div className="absolute inset-0" style={{ perspective: 600 }}>
-          <div style={{ transformStyle: "preserve-3d", animation: "orbit3dReverse 2.4s linear infinite" }}>
-            {Array.from({ length: 6 }).map((_, i) => {
-              const angle = (i / 6) * 360;
-              return (
-                <div
-                  key={`i-${i}`}
-                  className="absolute left-1/2 top-1/2"
-                  style={{ transform: `rotateX(${angle}deg) translateZ(32px)` }}
-                >
-                  <span
-                    className="block w-2 h-2 rounded-full bg-[#c9a227]"
-                    style={{
-                      marginLeft: -4,
-                      marginTop: -4,
-                      opacity: 0.5 + (i % 2) * 0.2,
-                      animation: `pulseScale 1.2s ease-in-out ${i * 0.18}s infinite alternate`,
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Center logo mark */}
+        {/* Center logo with soft glow */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div
-            className="w-11 h-11 rounded-full bg-white shadow-[0_4px_20px_rgba(10,171,189,0.25)] flex items-center justify-center"
-            style={{ animation: "breathe 2.2s ease-in-out infinite" }}
+            className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg"
+            style={{ animation: "logoBreathe 2s ease-in-out infinite" }}
           >
-            <img src={logoUrl} alt="" className="w-7 h-7 object-contain" />
+            <img src={logoUrl} alt="" className="w-8 h-8 object-contain" />
           </div>
         </div>
       </div>
 
-      {/* Text */}
+      {/* Brand text with animated dots */}
       <div className="mt-8 text-center">
-        <p className="text-sm font-semibold text-slate-700 tracking-wide">Prime Smile</p>
-        <p className="text-xs text-slate-400 mt-1 tracking-widest uppercase">Loading</p>
+        <p className="text-[15px] font-semibold text-slate-800 tracking-wide">Prime Smile</p>
+        <p className="text-[11px] text-slate-400 mt-1 tracking-widest uppercase flex items-center justify-center gap-[2px]">
+          Loading
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className="inline-block w-1 h-1 rounded-full bg-slate-400"
+              style={{ animation: `dotFade 1.4s ease-in-out ${i * 0.2}s infinite` }}
+            />
+          ))}
+        </p>
       </div>
 
       <style>{`
-        @keyframes orbit3d {
-          from { transform: rotateY(0deg) rotateX(22deg); }
-          to   { transform: rotateY(360deg) rotateX(22deg); }
+        @keyframes ringPulse {
+          0%   { transform: scale(0.85); opacity: 1; }
+          100% { transform: scale(1.45); opacity: 0; }
         }
-        @keyframes orbit3dReverse {
-          from { transform: rotateX(0deg) rotateY(-18deg); }
-          to   { transform: rotateX(360deg) rotateY(-18deg); }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
         }
-        @keyframes pulseScale {
-          from { transform: scale(0.65); opacity: 0.35; }
-          to   { transform: scale(1.25); opacity: 1; }
+        @keyframes logoBreathe {
+          0%, 100% { transform: scale(1);   box-shadow: 0 0 12px rgba(10,171,189,0.15); }
+          50%      { transform: scale(1.08); box-shadow: 0 0 24px rgba(10,171,189,0.35); }
         }
-        @keyframes breathe {
-          0%, 100% { transform: scale(1);   box-shadow: 0 4px 20px rgba(10,171,189,0.2); }
-          50%      { transform: scale(1.06); box-shadow: 0 6px 28px rgba(10,171,189,0.38); }
+        @keyframes dotFade {
+          0%, 100% { opacity: 0.2; transform: scale(0.6); }
+          50%      { opacity: 1;   transform: scale(1); }
         }
       `}</style>
     </div>
