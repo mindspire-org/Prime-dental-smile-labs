@@ -92,30 +92,39 @@ async function loadShell() {
 
 const SHELL = await loadShell();
 
-// ── MIME map ───────────────────────────────────────────────────────────
-const MIME = {
-  ".html": "text/html; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8",
-  ".mjs": "text/javascript; charset=utf-8",
-  ".css": "text/css; charset=utf-8",
-  ".json": "application/json; charset=utf-8",
-  ".svg": "image/svg+xml",
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".webp": "image/webp",
-  ".ico": "image/x-icon",
-  ".woff": "font/woff",
-  ".woff2": "font/woff2",
-  ".ttf": "font/ttf",
-};
-
-function safeJoin(base, reqPath) {
-  const normalized = path.normalize(reqPath).replace(/^([/\\])+/, "");
-  return path.join(base, normalized);
+// ── Startup sanity checks ──────────────────────────────────────────────
+try {
+  const clientStat = await stat(CLIENT_DIR);
+  if (!clientStat.isDirectory()) {
+    console.error(`CRITICAL: ${CLIENT_DIR} exists but is not a directory.`);
+  } else {
+    const assetDir = path.join(CLIENT_DIR, "assets");
+    const assetStat = await stat(assetDir).catch(() => null);
+    if (!assetStat?.isDirectory()) {
+      console.error(`CRITICAL: ${assetDir} not found. Run \`npm run build\` before starting the server.`);
+    }
+  }
+} catch {
+  console.error(`CRITICAL: ${CLIENT_DIR} does not exist. Run \`npm run build\` before starting the server.`);
 }
 
 const app = await createApiApp();
+
+// ── Static file serving ────────────────────────────────────────────────
+// Use express.static for reliability. Files that exist are served with
+// correct MIME types and caching headers. Missing files fall through.
+app.use(express.static(CLIENT_DIR, {
+  maxAge: "1y",
+  immutable: true,
+  index: false,
+  dotfiles: "ignore",
+  setHeaders: (res, filepath) => {
+    const ext = path.extname(filepath).toLowerCase();
+    if (ext === ".html") {
+      res.setHeader("cache-control", "no-cache");
+    }
+  },
+}));
 
 // Serve /favicon.ico from the SVG asset so browsers don't hit the SPA catch-all
 app.get("/favicon.ico", async (req, res) => {
@@ -130,33 +139,26 @@ app.get("/favicon.ico", async (req, res) => {
   }
 });
 
-app.use(async (req, res) => {
-  try {
-    const pathname = decodeURIComponent(req.path);
-    const filePath = safeJoin(CLIENT_DIR, pathname);
-    const fileStat = await stat(filePath).catch(() => null);
+// ── SPA catch-all ────────────────────────────────────────────────────────
+// Only serve the prerendered shell for page routes (no file extension).
+// Requests for missing .js / .css / .png etc. get 404 instead of HTML,
+// which prevents reverse proxies (nginx, Cloudflare) from returning 502.
+const STATIC_EXT_RE = /\.(js|mjs|css|json|svg|png|jpg|jpeg|webp|ico|woff|woff2|ttf|map)$/i;
 
-    if (fileStat?.isFile()) {
-      const data = await readFile(filePath);
-      const ext = path.extname(filePath).toLowerCase();
-      const contentType = MIME[ext] ?? "application/octet-stream";
+app.use((req, res) => {
+  const pathname = decodeURIComponent(req.path);
 
-      res.writeHead(200, {
-        "content-type": contentType,
-        "cache-control": ext === ".html" ? "no-cache" : "public, max-age=31536000, immutable",
-      });
-      res.end(data);
-      return;
-    }
-  } catch (err) {
-    console.error(err);
+  // If it looks like a static file request but wasn't found by express.static,
+  // return 404 so the browser/proxy gets a clean error instead of HTML.
+  if (STATIC_EXT_RE.test(pathname)) {
+    res.status(404).end();
+    return;
   }
 
-  res.writeHead(200, {
+  res.status(200).set({
     "content-type": "text/html; charset=utf-8",
     "cache-control": "no-cache",
-  });
-  res.end(SHELL);
+  }).end(SHELL);
 });
 
 const server = app.listen(PORT, "0.0.0.0", () => {
