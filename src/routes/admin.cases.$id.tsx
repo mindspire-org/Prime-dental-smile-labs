@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { apiFetch, getCurrentUser, openRealtimeConnection, type AuthUser } from "@/lib/api";
 import { generateCasePdf } from "@/lib/case-pdf";
 import { CaseFileList } from "@/components/site/CaseFiles";
+import { UploadProgressModal, type UploadFile } from "@/components/site/UploadProgressModal";
 import { ToothChart } from "@/components/site/ToothChart";
 import { shadeFields } from "@/lib/shade";
 
@@ -42,7 +43,10 @@ function AdminCaseDetail() {
   const wsRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<string>("");
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [modalFiles, setModalFiles] = useState<UploadFile[]>([]);
+  const [uploadPhase, setUploadPhase] = useState("");
+  const xhrRef = useRef<XMLHttpRequest | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   async function load() {
@@ -86,22 +90,60 @@ function AdminCaseDetail() {
     if (!file || !data?.case?._id) return;
     const MAX_MB = 250;
     if (file.size > MAX_MB * 1024 * 1024) { alert(`File must be under ${MAX_MB} MB`); return; }
+
+    const fileItem: UploadFile = { name: file.name, size: file.size, progress: 0, status: "pending" };
+    setModalFiles([fileItem]);
+    setUploadPhase("Preparing upload…");
+    setShowUploadModal(true);
     setUploading(true);
-    setUploadProgress("Requesting upload URL…");
+
     try {
       const { uploadUrl, file: fileMeta } = await apiFetch<{ uploadUrl: string; file: any }>("/api/files/upload-url", {
         method: "POST",
         body: JSON.stringify({ caseId: data.case._id, fileName: file.name, contentType: file.type || "application/octet-stream", size: file.size }),
       });
-      setUploadProgress("Uploading to storage…");
-      await fetch(uploadUrl, { method: "PUT", body: file, headers: { "content-type": file.type || "application/octet-stream" } });
-      setUploadProgress("Finalising…");
+
+      setUploadPhase("Uploading to storage…");
+      setModalFiles([{ ...fileItem, status: "uploading" }]);
+
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhrRef.current = xhr;
+        xhr.timeout = 0;
+        xhr.upload.addEventListener("progress", (event) => {
+          if (event.lengthComputable) {
+            const pct = Math.round((event.loaded / event.total) * 100);
+            setModalFiles([{ ...fileItem, progress: pct, status: "uploading" }]);
+          }
+        });
+        xhr.addEventListener("load", () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            setModalFiles([{ ...fileItem, progress: 100, status: "done" }]);
+            setUploadPhase("Finalising…");
+            resolve();
+          } else {
+            reject(new Error(`Upload failed: ${xhr.status}`));
+          }
+        });
+        xhr.addEventListener("error", () => reject(new Error("Network error")));
+        xhr.addEventListener("abort", () => reject(new Error("Upload cancelled")));
+        xhr.open("PUT", uploadUrl);
+        xhr.setRequestHeader("content-type", file.type || "application/octet-stream");
+        xhr.send(file);
+      });
+
       setData(prev => prev ? { ...prev, case: { ...prev.case, files: [...(prev.case.files || []), fileMeta] } } : prev);
+      setUploadPhase("File uploaded!");
+      await new Promise((r) => setTimeout(r, 1200));
     } catch (err: any) {
+      setModalFiles([{ ...fileItem, status: "error" }]);
+      setUploadPhase("Upload failed");
+      await new Promise((r) => setTimeout(r, 1500));
       alert(err.message || "Upload failed");
     } finally {
+      setShowUploadModal(false);
       setUploading(false);
-      setUploadProgress("");
+      xhrRef.current = null;
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }
@@ -299,7 +341,7 @@ function AdminCaseDetail() {
                 className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors disabled:opacity-50"
               >
                 <Upload size={14}/>
-                {uploading ? uploadProgress || "Uploading…" : "Upload file to case"}
+                {uploading ? "Uploading…" : "Upload file to case"}
               </button>
             </div>
           </section>
@@ -441,6 +483,18 @@ function AdminCaseDetail() {
           )}
         </aside>
       </div>
+
+      <UploadProgressModal
+        open={showUploadModal}
+        files={modalFiles}
+        phase={uploadPhase}
+        canCancel={uploading}
+        onCancel={() => {
+          xhrRef.current?.abort();
+          setShowUploadModal(false);
+          setUploading(false);
+        }}
+      />
     </div>
   );
 }

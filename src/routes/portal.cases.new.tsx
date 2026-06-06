@@ -254,9 +254,9 @@ function NewCasePage() {
           }
         }
 
-        setUploadPhase("Finalising…");
+        setUploadPhase("All files uploaded!");
         // Let user see "complete" for a moment before hiding
-        await new Promise((r) => setTimeout(r, 800));
+        await new Promise((r) => setTimeout(r, 1500));
       }
 
       setShowUploadModal(false);
