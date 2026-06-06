@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { apiFetch, getCurrentUser } from "@/lib/api";
 import {
   CheckCircle2, FileText, User, Calendar, Package,
@@ -122,6 +122,9 @@ function NewCasePage() {
   const [drag, setDrag] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadFile[]>([]);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadPhase, setUploadPhase] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const xhrRefs = useRef<XMLHttpRequest[]>([]);
   const [decl, setDecl] = useState({ a: false, b: false, c: false });
 
   useEffect(() => {
@@ -161,6 +164,22 @@ function NewCasePage() {
     if (!decl.a || !decl.b || !decl.c) { setError("Please confirm all three declarations."); return; }
     setSubmitting(true);
     setError("");
+    xhrRefs.current = [];
+
+    // Show modal immediately so user knows something is happening
+    if (files.length > 0) {
+      const progressInit: UploadFile[] = files.map((f) => ({
+        name: f.name,
+        size: f.size,
+        progress: 0,
+        status: "pending" as const,
+      }));
+      setUploadProgress(progressInit);
+      setUploadPhase("Creating case…");
+      setShowUploadModal(true);
+      setIsUploading(true);
+    }
+
     try {
       const result = await apiFetch<any>("/api/cases", {
         method: "POST",
@@ -180,17 +199,11 @@ function NewCasePage() {
           notes: patientForm.notes || undefined,
         }),
       });
+
       // Upload all attached files to the newly created case with progress tracking
       const caseId = result.case._id;
       if (files.length > 0 && caseId) {
-        const progressInit: UploadFile[] = files.map((f) => ({
-          name: f.name,
-          size: f.size,
-          progress: 0,
-          status: "pending" as const,
-        }));
-        setUploadProgress(progressInit);
-        setShowUploadModal(true);
+        setUploadPhase("Uploading files…");
 
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
@@ -203,9 +216,11 @@ function NewCasePage() {
               body: JSON.stringify({ caseId, fileName: file.name, contentType: file.type || "application/octet-stream", size: file.size }),
             });
 
-            // Upload with XMLHttpRequest for progress tracking
+            // Upload with XMLHttpRequest for progress tracking (no timeout for large files)
             await new Promise<void>((resolve, reject) => {
               const xhr = new XMLHttpRequest();
+              xhrRefs.current.push(xhr);
+              xhr.timeout = 0; // Never abort large uploads
               xhr.upload.addEventListener("progress", (event) => {
                 if (event.lengthComputable) {
                   const pct = Math.round((event.loaded / event.total) * 100);
@@ -225,25 +240,36 @@ function NewCasePage() {
                 }
               });
               xhr.addEventListener("error", () => reject(new Error("Network error")));
+              xhr.addEventListener("abort", () => reject(new Error("Upload cancelled")));
               xhr.open("PUT", uploadUrl);
               xhr.setRequestHeader("content-type", file.type || "application/octet-stream");
               xhr.send(file);
             });
-          } catch (uploadErr) {
+          } catch (uploadErr: any) {
             console.error("File upload failed:", uploadErr);
             setUploadProgress((prev) =>
               prev.map((p, idx) => (idx === i ? { ...p, status: "error" as const } : p))
             );
+            // Continue with remaining files instead of breaking everything
           }
         }
-        // Hide modal after a brief delay so users see "complete"
-        setTimeout(() => setShowUploadModal(false), 1200);
+
+        setUploadPhase("Finalising…");
+        // Let user see "complete" for a moment before hiding
+        await new Promise((r) => setTimeout(r, 800));
       }
+
+      setShowUploadModal(false);
+      setIsUploading(false);
+      setSubmitting(false);
       setDone(result.case);
     } catch (e: any) {
       setError(e.message || "Submission failed. Please try again.");
-      setSubmitting(false);
       setShowUploadModal(false);
+      setIsUploading(false);
+      setSubmitting(false);
+      // Abort any in-flight uploads
+      xhrRefs.current.forEach((xhr) => { try { xhr.abort(); } catch {} });
     }
   }
 
@@ -608,7 +634,14 @@ function NewCasePage() {
       <UploadProgressModal
         open={showUploadModal}
         files={uploadProgress}
-        onCancel={() => { /* uploads can't be cancelled mid-flight easily */ }}
+        phase={uploadPhase}
+        canCancel={isUploading}
+        onCancel={() => {
+          xhrRefs.current.forEach((xhr) => { try { xhr.abort(); } catch {} });
+          setShowUploadModal(false);
+          setIsUploading(false);
+          setSubmitting(false);
+        }}
       />
     </div>
   );

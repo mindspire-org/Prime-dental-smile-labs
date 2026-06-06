@@ -13,11 +13,13 @@ type Props = {
   open: boolean;
   files: UploadFile[];
   title?: string;
+  phase?: string;
   onCancel?: () => void;
+  canCancel?: boolean;
 };
 
 
-export function UploadProgressModal({ open, files, title = "Uploading Files", onCancel }: Props) {
+export function UploadProgressModal({ open, files, title = "Uploading Files", phase, onCancel, canCancel = false }: Props) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -78,11 +80,12 @@ export function UploadProgressModal({ open, files, title = "Uploading Files", on
             <UploadCloud size={28} className="text-white" />
           </div>
 
-          {/* Close button */}
-          {onCancel && (
+          {/* Close / Cancel button */}
+          {canCancel && onCancel && (
             <button
               onClick={onCancel}
               className="absolute top-3 right-3 p-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors"
+              title="Cancel upload"
             >
               <X size={16} />
             </button>
@@ -96,7 +99,7 @@ export function UploadProgressModal({ open, files, title = "Uploading Files", on
             <div>
               <h3 className="text-sm font-bold text-slate-800">{allDone ? "Upload Complete" : title}</h3>
               <p className="text-[11px] text-slate-400 mt-0.5">
-                {allDone
+                {phase ? phase : allDone
                   ? `${files.length} file${files.length > 1 ? "s" : ""} uploaded successfully`
                   : `${files.filter((f) => f.status === "done").length} of ${files.length} done`}
               </p>

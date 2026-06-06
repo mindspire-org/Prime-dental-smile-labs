@@ -181,7 +181,7 @@ app.use("/uploads", express.static(UPLOADS_DIR, {
 // Only serve the prerendered shell for page routes (no file extension).
 // Requests for missing .js / .css / .png etc. get 404 instead of HTML,
 // which prevents reverse proxies (nginx, Cloudflare) from returning 502.
-const STATIC_EXT_RE = /\.(js|mjs|css|json|svg|png|jpg|jpeg|webp|ico|woff|woff2|ttf|map)$/i;
+const STATIC_EXT_RE = /\.(js|mjs|css|json|svg|png|jpg|jpeg|webp|ico|woff|woff2|ttf|map|zip|rar|stl|ply|obj|dcm|dicom|pdf)$/i;
 
 app.use(async (req, res) => {
   const pathname = decodeURIComponent(req.path);

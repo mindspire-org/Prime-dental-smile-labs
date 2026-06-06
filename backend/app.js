@@ -4,7 +4,12 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { connectDatabase, isConnected } from "./db.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PROJECT_ROOT = path.join(__dirname, "..");
 import { authRouter } from "./routes/auth.js";
 import { casesRouter } from "./routes/cases.js";
 import { clinicsRouter } from "./routes/clinics.js";
@@ -101,7 +106,14 @@ export async function createApiApp() {
   app.use("/api/admin/backups", backupsRouter);
 
   // Serve locally uploaded files (fallback when S3 is not configured)
-  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+  app.use("/uploads", express.static(path.join(PROJECT_ROOT, "uploads"), {
+    index: false,
+    dotfiles: "ignore",
+    setHeaders: (res, filepath) => {
+      const filename = path.basename(filepath);
+      res.setHeader("content-disposition", `attachment; filename="${encodeURIComponent(filename)}"`);
+    },
+  }));
 
   // Public testimonials (only approved, no auth required)
   app.get("/api/testimonials", async (req, res) => {
