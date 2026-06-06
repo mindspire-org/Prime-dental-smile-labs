@@ -8,7 +8,7 @@ import {
   Monitor, Tablet, Smartphone, Palette, Layers, Copy, RefreshCw,
   Info, Lock, Unlock, Globe, Code, Sparkles, ArrowUpRight, ArrowRight,
   Wrench, Cpu, Frame, BookOpen, Smile, FlaskConical, Target,
-  Shield, PencilRuler, MessageCircle, Undo2, Redo2
+  Shield, PencilRuler, MessageCircle, Undo2, Redo2, X
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/page-editor/$slug")({ component: PageEditor });
@@ -1109,9 +1109,103 @@ function TextArea({ label, value, onChange }: { label: string; value: string; on
   );
 }
 
+type MediaItem = { _id: string; filename: string; originalName: string; url: string; mimeType: string; size: number; alt: string; createdAt: string };
+
+function MediaPicker({ open, onClose, onSelect }: { open: boolean; onClose: () => void; onSelect: (url: string) => void }) {
+  const [items, setItems] = useState<MediaItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setLoading(true);
+    apiFetch<{ items: MediaItem[]; total: number }>(`/api/admin/media?limit=50&search=${encodeURIComponent(query)}`)
+      .then(r => setItems(r.items || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [open, query]);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) { if (e.key === "Escape") onClose(); }
+    if (open) window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+          <h3 className="font-semibold text-slate-800 text-sm">Choose from Media Library</h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 transition"><X size={16}/></button>
+        </div>
+        <div className="px-5 py-3 border-b border-slate-100">
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/>
+            <input
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Search media..."
+              className="w-full pl-8 pr-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-400"
+            />
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto p-5">
+          {loading ? (
+            <div className="flex items-center justify-center py-12 text-slate-400 text-sm">Loading...</div>
+          ) : items.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+              <Image size={32} className="mb-2 opacity-30"/>
+              <p className="text-sm">No media found</p>
+              <p className="text-xs mt-1">Upload files in the Media Library first</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+              {items.map(m => (
+                <button
+                  key={m._id}
+                  onClick={() => setSelected(m._id)}
+                  className={`relative aspect-square rounded-xl overflow-hidden border-2 transition hover:shadow-md ${selected === m._id ? "border-indigo-500 ring-2 ring-indigo-100" : "border-transparent"}`}
+                >
+                  <img src={m.url} alt={m.originalName} className="w-full h-full object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 bg-black/50 px-2 py-1">
+                    <p className="text-[10px] text-white truncate">{m.originalName}</p>
+                  </div>
+                  {selected === m._id && (
+                    <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center">
+                      <CheckCircle2 size={12} className="text-white"/>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-slate-100">
+          <button onClick={onClose} className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:bg-slate-100 transition">Cancel</button>
+          <button
+            onClick={() => {
+              const item = items.find(i => i._id === selected);
+              if (item) onSelect(item.url);
+              onClose();
+            }}
+            disabled={!selected}
+            className="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Select Image
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ImageField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -1141,12 +1235,17 @@ function ImageField({ label, value, onChange }: { label: string; value: string; 
           className="px-3 py-2 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors disabled:opacity-50 inline-flex items-center gap-1 shrink-0">
           {uploading ? <><Save size={12} className="animate-spin"/> Uploading</> : <><Upload size={12}/> Upload</>}
         </button>
+        <button onClick={() => setPickerOpen(true)}
+          className="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors inline-flex items-center gap-1 shrink-0">
+          <Image size={12}/> Media
+        </button>
       </div>
       {value && (
         <div className="mt-2 rounded-lg overflow-hidden border border-slate-100 h-20 w-full bg-slate-50">
           <img src={value} alt="Preview" className="h-full w-full object-contain" />
         </div>
       )}
+      <MediaPicker open={pickerOpen} onClose={() => setPickerOpen(false)} onSelect={onChange} />
     </div>
   );
 }
@@ -1154,6 +1253,7 @@ function ImageField({ label, value, onChange }: { label: string; value: string; 
 function InlineImageField({ value, onChange, placeholder = "Image URL" }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1176,9 +1276,16 @@ function InlineImageField({ value, onChange, placeholder = "Image URL" }: { valu
         className="flex-1 min-w-0 px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
       <button onClick={() => fileRef.current?.click()} disabled={uploading}
-        className="px-2 py-1.5 rounded-lg text-[10px] font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors disabled:opacity-50 inline-flex items-center gap-1 shrink-0">
+        className="px-2 py-1.5 rounded-lg text-[10px] font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors disabled:opacity-50 inline-flex items-center gap-1 shrink-0"
+        title="Upload">
         {uploading ? <Save size={10} className="animate-spin"/> : <Upload size={10}/>}
       </button>
+      <button onClick={() => setPickerOpen(true)}
+        className="px-2 py-1.5 rounded-lg text-[10px] font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors inline-flex items-center gap-1 shrink-0"
+        title="Choose from media">
+        <Image size={10}/>
+      </button>
+      <MediaPicker open={pickerOpen} onClose={() => setPickerOpen(false)} onSelect={onChange} />
     </div>
   );
 }

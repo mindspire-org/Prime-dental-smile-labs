@@ -4,22 +4,12 @@ import {
   LayoutDashboard, Users, Building2, Briefcase, FileText,
   Search, BarChart3, Activity, LogOut, ChevronRight, Settings, Shield,
   Image, Globe, Bell, Star, Wrench, BarChart2, Layout, BookOpen, Mail,
-  ShieldCheck, MessageSquare, Loader2, Database,
+  ShieldCheck, MessageSquare, Database,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { clearSession, getCurrentUser, type AuthUser } from "@/lib/api";
 import { logoUrl } from "@/lib/logo";
-
-function AuthLoading() {
-  return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: "#f1f5f9" }}>
-      <div className="flex flex-col items-center gap-3">
-        <Loader2 size={32} className="text-indigo-500 animate-spin"/>
-        <span className="text-sm text-slate-500 font-medium">Checking authentication…</span>
-      </div>
-    </div>
-  );
-}
+import { Preloader } from "@/components/site/Preloader";
 
 export const Route = createFileRoute("/admin")({
   beforeLoad: async () => {
@@ -45,7 +35,6 @@ export const Route = createFileRoute("/admin")({
     if (!user) throw redirect({ to: "/login" as any });
     if (user.role !== "admin" && user.role !== "lab_staff") throw redirect({ to: "/portal" as any });
   },
-  pendingComponent: AuthLoading,
   component: AdminLayout,
 });
 
@@ -147,7 +136,7 @@ function AdminLayout() {
   }, [navigate]);
 
   if (checking) {
-    return <AuthLoading />;
+    return <Preloader />;
   }
 
   const initials = user?.name?.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase() ?? "";

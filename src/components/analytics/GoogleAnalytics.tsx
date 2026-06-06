@@ -40,10 +40,13 @@ export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
     // Configure Google Analytics
     script.onload = () => {
       gtag("js", new Date());
+      // send_page_view: false — the __root.tsx router subscriber calls
+      // analytics.pageview() on every route change (including initial load)
+      // so we avoid double-counting the first page view.
       gtag("config", measurementId, {
         page_title: document.title,
         page_location: window.location.href,
-        send_page_view: true,
+        send_page_view: false,
         // Custom dimensions for dental lab tracking
         custom_map: {
           custom_dimension_1: "user_type", // dentist, lab_staff, admin
