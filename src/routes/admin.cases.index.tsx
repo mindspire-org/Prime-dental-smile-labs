@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import {
   Search, ChevronDown, Printer, CalendarDays, Briefcase, Clock, CheckCircle2, AlertCircle,
+  TrendingUp, FlaskConical, ArrowRight,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/cases/")({
@@ -18,8 +19,26 @@ const STATUS_COLORS: Record<string,{bg:string;text:string}> = {
   "Completed":{bg:"bg-slate-100",text:"text-slate-600"},
   "Design Stage":{bg:"bg-violet-50",text:"text-violet-700"},
   "Quality Control":{bg:"bg-orange-50",text:"text-orange-700"},
+  "Finishing":{bg:"bg-sky-50",text:"text-sky-700"},
+  "Ready for Dispatch":{bg:"bg-lime-50",text:"text-lime-700"},
+  "File Review":{bg:"bg-blue-50",text:"text-blue-700"},
+  "Dentist Approval":{bg:"bg-pink-50",text:"text-pink-700"},
 };
 const SC = (s:string)=>STATUS_COLORS[s]??{bg:"bg-slate-100",text:"text-slate-600"};
+
+const STATUS_BAR_COLORS: Record<string, string> = {
+  "Submitted": "#0aabbd",
+  "In Production": "#6366f1",
+  "Design Stage": "#8b5cf6",
+  "Quality Control": "#f59e0b",
+  "Dispatched": "#10b981",
+  "Completed": "#64748b",
+  "Awaiting Information": "#ef4444",
+  "File Review": "#3b82f6",
+  "Finishing": "#06b6d4",
+  "Ready for Dispatch": "#84cc16",
+  "Dentist Approval": "#ec4899",
+};
 
 function AdminCasesIndex() {
   const [data,setData]=useState<any>(null);
@@ -72,7 +91,10 @@ function AdminCasesIndex() {
   const activeCases = stats?.cases?.active ?? 0;
   const completedCases = stats?.cases?.completed ?? 0;
   const awaitingInfo = stats?.cases?.awaitingInfo ?? 0;
-  const inProduction = stats?.cases?.inProduction ?? 0;
+  const atLab = stats?.cases?.atLab ?? 0;
+  const thisMonth = stats?.cases?.thisMonth ?? 0;
+  const totalCases = stats?.cases?.total ?? 0;
+  const byStatus = (stats?.byStatus ?? {}) as Record<string,number>;
 
   return(
     <div className="space-y-5">
@@ -97,11 +119,13 @@ function AdminCasesIndex() {
       </div>
 
       {/* Mini Dashboard */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {[
-          { label: "Total Cases", value: data?.total ?? 0, icon: Briefcase, color: "bg-indigo-500" },
+          { label: "Total Cases", value: totalCases, icon: Briefcase, color: "bg-indigo-500" },
           { label: "Active", value: activeCases, icon: Clock, color: "bg-amber-500" },
+          { label: "This Month", value: thisMonth, icon: TrendingUp, color: "bg-blue-500" },
           { label: "Completed", value: completedCases, icon: CheckCircle2, color: "bg-emerald-500" },
+          { label: "At Lab", value: atLab, icon: FlaskConical, color: "bg-sky-500" },
           { label: "Awaiting Info", value: awaitingInfo, icon: AlertCircle, color: "bg-orange-500" },
         ].map(card => (
           <div key={card.label} className="print-card bg-white rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
@@ -117,6 +141,28 @@ function AdminCasesIndex() {
           </div>
         ))}
       </div>
+
+      {/* Cases by Status breakdown */}
+      {Object.keys(byStatus).length > 0 && (
+        <div className="bg-white rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.05)] print-card">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-bold text-slate-800 text-sm">Cases by Status</h2>
+            <Link to="/admin/cases" className="text-xs text-indigo-500 hover:underline inline-flex items-center gap-1">View all <ArrowRight size={11}/></Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2.5">
+            {Object.entries(byStatus).sort(([,a],[,b])=>b-a).map(([status, count]) => (
+              <div key={status} className="flex items-center gap-3 text-xs">
+                <div className="w-2 h-2 rounded-full shrink-0" style={{ background: STATUS_BAR_COLORS[status] ?? "#94a3b8" }}/>
+                <span className="text-slate-600 flex-1 truncate">{status}</span>
+                <span className="font-semibold text-slate-700 w-6 text-right">{count}</span>
+                <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full transition-all duration-500" style={{ width: `${totalCases > 0 ? Math.round((count / totalCases) * 100) : 0}%`, background: STATUS_BAR_COLORS[status] ?? "#94a3b8" }}/>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="bg-white rounded-2xl p-4 shadow-[0_2px_12px_rgba(0,0,0,0.05)] flex flex-wrap gap-3 items-center no-print">

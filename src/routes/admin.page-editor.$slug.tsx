@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { apiFetch } from "@/lib/api";
+import { SiteFooterView, FOOTER_DEFAULTS } from "@/components/site/SiteFooter";
 import {
   ChevronLeft, Plus, Trash2, GripVertical, Settings2, Eye,
   Save, CheckCircle2, Type, Image, LayoutGrid, MessageSquare, Upload,
@@ -484,6 +485,50 @@ const BLOCK_TYPES: BlockType[] = [
         { category: "Case Study", title: "Full-arch implant rehabilitation: workflow walkthrough", date: "28 Mar 2026", img: "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=800&q=80&auto=format&fit=crop" },
         { category: "Materials", title: "Updated zirconia portfolio: improved translucency and strength", date: "14 Mar 2026", img: "https://images.unsplash.com/photo-1590424693420-634a0b0b782c?w=800&q=80&auto=format&fit=crop" },
       ]
+    }
+  },
+  {
+    id: "site-footer",
+    label: "Site Footer",
+    icon: LayoutGrid,
+    category: "Layout",
+    description: "Global footer: brand, link columns, socials and legal links",
+    defaultProps: {
+      brandName: "Prime Smile",
+      brandRest: " Dental Laboratory",
+      description: "Advanced digital dental laboratory serving UK and Cyprus dentists. Focused on precision, quality, and long-term results. All cases handled with strict confidentiality.",
+      socials: [
+        { icon: "Linkedin", href: "#" },
+        { icon: "Facebook", href: "#" },
+        { icon: "Instagram", href: "#" },
+        { icon: "Mail", href: "#" },
+      ],
+      columns: [
+        { title: "Lab Services", links: [
+          { label: "Fixed Restorations", href: "/services/fixed-restorations" },
+          { label: "Implant Prosthetics", href: "/services/implant-prosthetics" },
+          { label: "Removable Prosthetics", href: "/services/removable-prosthetics" },
+          { label: "Metal Frameworks", href: "/services/metal-frameworks" },
+          { label: "Splints & Guards", href: "/services/splints-guards" },
+        ] },
+        { title: "Resources", links: [
+          { label: "Prescription Guide", href: "/resources" },
+          { label: "Material Guide", href: "/resources" },
+          { label: "FAQs", href: "/resources" },
+        ] },
+        { title: "Support", links: [
+          { label: "Quality & Compliance", href: "/quality" },
+          { label: "Technology", href: "/technology" },
+          { label: "Contact", href: "/contact" },
+          { label: "Dentist Portal", href: "/portal" },
+        ] },
+      ],
+      copyright: "© {year} Prime Smile Dental Laboratory. All rights reserved.",
+      legal: [
+        { label: "Privacy Policy", href: "/privacy-policy" },
+        { label: "Terms of Service", href: "/terms-of-service" },
+        { label: "Data Notice", href: "/data-notice" },
+      ],
     }
   },
 ];
@@ -1074,6 +1119,12 @@ function BlockPreview({ type, props }: { type: string; props: any }) {
             </article>
           ))}
         </div>
+      </div>
+    );
+
+    case "site-footer": return (
+      <div className="overflow-hidden rounded-xl border border-slate-200">
+        <SiteFooterView {...props}/>
       </div>
     );
 
@@ -1726,6 +1777,53 @@ function BlockPropsEditor({ type, props, onChange }: { type: string; props: any;
         </div>
       </div>
     );
+    case "site-footer": return (
+      <div className="space-y-3">
+        <TextField label="Brand Name (teal)" value={props.brandName} onChange={v => set("brandName", v)}/>
+        <TextField label="Brand Suffix" value={props.brandRest} onChange={v => set("brandRest", v)}/>
+        <TextArea label="Description" value={props.description} onChange={v => set("description", v)}/>
+
+        <div className="text-xs font-medium text-slate-600 mb-1 pt-1">Social Links</div>
+        {(props.socials || []).map((s: any, i: number) => (
+          <div key={i} className="flex gap-2 items-center">
+            <input value={s.icon} onChange={e => { const a = [...props.socials]; a[i] = { ...a[i], icon: e.target.value }; set("socials", a); }} placeholder="Icon" title="Linkedin, Facebook, Instagram, Mail, Twitter, Youtube, Globe, Phone, MapPin" className="w-28 px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+            <input value={s.href} onChange={e => { const a = [...props.socials]; a[i] = { ...a[i], href: e.target.value }; set("socials", a); }} placeholder="URL" className="flex-1 px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+            <button onClick={() => set("socials", props.socials.filter((_: any, j: number) => j !== i))} className="text-red-400 hover:text-red-600"><Trash2 size={13}/></button>
+          </div>
+        ))}
+        <button onClick={() => set("socials", [...(props.socials || []), { icon: "Mail", href: "#" }])} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800">+ Add social</button>
+
+        <div className="text-xs font-medium text-slate-600 mb-1 pt-2">Link Columns</div>
+        {(props.columns || []).map((col: any, ci: number) => (
+          <div key={ci} className="border border-slate-100 rounded-xl p-3 space-y-2">
+            <div className="flex justify-between items-center gap-2">
+              <input value={col.title} onChange={e => { const c = [...props.columns]; c[ci] = { ...c[ci], title: e.target.value }; set("columns", c); }} placeholder="Column title" className="flex-1 px-2 py-1.5 rounded-lg border border-slate-200 text-sm font-semibold focus:outline-none"/>
+              <button onClick={() => set("columns", props.columns.filter((_: any, j: number) => j !== ci))} className="text-red-400"><Trash2 size={12}/></button>
+            </div>
+            {(col.links || []).map((lnk: any, li: number) => (
+              <div key={li} className="flex gap-2 items-center">
+                <input value={lnk.label} onChange={e => { const c = [...props.columns]; const lks = [...(c[ci].links || [])]; lks[li] = { ...lks[li], label: e.target.value }; c[ci] = { ...c[ci], links: lks }; set("columns", c); }} placeholder="Label" className="flex-1 px-2 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none"/>
+                <input value={lnk.href} onChange={e => { const c = [...props.columns]; const lks = [...(c[ci].links || [])]; lks[li] = { ...lks[li], href: e.target.value }; c[ci] = { ...c[ci], links: lks }; set("columns", c); }} placeholder="/path" className="w-24 px-2 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none"/>
+                <button onClick={() => { const c = [...props.columns]; c[ci] = { ...c[ci], links: c[ci].links.filter((_: any, j: number) => j !== li) }; set("columns", c); }} className="text-red-400"><Trash2 size={12}/></button>
+              </div>
+            ))}
+            <button onClick={() => { const c = [...props.columns]; c[ci] = { ...c[ci], links: [...(c[ci].links || []), { label: "", href: "" }] }; set("columns", c); }} className="text-[11px] text-indigo-600 font-semibold hover:text-indigo-800">+ Add link</button>
+          </div>
+        ))}
+        <button onClick={() => set("columns", [...(props.columns || []), { title: "New Column", links: [] }])} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800">+ Add column</button>
+
+        <TextField label="Copyright (use {year})" value={props.copyright} onChange={v => set("copyright", v)}/>
+        <div className="text-xs font-medium text-slate-600 mb-1">Legal Links</div>
+        {(props.legal || []).map((l: any, i: number) => (
+          <div key={i} className="flex gap-2 items-center">
+            <input value={l.label} onChange={e => { const a = [...props.legal]; a[i] = { ...a[i], label: e.target.value }; set("legal", a); }} placeholder="Label" className="flex-1 px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+            <input value={l.href} onChange={e => { const a = [...props.legal]; a[i] = { ...a[i], href: e.target.value }; set("legal", a); }} placeholder="/path" className="w-24 px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+            <button onClick={() => set("legal", props.legal.filter((_: any, j: number) => j !== i))} className="text-red-400"><Trash2 size={13}/></button>
+          </div>
+        ))}
+        <button onClick={() => set("legal", [...(props.legal || []), { label: "", href: "" }])} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800">+ Add legal link</button>
+      </div>
+    );
     default: return <div className="text-xs text-slate-400 text-center py-4">No props for this block type</div>;
   }
 }
@@ -2050,20 +2148,36 @@ const DEFAULT_DIGITAL_DESIGN_BLOCKS: Block[] = [
   { id: "dd-cta", type: "cta", order: 2, props: { heading: "Need design support?", text: "Upload your case and our team will review and advise on the best approach.", buttonText: "Get Started", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
+/* ─── Shared footer block (appended to every page layout) ── */
+const DEFAULT_FOOTER_BLOCK: Block = {
+  id: "site-footer-1",
+  type: "site-footer",
+  order: 999,
+  props: {
+    brandName: FOOTER_DEFAULTS.brandName,
+    brandRest: FOOTER_DEFAULTS.brandRest,
+    description: FOOTER_DEFAULTS.description,
+    socials: FOOTER_DEFAULTS.socials,
+    columns: FOOTER_DEFAULTS.columns,
+    copyright: FOOTER_DEFAULTS.copyright,
+    legal: FOOTER_DEFAULTS.legal,
+  },
+};
+
 const PAGE_DEFAULTS: Record<string, Block[]> = {
-  home: DEFAULT_HOME_BLOCKS,
-  about: DEFAULT_ABOUT_BLOCKS,
-  services: DEFAULT_SERVICES_BLOCKS,
-  quality: DEFAULT_QUALITY_BLOCKS,
-  technology: DEFAULT_TECHNOLOGY_BLOCKS,
-  workflow: DEFAULT_WORKFLOW_BLOCKS,
-  contact: DEFAULT_CONTACT_BLOCKS,
-  "fixed-restorations": DEFAULT_FIXED_RESTORATIONS_BLOCKS,
-  "implant-prosthetics": DEFAULT_IMPLANT_BLOCKS,
-  "removable-prosthetics": DEFAULT_REMOVABLE_BLOCKS,
-  "metal-frameworks": DEFAULT_METAL_BLOCKS,
-  "splints-guards": DEFAULT_SPLINTS_BLOCKS,
-  "digital-design": DEFAULT_DIGITAL_DESIGN_BLOCKS,
+  home: [...DEFAULT_HOME_BLOCKS, DEFAULT_FOOTER_BLOCK],
+  about: [...DEFAULT_ABOUT_BLOCKS, DEFAULT_FOOTER_BLOCK],
+  services: [...DEFAULT_SERVICES_BLOCKS, DEFAULT_FOOTER_BLOCK],
+  quality: [...DEFAULT_QUALITY_BLOCKS, DEFAULT_FOOTER_BLOCK],
+  technology: [...DEFAULT_TECHNOLOGY_BLOCKS, DEFAULT_FOOTER_BLOCK],
+  workflow: [...DEFAULT_WORKFLOW_BLOCKS, DEFAULT_FOOTER_BLOCK],
+  contact: [...DEFAULT_CONTACT_BLOCKS, DEFAULT_FOOTER_BLOCK],
+  "fixed-restorations": [...DEFAULT_FIXED_RESTORATIONS_BLOCKS, DEFAULT_FOOTER_BLOCK],
+  "implant-prosthetics": [...DEFAULT_IMPLANT_BLOCKS, DEFAULT_FOOTER_BLOCK],
+  "removable-prosthetics": [...DEFAULT_REMOVABLE_BLOCKS, DEFAULT_FOOTER_BLOCK],
+  "metal-frameworks": [...DEFAULT_METAL_BLOCKS, DEFAULT_FOOTER_BLOCK],
+  "splints-guards": [...DEFAULT_SPLINTS_BLOCKS, DEFAULT_FOOTER_BLOCK],
+  "digital-design": [...DEFAULT_DIGITAL_DESIGN_BLOCKS, DEFAULT_FOOTER_BLOCK],
 };
 
 /* ─── Main editor component ───────────────────────────── */

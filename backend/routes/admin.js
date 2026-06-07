@@ -10,7 +10,7 @@ export const adminRouter = express.Router();
 adminRouter.use(requireAuth, requireRole("admin", "lab_staff"));
 
 /* ── Overview stats ─────────────────────────────────────── */
-adminRouter.get("/stats", requireRole("admin"), async (req, res) => {
+adminRouter.get("/stats", async (req, res) => {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -18,7 +18,7 @@ adminRouter.get("/stats", requireRole("admin"), async (req, res) => {
   const [
     totalCases, activeCases, completedCases, dispatchedThisMonth,
     totalUsers, totalDentists, totalLabStaff, totalClinics,
-    awaitingInfo, inProduction,
+    awaitingInfo, inProduction, atLab,
     casesThisMonth, casesLastMonth,
     recentActivity,
     casesByStatus,
@@ -33,6 +33,7 @@ adminRouter.get("/stats", requireRole("admin"), async (req, res) => {
     Clinic.countDocuments(),
     Case.countDocuments({ status: "Awaiting Information" }),
     Case.countDocuments({ status: "In Production" }),
+    Case.countDocuments({ status: { $in: ["In Production", "Finishing", "Quality Control"] } }),
     Case.countDocuments({ createdAt: { $gte: monthStart } }),
     Case.countDocuments({ createdAt: { $gte: lastMonthStart, $lt: monthStart } }),
     ActivityLog.find().populate("actor", "name role").sort({ createdAt: -1 }).limit(15),
@@ -44,7 +45,7 @@ adminRouter.get("/stats", requireRole("admin"), async (req, res) => {
     : casesThisMonth > 0 ? 100 : 0;
 
   res.json({
-    cases: { total: totalCases, active: activeCases, completed: completedCases, dispatched: dispatchedThisMonth, awaitingInfo, inProduction, thisMonth: casesThisMonth, monthGrowth },
+    cases: { total: totalCases, active: activeCases, completed: completedCases, dispatched: dispatchedThisMonth, awaitingInfo, inProduction, atLab, thisMonth: casesThisMonth, monthGrowth },
     users: { total: totalUsers, dentists: totalDentists, labStaff: totalLabStaff },
     clinics: { total: totalClinics },
     byStatus: Object.fromEntries(casesByStatus.map(({ _id, count }) => [_id, count])),

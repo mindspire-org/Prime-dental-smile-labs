@@ -155,7 +155,7 @@ function AdminLayout() {
         <div className="px-5 pt-5 pb-4 border-b border-white/8 relative">
           <Link to="/" className="flex items-center gap-2.5">
             <img src={logoUrl} alt="Prime Smiles" className="h-9 w-auto object-contain" />
-            <div className="text-white/30 text-[9px] uppercase tracking-[0.15em] mt-0.5 self-end pb-0.5">Admin</div>
+            <div className="text-white/30 text-[9px] uppercase tracking-[0.15em] mt-0.5 self-end pb-0.5">{user?.role === "lab_staff" ? "Lab" : "Admin"}</div>
           </Link>
         </div>
 

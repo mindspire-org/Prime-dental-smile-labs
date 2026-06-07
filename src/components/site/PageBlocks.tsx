@@ -7,6 +7,7 @@ import {
   MessageCircle, BookOpen
 } from "lucide-react";
 import { Placeholder } from "./Placeholder";
+import { SiteFooterView } from "./SiteFooter";
 
 type Block = { id: string; type: string; order: number; props: Record<string, any> };
 
@@ -583,6 +584,9 @@ function BlockRenderer({ type, props }: { type: string; props: any }) {
         </div>
       </section>
     );
+
+    case "site-footer":
+      return <SiteFooterView {...(props || {})} />;
 
     default:
       return <div className="p-4 rounded-xl bg-gray-50 text-sm text-gray-400">[{type}] block</div>;

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Plus, TrendingUp, Clock, CheckCircle2, Activity } from "lucide-react";
+import { ArrowRight, Plus, TrendingUp, Clock, CheckCircle2, Activity, AlertTriangle, CalendarDays, FlaskConical, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { apiFetch, getCurrentUser, openRealtimeConnection, type AuthUser } from "@/lib/api";
 
@@ -17,6 +17,20 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; dot: string }> =
   "Quality Control":     { bg: "bg-orange-50", text: "text-orange-700", dot: "bg-orange-400" },
 };
 const defaultStatus = { bg: "bg-slate-100", text: "text-slate-600", dot: "bg-slate-400" };
+
+const STATUS_BAR_COLORS: Record<string, string> = {
+  "Submitted": "#0aabbd",
+  "In Production": "#6366f1",
+  "Design Stage": "#8b5cf6",
+  "Quality Control": "#f59e0b",
+  "Dispatched": "#10b981",
+  "Completed": "#64748b",
+  "Awaiting Information": "#ef4444",
+  "File Review": "#3b82f6",
+  "Finishing": "#06b6d4",
+  "Ready for Dispatch": "#84cc16",
+  "Dentist Approval": "#ec4899",
+};
 
 type DashboardCase = {
   _id: string; caseNumber: string; patientRef: string;
@@ -149,15 +163,17 @@ function PortalDashboard() {
   if (!data) return (
     <div className="space-y-6 animate-pulse">
       <div className="h-36 bg-white rounded-2xl"/>
-      <div className="grid grid-cols-4 gap-4">{[...Array(4)].map((_,i) => <div key={i} className="h-28 bg-white rounded-2xl"/>)}</div>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">{[...Array(6)].map((_,i) => <div key={i} className="h-28 bg-white rounded-2xl"/>)}</div>
     </div>
   );
 
   const STAT_CARDS = [
     { n: data.stats.totalCases,          l: "Total Cases",       sub: "All time",          icon: Activity,    bar: "#0aabbd, #078a99", light: "bg-cyan-50",   text: "text-cyan-600" },
     { n: data.stats.activeCases,         l: "Active Cases",      sub: "In progress",       icon: TrendingUp,  bar: "#6366f1, #4f46e5", light: "bg-violet-50", text: "text-violet-600" },
+    { n: data.stats.thisMonth,           l: "This Month",        sub: "New cases",         icon: CalendarDays,bar: "#3b82f6, #2563eb", light: "bg-blue-50",   text: "text-blue-600" },
     { n: data.stats.awaitingAction,      l: "Awaiting Action",   sub: "Need your input",   icon: Clock,       bar: "#f59e0b, #d97706", light: "bg-amber-50",  text: "text-amber-600" },
-    { n: data.stats.dispatchedThisMonth, l: "Dispatched",        sub: "This month",        icon: CheckCircle2,bar: "#10b981, #059669", light: "bg-emerald-50",text: "text-emerald-600" },
+    { n: data.stats.inProduction,         l: "At Lab",            sub: "In production",     icon: FlaskConical,bar: "#06b6d4, #0891b2", light: "bg-sky-50",    text: "text-sky-600" },
+    { n: data.stats.urgentCases,          l: "Urgent",            sub: "Express / Urgent",  icon: Zap,         bar: "#ef4444, #dc2626", light: "bg-red-50",    text: "text-red-600" },
   ];
 
   return (
@@ -192,7 +208,7 @@ function PortalDashboard() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {STAT_CARDS.map((s) => {
           const Icon = s.icon;
           return (
@@ -214,6 +230,63 @@ function PortalDashboard() {
             </div>
           );
         })}
+      </div>
+
+      {/* Analytics row */}
+      <div className="grid md:grid-cols-2 gap-5">
+        {/* Cases by Status */}
+        <div className="bg-white rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-bold text-slate-800 text-sm">Cases by Status</h2>
+            <Link to="/portal/cases" className="text-xs text-teal hover:underline">View all</Link>
+          </div>
+          <div className="space-y-2.5">
+            {Object.entries(data.stats.byStatus as Record<string,number>).sort(([,a],[,b])=>b-a).map(([status, count]) => (
+              <div key={status} className="flex items-center gap-3 text-xs">
+                <div className="w-2 h-2 rounded-full shrink-0" style={{ background: STATUS_BAR_COLORS[status] ?? "#94a3b8" }}/>
+                <span className="text-slate-600 flex-1 truncate">{status}</span>
+                <span className="font-semibold text-slate-700 w-6 text-right">{count}</span>
+                <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full transition-all duration-500" style={{ width: `${data.stats.totalCases > 0 ? Math.round((count / data.stats.totalCases) * 100) : 0}%`, background: STATUS_BAR_COLORS[status] ?? "#94a3b8" }}/>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Needs Attention */}
+        <div className="bg-white rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-bold text-slate-800 text-sm">Needs Attention</h2>
+            {data.stats.awaitingAction > 0 && (
+              <span className="text-[10px] font-semibold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">{data.stats.awaitingAction} awaiting info</span>
+            )}
+          </div>
+          <div className="space-y-3">
+            {[
+              { label: "Awaiting Your Approval", count: data.stats.awaitingApproval, color: "#ec4899", sub: "Review required" },
+              { label: "Overdue", count: data.stats.overdueCases, color: "#ef4444", sub: "Past due date" },
+              { label: "Due Soon (7 days)", count: data.stats.upcomingDue, color: "#f59e0b", sub: "Upcoming deadline" },
+              { label: "Urgent / Express", count: data.stats.urgentCases, color: "#dc2626", sub: "High priority" },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${item.color}15` }}>
+                  <AlertTriangle size={14} style={{ color: item.color }}/>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-slate-700">{item.label}</span>
+                    <span className="text-sm font-bold text-slate-800">{item.count ?? 0}</span>
+                  </div>
+                  <div className="text-[10px] text-slate-400">{item.sub}</div>
+                </div>
+                <div className="w-16 h-1 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full" style={{ width: `${Math.min(100, ((item.count ?? 0) / Math.max(data.stats.totalCases, 1)) * 100)}%`, background: item.color }}/>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Quick actions + illustrations */}
