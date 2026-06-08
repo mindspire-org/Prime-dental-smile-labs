@@ -275,7 +275,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@PrimeSmileLabs" },
       { name: "application-name", content: "Prime Smile Labs" },
-      { name: "generator", content: "Developed & Designed by Mindspire (mindspire.org)" },
+      { name: "generator", content: "primesmile.eu" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

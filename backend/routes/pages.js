@@ -232,7 +232,7 @@ const DEFAULT_PAGE_BLOCKS = {
           { label: "Dentist Portal", href: "/portal" },
         ] },
       ],
-      copyright: "© {year} Prime Smile Dental Laboratory. All rights reserved.",
+      copyright: "© {year} primesmile.eu — All rights reserved.",
       legal: [
         { label: "Privacy Policy", href: "/privacy-policy" },
         { label: "Terms of Service", href: "/terms-of-service" },

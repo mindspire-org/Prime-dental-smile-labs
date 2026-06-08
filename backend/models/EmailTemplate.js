@@ -59,7 +59,7 @@ emailTemplateSchema.statics.getDefaultTemplate = function(key) {
     <p>Please change your password after first login.</p>
     <p><a href="{{loginUrl}}" class="btn">Log In Now</a></p>
   </div>
-  <div class="footer">© {{year}} Prime Smile Dental Laboratory · Developed by <a href="https://mindspire.org" style="color:#0aabbd">Mindspire</a></div>
+  <div class="footer">© {{year}} primesmile.eu · All rights reserved</div>
 </div></body></html>`,
       variables: ["name", "email", "temporaryPassword", "loginUrl", "year"]
     },
@@ -86,7 +86,7 @@ emailTemplateSchema.statics.getDefaultTemplate = function(key) {
     <p>We'll notify you as soon as its status changes. You can track it at any time in your portal.</p>
     <p><a href="{{portalUrl}}" class="btn">View My Cases</a></p>
   </div>
-  <div class="footer">© {{year}} Prime Smile Dental Laboratory · Developed by <a href="https://mindspire.org" style="color:#0aabbd">Mindspire</a></div>
+  <div class="footer">© {{year}} primesmile.eu · All rights reserved</div>
 </div></body></html>`,
       variables: ["name", "caseNumber", "portalUrl", "year"]
     },
@@ -113,7 +113,7 @@ emailTemplateSchema.statics.getDefaultTemplate = function(key) {
     {{#if note}}<p><strong>Lab note:</strong> {{note}}</p>{{/if}}
     <p><a href="{{portalUrl}}" class="btn">View Case</a></p>
   </div>
-  <div class="footer">© {{year}} Prime Smile Dental Laboratory · Developed by <a href="https://mindspire.org" style="color:#0aabbd">Mindspire</a></div>
+  <div class="footer">© {{year}} primesmile.eu · All rights reserved</div>
 </div></body></html>`,
       variables: ["name", "caseNumber", "status", "note", "portalUrl", "year"]
     },
@@ -138,7 +138,7 @@ emailTemplateSchema.statics.getDefaultTemplate = function(key) {
     <p><strong>{{senderName}}</strong> has sent a message regarding case <span class="pill">{{caseNumber}}</span>.</p>
     <p><a href="{{portalUrl}}" class="btn">View & Reply</a></p>
   </div>
-  <div class="footer">© {{year}} Prime Smile Dental Laboratory · Developed by <a href="https://mindspire.org" style="color:#0aabbd">Mindspire</a></div>
+  <div class="footer">© {{year}} primesmile.eu · All rights reserved</div>
 </div></body></html>`,
       variables: ["name", "caseNumber", "senderName", "portalUrl", "year"]
     }

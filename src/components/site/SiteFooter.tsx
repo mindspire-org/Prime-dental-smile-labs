@@ -65,7 +65,7 @@ export const FOOTER_DEFAULTS: Required<SiteFooterProps> = {
       ],
     },
   ],
-  copyright: "© {year} Prime Smile Dental Laboratory. All rights reserved.",
+  copyright: "© {year} primesmile.eu — All rights reserved.",
   legal: [
     { label: "Privacy Policy", href: "/privacy-policy" },
     { label: "Terms of Service", href: "/terms-of-service" },
@@ -146,12 +146,6 @@ export function SiteFooterView(props: SiteFooterProps) {
         <div className="max-w-7xl mx-auto px-5 lg:px-8 py-5 flex flex-col md:flex-row justify-between gap-3 text-xs text-white/45">
           <div className="flex flex-col gap-1">
             <div>{copyright}</div>
-            <div className="text-white/25">
-              Developed &amp; Designed by{" "}
-              <a href="https://mindspire.org" target="_blank" rel="noopener noreferrer" className="text-teal/60 hover:text-teal transition-colors">Mindspire</a>{" "}
-              &mdash;{" "}
-              <a href="https://mindspire.org" target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white/60 transition-colors">mindspire.org</a>
-            </div>
           </div>
           <div className="flex gap-5">
             {legal.map((l, i) => (

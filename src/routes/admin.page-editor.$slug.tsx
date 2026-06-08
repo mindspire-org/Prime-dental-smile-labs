@@ -2165,19 +2165,22 @@ const DEFAULT_FOOTER_BLOCK: Block = {
 };
 
 const PAGE_DEFAULTS: Record<string, Block[]> = {
-  home: [...DEFAULT_HOME_BLOCKS, DEFAULT_FOOTER_BLOCK],
-  about: [...DEFAULT_ABOUT_BLOCKS, DEFAULT_FOOTER_BLOCK],
-  services: [...DEFAULT_SERVICES_BLOCKS, DEFAULT_FOOTER_BLOCK],
-  quality: [...DEFAULT_QUALITY_BLOCKS, DEFAULT_FOOTER_BLOCK],
-  technology: [...DEFAULT_TECHNOLOGY_BLOCKS, DEFAULT_FOOTER_BLOCK],
-  workflow: [...DEFAULT_WORKFLOW_BLOCKS, DEFAULT_FOOTER_BLOCK],
-  contact: [...DEFAULT_CONTACT_BLOCKS, DEFAULT_FOOTER_BLOCK],
-  "fixed-restorations": [...DEFAULT_FIXED_RESTORATIONS_BLOCKS, DEFAULT_FOOTER_BLOCK],
-  "implant-prosthetics": [...DEFAULT_IMPLANT_BLOCKS, DEFAULT_FOOTER_BLOCK],
-  "removable-prosthetics": [...DEFAULT_REMOVABLE_BLOCKS, DEFAULT_FOOTER_BLOCK],
-  "metal-frameworks": [...DEFAULT_METAL_BLOCKS, DEFAULT_FOOTER_BLOCK],
-  "splints-guards": [...DEFAULT_SPLINTS_BLOCKS, DEFAULT_FOOTER_BLOCK],
-  "digital-design": [...DEFAULT_DIGITAL_DESIGN_BLOCKS, DEFAULT_FOOTER_BLOCK],
+  home: DEFAULT_HOME_BLOCKS,
+  about: DEFAULT_ABOUT_BLOCKS,
+  services: DEFAULT_SERVICES_BLOCKS,
+  quality: DEFAULT_QUALITY_BLOCKS,
+  technology: DEFAULT_TECHNOLOGY_BLOCKS,
+  workflow: DEFAULT_WORKFLOW_BLOCKS,
+  contact: DEFAULT_CONTACT_BLOCKS,
+  "fixed-restorations": DEFAULT_FIXED_RESTORATIONS_BLOCKS,
+  "implant-prosthetics": DEFAULT_IMPLANT_BLOCKS,
+  "removable-prosthetics": DEFAULT_REMOVABLE_BLOCKS,
+  "metal-frameworks": DEFAULT_METAL_BLOCKS,
+  "splints-guards": DEFAULT_SPLINTS_BLOCKS,
+  "digital-design": DEFAULT_DIGITAL_DESIGN_BLOCKS,
+  // Footer is its own editable page (rendered globally by <SiteFooter/>),
+  // not appended to other pages — otherwise it would render twice.
+  footer: [DEFAULT_FOOTER_BLOCK],
 };
 
 /* ─── Main editor component ───────────────────────────── */

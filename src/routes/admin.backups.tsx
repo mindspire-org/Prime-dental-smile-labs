@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, getAccessToken } from "@/lib/api";
 import { formatBytes } from "@/lib/utils";
 import {
   Database, Download, Upload, Save, Trash2, RotateCcw,
@@ -77,6 +77,7 @@ export default function BackupsPage() {
   const [message, setMessage] = useState("");
   const [selectedCollections, setSelectedCollections] = useState<string[]>(COLLECTIONS.map(c => c.key));
   const [importJson, setImportJson] = useState("");
+  const [importOverwrite, setImportOverwrite] = useState(true);
   const [snapshotName, setSnapshotName] = useState("");
   const [restoreId, setRestoreId] = useState<string | null>(null);
   const [cleanupResult, setCleanupResult] = useState<any>(null);
@@ -131,12 +132,18 @@ export default function BackupsPage() {
   async function exportData() {
     setLoading(true); setMessage("");
     try {
+      const token = getAccessToken();
       const res = await fetch("/api/admin/backups/export", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "content-type": "application/json",
+          // Auth is Bearer-based — a raw fetch must attach the token itself.
+          ...(token ? { authorization: `Bearer ${token}` } : {}),
+        },
         credentials: "include",
         body: JSON.stringify({ collections: selectedCollections }),
       });
+      if (res.status === 401) throw new Error("Session expired — please reload and log in again.");
       if (!res.ok) throw new Error("Export failed");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -158,7 +165,7 @@ export default function BackupsPage() {
       const data = JSON.parse(importJson);
       const r = await apiFetch<any>("/api/admin/backups/import", {
         method: "POST",
-        body: JSON.stringify({ data, collections: selectedCollections, overwrite: true }),
+        body: JSON.stringify({ data, collections: selectedCollections, overwrite: importOverwrite }),
       });
       setMessage(`Imported ${r.imported} records successfully.`);
     } catch (err: any) {
@@ -314,6 +321,17 @@ export default function BackupsPage() {
           <Card>
             <SectionHeader icon={Upload} title="Import Data" subtitle="Paste JSON backup data to restore records" />
             <CollectionPicker selected={selectedCollections} onChange={setSelectedCollections} />
+            <div className="flex items-center justify-between mt-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <div>
+                <div className="text-sm font-medium text-slate-700">Replace existing data</div>
+                <div className="text-[11px] text-slate-400">
+                  {importOverwrite
+                    ? "Selected collections are wiped, then imported (clean restore)."
+                    : "Imported records are added alongside existing data (merge)."}
+                </div>
+              </div>
+              <Toggle value={importOverwrite} onChange={setImportOverwrite} />
+            </div>
             <textarea value={importJson} onChange={e => setImportJson(e.target.value)} rows={8}
               placeholder={`Paste JSON data here...\nFormat: { "users": [...], "cases": [...] }`}
               className="w-full mt-4 px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-400 font-mono resize-none" />

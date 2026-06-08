@@ -57,7 +57,7 @@ function wrap(title, body) {
 <div class="card">
   <div class="header"><h1>Prime<span style="color:rgba(255,255,255,0.7)">Smile</span> Labs</h1><p>${title}</p></div>
   <div class="body">${body}</div>
-  <div class="footer">© ${new Date().getFullYear()} Prime Smile Dental Laboratory · Developed by <a href="https://mindspire.org" style="color:#0aabbd">Mindspire</a></div>
+  <div class="footer">© ${new Date().getFullYear()} primesmile.eu · All rights reserved</div>
 </div></body></html>`;
 }
 
