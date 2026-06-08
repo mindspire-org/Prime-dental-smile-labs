@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.join(__dirname, "..", "..");
 
-const allowedExtensions = ["stl", "ply", "obj", "dcm", "dicom", "zip", "rar", "jpg", "jpeg", "png", "pdf"];
+const allowedExtensions = ["stl", "ply", "obj", "dcm", "dicom", "zip", "rar", "jpg", "jpeg", "png", "webp", "gif", "svg", "pdf"];
 const UPLOADS_DIR = path.join(PROJECT_ROOT, "uploads");
 
 function client() {

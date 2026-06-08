@@ -72,7 +72,7 @@ const FOOTER_BLOCK = { id: "footer-main", type: "site-footer", order: 99, props:
 
 const DEFAULT_PAGE_BLOCKS = {
   home: [
-    { id: "home-hero-1", type: "home-hero", order: 0, props: { eyebrow: "Digital Dental Laboratory", heading: "Digital Dental Laboratory for UK & Cyprus Dentists", highlight: "UK & Cyprus", subheading: "CAD/CAM milling · SLM metal printing · Zirconia · Lithium disilicate · Implant prosthetics · Digital prescription workflow.", image: "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=1600&q=80&auto=format&fit=crop", cta1: "Submit a Case", cta1Link: "/submit", cta2: "Request Free Consultation", cta2Link: "/contact" } },
+    { id: "home-hero-1", type: "home-hero", order: 0, props: { eyebrow: "Digital Dental Laboratory", heading: "Digital Dental Laboratory for UK & Cyprus Dentists", highlight: "UK & Cyprus", subheading: "CAD/CAM milling · SLM metal printing · Zirconia · Lithium disilicate · Implant prosthetics · Digital prescription workflow.", gallery: [ { src: "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=1600&q=80&auto=format&fit=crop", alt: "Lab facility" }, { src: "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=1600&q=80&auto=format&fit=crop", alt: "CAD/CAM workflow" }, { src: "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1600&q=80&auto=format&fit=crop", alt: "Zirconia restoration" } ], cta1: "Submit a Case", cta1Link: "/submit", cta2: "Request Free Consultation", cta2Link: "/contact" } },
     { id: "home-trust-1", type: "home-trust-strip", order: 1, props: { items: [ { icon: "Cpu", title: "Digital", desc: "CAD/CAM Workflow" }, { icon: "Lock", title: "Confidential", desc: "Patient Data Protection" }, { icon: "FlaskConical", title: "Advanced", desc: "CE-Certified Materials" }, { icon: "Target", title: "Precision", desc: "Multi-Step Quality Control" } ] } },
     { id: "home-stats-1", type: "home-stats", order: 2, props: { eyebrow: "About Us", heading: "A digital lab built around precision, traceability and trust.", body: "Prime Smile is a fully digital dental laboratory partnering with dentists across the UK and Cyprus. Every case is processed through a structured digital prescription workflow with strict quality control at every stage.", linkText: "About Us", linkHref: "/about", stats: [ { value: "10", suffix: "+", label: "Years of Digital Lab Experience" }, { value: "500", suffix: "+", label: "Cases Delivered Per Month" }, { value: "6", suffix: "", label: "Multi-Step Quality Control Points" }, { value: "100", suffix: "%", label: "CE-Certified Materials Used" } ] } },
     { id: "home-workflow-1", type: "home-workflow", order: 3, props: { eyebrow: "Modern Approach", heading: "Our Digital Workflow", subheading: "We use advanced digital instruments and workflow to ensure the highest standard of every restoration.", steps: ["Register / Login","Fill Digital Prescription","Upload Scans & Files","Track Your Case Live","Receive Finished Work"], linkText: "Learn about our Digital Workflow", linkHref: "/workflow" } },
@@ -263,6 +263,31 @@ pagesRouter.get("/", async (req, res) => {
   res.json({ pages });
 });
 
+function normalizeBlocks(slug, blocks) {
+  if (slug !== "contact" || !blocks?.length) return blocks;
+  return blocks.map(b => {
+    if (b.type === "text" && b.props?.content && /Email:\s*info@/.test(b.props.content)) {
+      return {
+        id: b.id,
+        type: "contact-info",
+        order: b.order,
+        props: {
+          heading: "Contact Details",
+          subheading: "We are here to help. Reach out by email, phone or visit us.",
+          items: [
+            { icon: "Mail", label: "Email", value: "info@primesmile.co.uk", href: "mailto:info@primesmile.co.uk" },
+            { icon: "Phone", label: "Phone", value: "+44 20 0000 0000", href: "tel:+442000000000" },
+            { icon: "MapPin", label: "Address", value: "London, UK", href: "" },
+          ],
+          backgroundColor: "#f8fafc",
+          layout: "cards"
+        }
+      };
+    }
+    return b;
+  });
+}
+
 pagesRouter.get("/:slug", async (req, res) => {
   let page = await Page.findOne({ slug: req.params.slug });
   if (!page) {
@@ -270,6 +295,7 @@ pagesRouter.get("/:slug", async (req, res) => {
     if (!meta) return res.status(404).json({ error: "Page not found" });
     page = { slug: meta.slug, title: meta.title, blocks: DEFAULT_PAGE_BLOCKS[req.params.slug] || [], published: true };
   }
+  page = { ...page.toObject?.() || page, blocks: normalizeBlocks(req.params.slug, page.blocks || []) };
   res.json({ page });
 });
 

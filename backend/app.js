@@ -110,8 +110,11 @@ export async function createApiApp() {
     index: false,
     dotfiles: "ignore",
     setHeaders: (res, filepath) => {
-      const filename = path.basename(filepath);
-      res.setHeader("content-disposition", `attachment; filename="${encodeURIComponent(filename)}"`);
+      const imageExts = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp"];
+      if (!imageExts.includes(path.extname(filepath).toLowerCase())) {
+        const filename = path.basename(filepath);
+        res.setHeader("content-disposition", `attachment; filename="${encodeURIComponent(filename)}"`);
+      }
     },
   }));
 

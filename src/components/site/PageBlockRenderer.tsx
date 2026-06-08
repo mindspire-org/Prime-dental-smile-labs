@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { SiteFooterView } from "@/components/site/SiteFooter";
 import {
   ChevronDown, CheckCircle2, Type, Image, LayoutGrid, MessageSquare,
@@ -5,7 +6,7 @@ import {
   Layers, ArrowUpRight, ArrowRight,
   Wrench, Cpu, Frame, BookOpen, Smile, FlaskConical, Target,
   Shield, PencilRuler, MessageCircle,
-  Mail, Phone, MapPin,
+  Mail, Phone, MapPin, Lock,
 } from "lucide-react";
 
 export type BlockItem = {
@@ -14,6 +15,56 @@ export type BlockItem = {
   order: number;
   props: Record<string, any>;
 };
+
+function HeroSlideshow({ gallery, eyebrow, heading, highlight, subheading, cta1, cta1Link, cta2, cta2Link }: any) {
+  const slides = (gallery || []).filter((s: any) => s.src);
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const t = setInterval(() => setIdx(i => (i + 1) % slides.length), 5000);
+    return () => clearInterval(t);
+  }, [slides.length]);
+  return (
+    <div className="relative text-white overflow-hidden" style={{ background: "#0d1e2c" }}>
+      <div className="absolute inset-0">
+        {slides.map((s: any, i: number) => (
+          <img
+            key={i}
+            src={s.src}
+            alt={s.alt || ""}
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+            style={{ opacity: i === idx ? 0.4 : 0 }}
+            loading="lazy"
+          />
+        ))}
+      </div>
+      <div className="absolute inset-0 opacity-[0.06]" style={{
+        backgroundImage:"linear-gradient(#0aabbd 1px, transparent 1px), linear-gradient(90deg, #0aabbd 1px, transparent 1px)",
+        backgroundSize:"48px 48px",
+      }}/>
+      <div className="relative px-6 lg:px-8 pt-16 pb-14">
+        <span className="text-[10px] uppercase tracking-[0.15em] text-teal-400 font-semibold">{eyebrow}</span>
+        <h1 className="mt-3 font-bold text-2xl md:text-3xl lg:text-4xl leading-[1.1] max-w-3xl">
+          {heading?.replace(highlight || "", "")}
+          {highlight && <span className="text-teal-400">{highlight}</span>}
+        </h1>
+        <p className="mt-4 text-sm md:text-base text-white/80 max-w-2xl leading-relaxed">{subheading}</p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          {cta1 && <span className="inline-flex items-center gap-2 bg-white text-slate-800 font-semibold px-5 py-2.5 rounded-lg text-sm">{cta1} <ArrowRight size={14}/></span>}
+          {cta2 && <span className="inline-flex items-center gap-2 border border-white/30 text-white font-semibold px-5 py-2.5 rounded-lg text-sm">{cta2}</span>}
+        </div>
+      </div>
+      {slides.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {slides.map((_: any, i: number) => (
+            <button key={i} onClick={() => setIdx(i)}
+              className={`w-2 h-2 rounded-full transition-colors ${i === idx ? "bg-white" : "bg-white/40"}`}/>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function getPaddingClass(padding: string) {
   switch (padding) {
@@ -383,31 +434,8 @@ export function PageBlockRenderer({ type, props }: { type: string; props: any })
       </div>
     );
 
-    case "home-hero": return (
-      <div className="relative text-white overflow-hidden" style={{ background: "#0d1e2c" }}>
-        {props.image && (
-          <div className="absolute inset-0">
-            <img src={props.image} alt="" className="w-full h-full object-cover opacity-40" />
-          </div>
-        )}
-        <div className="absolute inset-0 opacity-[0.06]" style={{
-          backgroundImage:"linear-gradient(#0aabbd 1px, transparent 1px), linear-gradient(90deg, #0aabbd 1px, transparent 1px)",
-          backgroundSize:"48px 48px",
-        }}/>
-        <div className="relative px-6 lg:px-8 pt-16 pb-14">
-          <span className="text-[10px] uppercase tracking-[0.15em] text-teal-400 font-semibold">{props.eyebrow}</span>
-          <h1 className="mt-3 font-bold text-2xl md:text-3xl lg:text-4xl leading-[1.1] max-w-3xl">
-            {props.heading?.replace(props.highlight || "", "")}
-            {props.highlight && <span className="text-teal-400">{props.highlight}</span>}
-          </h1>
-          <p className="mt-4 text-sm md:text-base text-white/80 max-w-2xl leading-relaxed">{props.subheading}</p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            {props.cta1 && <span className="inline-flex items-center gap-2 bg-white text-slate-800 font-semibold px-5 py-2.5 rounded-lg text-sm">{props.cta1} <ArrowRight size={14}/></span>}
-            {props.cta2 && <span className="inline-flex items-center gap-2 border border-white/30 text-white font-semibold px-5 py-2.5 rounded-lg text-sm">{props.cta2}</span>}
-          </div>
-        </div>
-      </div>
-    );
+    case "home-hero":
+      return <HeroSlideshow {...props} />;
 
     case "home-trust-strip": return (
       <div className="bg-white border-y border-slate-200">

@@ -312,7 +312,11 @@ const BLOCK_TYPES: BlockType[] = [
       heading: "Digital Dental Laboratory for UK & Cyprus Dentists",
       highlight: "UK & Cyprus",
       subheading: "CAD/CAM milling Â· SLM metal printing Â· Zirconia Â· Lithium disilicate Â· Implant prosthetics Â· Digital prescription workflow.",
-      image: "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=1600&q=80&auto=format&fit=crop",
+      gallery: [
+        { src: "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=1600&q=80&auto=format&fit=crop", alt: "Lab facility" },
+        { src: "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=1600&q=80&auto=format&fit=crop", alt: "CAD/CAM workflow" },
+        { src: "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1600&q=80&auto=format&fit=crop", alt: "Zirconia restoration" },
+      ],
       cta1: "Submit a Case",
       cta1Link: "/submit",
       cta2: "Request Free Consultation",
@@ -1013,7 +1017,15 @@ function BlockPropsEditor({ type, props, onChange }: { type: string; props: any;
         <TextField label="Heading" value={props.heading} onChange={v => set("heading", v)}/>
         <TextField label="Highlight Word" value={props.highlight} onChange={v => set("highlight", v)}/>
         <TextArea label="Subheading" value={props.subheading} onChange={v => set("subheading", v)}/>
-        <ImageField label="Background Image" value={props.image} onChange={v => set("image", v)}/>
+        <div className="text-xs font-medium text-slate-600 mb-1">Background Slideshow</div>
+        {(props.gallery || []).map((img: any, i: number) => (
+          <div key={i} className="border border-slate-100 rounded-xl p-3 space-y-2">
+            <div className="flex justify-between"><span className="text-xs text-slate-400">Slide {i + 1}</span><button onClick={() => set("gallery", props.gallery.filter((_: any, j: number) => j !== i))} className="text-red-400"><Trash2 size={12}/></button></div>
+            <InlineImageField value={img.src} onChange={v => { const g = [...props.gallery]; g[i] = { ...g[i], src: v }; set("gallery", g); }}/>
+            <input value={img.alt} onChange={e => { const g = [...props.gallery]; g[i] = { ...g[i], alt: e.target.value }; set("gallery", g); }} placeholder="Alt text" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+          </div>
+        ))}
+        <button onClick={() => set("gallery", [...(props.gallery || []), { src: "", alt: "" }])} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800">+ Add slide</button>
         <TextField label="CTA 1 Text" value={props.cta1} onChange={v => set("cta1", v)}/>
         <TextField label="CTA 1 Link" value={props.cta1Link} onChange={v => set("cta1Link", v)}/>
         <TextField label="CTA 2 Text" value={props.cta2} onChange={v => set("cta2", v)}/>
@@ -1308,7 +1320,11 @@ const DEFAULT_HOME_BLOCKS: Block[] = [
     heading: "Digital Dental Laboratory for UK & Cyprus Dentists",
     highlight: "UK & Cyprus",
     subheading: "CAD/CAM milling Â· SLM metal printing Â· Zirconia Â· Lithium disilicate Â· Implant prosthetics Â· Digital prescription workflow.",
-    image: "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=1600&q=80&auto=format&fit=crop",
+    gallery: [
+      { src: "https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=1600&q=80&auto=format&fit=crop", alt: "Lab facility" },
+      { src: "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=1600&q=80&auto=format&fit=crop", alt: "CAD/CAM workflow" },
+      { src: "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1600&q=80&auto=format&fit=crop", alt: "Zirconia restoration" },
+    ],
     cta1: "Submit a Case", cta1Link: "/submit",
     cta2: "Request Free Consultation", cta2Link: "/contact",
   }},

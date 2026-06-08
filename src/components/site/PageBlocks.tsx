@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowUpRight, Users, PlayCircle, Image,
@@ -9,6 +10,56 @@ import {
 import { Placeholder } from "./Placeholder";
 
 type Block = { id: string; type: string; order: number; props: Record<string, any> };
+
+function HeroSlideshow({ gallery, eyebrow, heading, highlight, subheading, cta1, cta1Link, cta2, cta2Link }: any) {
+  const slides = (gallery || []).filter((s: any) => s.src);
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const t = setInterval(() => setIdx(i => (i + 1) % slides.length), 5000);
+    return () => clearInterval(t);
+  }, [slides.length]);
+  return (
+    <section className="relative bg-[#0d1e2c] text-white overflow-hidden">
+      <div className="absolute inset-0">
+        {slides.map((s: any, i: number) => (
+          <img
+            key={i}
+            src={s.src}
+            alt={s.alt || ""}
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+            style={{ opacity: i === idx ? 0.4 : 0 }}
+            loading="lazy"
+          />
+        ))}
+      </div>
+      <div className="absolute inset-0 opacity-[0.06]" style={{
+        backgroundImage:"linear-gradient(#0aabbd 1px, transparent 1px), linear-gradient(90deg, #0aabbd 1px, transparent 1px)",
+        backgroundSize:"48px 48px",
+      }}/>
+      <div className="relative max-w-7xl mx-auto px-5 lg:px-8 pt-32 pb-28">
+        <span className="eyebrow">{eyebrow}</span>
+        <h1 className="mt-4 font-bold text-4xl md:text-5xl lg:text-[56px] leading-[1.1] max-w-4xl">
+          {heading.replace(highlight || "", "")}
+          {highlight && <span className="text-teal">{highlight}</span>}
+        </h1>
+        <p className="mt-6 text-base md:text-lg text-white/80 max-w-3xl leading-relaxed">{subheading}</p>
+        <div className="mt-9 flex flex-wrap gap-3">
+          {cta1 && <Link to={cta1Link || "#"} className="btn-teal">{cta1} <ArrowRight size={16}/></Link>}
+          {cta2 && <Link to={cta2Link || "#"} className="btn-outline-white">{cta2}</Link>}
+        </div>
+      </div>
+      {slides.length > 1 && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {slides.map((_: any, i: number) => (
+            <button key={i} onClick={() => setIdx(i)}
+              className={`w-2.5 h-2.5 rounded-full transition-colors ${i === idx ? "bg-white" : "bg-white/40"}`}/>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
 
 export function PageBlocks({ blocks }: { blocks: Block[] }) {
   if (!blocks?.length) return null;
@@ -328,31 +379,8 @@ function BlockRenderer({ type, props }: { type: string; props: any }) {
       );
 
     /* ── Home Sections ─────────────────────────── */
-    case "home-hero": return (
-      <section className="relative bg-[#0d1e2c] text-white overflow-hidden">
-        {props.image && (
-          <div className="absolute inset-0">
-            <img src={props.image} alt="" className="w-full h-full object-cover opacity-40" loading="lazy" />
-          </div>
-        )}
-        <div className="absolute inset-0 opacity-[0.06]" style={{
-          backgroundImage:"linear-gradient(#0aabbd 1px, transparent 1px), linear-gradient(90deg, #0aabbd 1px, transparent 1px)",
-          backgroundSize:"48px 48px",
-        }}/>
-        <div className="relative max-w-7xl mx-auto px-5 lg:px-8 pt-32 pb-28">
-          <span className="eyebrow">{props.eyebrow}</span>
-          <h1 className="mt-4 font-bold text-4xl md:text-5xl lg:text-[56px] leading-[1.1] max-w-4xl">
-            {props.heading.replace(props.highlight || "", "")}
-            {props.highlight && <span className="text-teal">{props.highlight}</span>}
-          </h1>
-          <p className="mt-6 text-base md:text-lg text-white/80 max-w-3xl leading-relaxed">{props.subheading}</p>
-          <div className="mt-9 flex flex-wrap gap-3">
-            {props.cta1 && <Link to={props.cta1Link || "#"} className="btn-teal">{props.cta1} <ArrowRight size={16}/></Link>}
-            {props.cta2 && <Link to={props.cta2Link || "#"} className="btn-outline-white">{props.cta2}</Link>}
-          </div>
-        </div>
-      </section>
-    );
+    case "home-hero":
+      return <HeroSlideshow {...props} />;
 
     case "home-trust-strip": return (
       <section className="bg-white border-y border-border-silver">
