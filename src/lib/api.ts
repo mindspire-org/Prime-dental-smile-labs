@@ -237,8 +237,8 @@ export async function requestNotificationPermission(): Promise<boolean> {
 export function showNotification(title: string, options?: NotificationOptions) {
   if (Notification.permission === "granted") {
     return new Notification(title, {
-      icon: "/favicon.ico",
-      badge: "/favicon.ico",
+      icon: "/primesmile-logo.png",
+      badge: "/primesmile-logo.png",
       ...options
     });
   }

@@ -73,15 +73,15 @@ export function SEOHead({
     if (ogDescription || description) updateMetaTag("twitter:description", ogDescription || description!);
     if (ogImage) updateMetaTag("twitter:image", ogImage);
 
-    // Favicon (SVG) — prevents automatic /favicon.ico requests
+    // Favicon — use brand logo, prevents automatic /favicon.ico requests
     {
-      const selector = 'link[rel="icon"][type="image/svg+xml"]';
+      const selector = 'link[rel="icon"][type="image/png"]';
       let favicon = document.querySelector(selector) as HTMLLinkElement;
       if (!favicon) {
         favicon = document.createElement("link");
         favicon.setAttribute("rel", "icon");
-        favicon.setAttribute("type", "image/svg+xml");
-        favicon.setAttribute("href", "/favicon.svg");
+        favicon.setAttribute("type", "image/png");
+        favicon.setAttribute("href", "/primesmile-logo.png");
         document.head.appendChild(favicon);
       }
     }
