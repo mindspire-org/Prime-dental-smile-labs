@@ -158,7 +158,17 @@ const DEFAULT_PAGE_BLOCKS = {
   ],
   contact: [
     { id: "c-hero", type: "hero", order: 0, props: { eyebrow: "Get in Touch", heading: "Contact Prime Smile Dental Lab", highlight: "", subheading: "Reach out for case submissions, partnerships or general enquiries. We respond within one business day.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", image: "", align: "center" } },
-    { id: "c-info", type: "text", order: 1, props: { content: "Email: info@primesmile.co.uk\nPhone: +44 20 0000 0000\nAddress: London, UK", align: "left", size: "base", textColor: "#374151", backgroundColor: "#ffffff", padding: "medium" } },
+    { id: "c-info", type: "contact-info", order: 1, props: {
+      heading: "Contact Details",
+      subheading: "We are here to help. Reach out by email, phone or visit us.",
+      items: [
+        { icon: "Mail", label: "Email", value: "info@primesmile.co.uk", href: "mailto:info@primesmile.co.uk" },
+        { icon: "Phone", label: "Phone", value: "+44 20 0000 0000", href: "tel:+442000000000" },
+        { icon: "MapPin", label: "Address", value: "London, UK", href: "" },
+      ],
+      backgroundColor: "#f8fafc",
+      layout: "cards"
+    } },
     { id: "c-cta", type: "cta", order: 2, props: { heading: "Ready to partner with us?", text: "Create a dentist account and start submitting cases through our digital workflow.", buttonText: "Create Account", buttonLink: "/portal", bgColor: "#0aabbd", textAlign: "center" } },
     FOOTER_BLOCK,
   ],

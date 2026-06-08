@@ -7,14 +7,15 @@ import {
   MessageCircle, BookOpen
 } from "lucide-react";
 import { Placeholder } from "./Placeholder";
-import { SiteFooterView } from "./SiteFooter";
 
 type Block = { id: string; type: string; order: number; props: Record<string, any> };
 
 export function PageBlocks({ blocks }: { blocks: Block[] }) {
   if (!blocks?.length) return null;
 
-  const sorted = [...blocks].sort((a, b) => (a.order || 0) - (b.order || 0));
+  const sorted = [...blocks]
+    .filter(b => b.type !== "site-footer")
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
 
   return (
     <div className="space-y-6">
@@ -584,9 +585,6 @@ function BlockRenderer({ type, props }: { type: string; props: any }) {
         </div>
       </section>
     );
-
-    case "site-footer":
-      return <SiteFooterView {...(props || {})} />;
 
     default:
       return <div className="p-4 rounded-xl bg-gray-50 text-sm text-gray-400">[{type}] block</div>;

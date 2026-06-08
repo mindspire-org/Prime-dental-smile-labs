@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Reveal } from "@/components/site/Reveal";
-import { Mail, Phone, MessageCircle, Send, CheckCircle2, AlertCircle } from "lucide-react";
-import { Placeholder } from "@/components/site/Placeholder";
+import { Send, CheckCircle2, AlertCircle } from "lucide-react";
 import { submitContactForm, validateForm, contactFormSchema, type ContactFormData } from "@/lib/forms";
 import { analytics } from "@/components/analytics/GoogleAnalytics";
+import { PageBlockRenderer, type BlockItem } from "@/components/site/PageBlockRenderer";
 
 export const Route = createFileRoute("/_marketing/contact")({
   head: () => ({
@@ -28,6 +28,20 @@ export const Route = createFileRoute("/_marketing/contact")({
 });
 
 function ContactPage() {
+  const [cmsBlocks, setCmsBlocks] = useState<BlockItem[]>([]);
+  const [cmsLoading, setCmsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/admin/pages/contact")
+      .then(r => (r.ok ? r.json() : Promise.reject()))
+      .then(d => {
+        const blocks = (d.page?.blocks || []).sort((a: BlockItem, b: BlockItem) => (a.order ?? 0) - (b.order ?? 0));
+        setCmsBlocks(blocks);
+      })
+      .catch(() => {})
+      .finally(() => setCmsLoading(false));
+  }, []);
+
   const [formData, setFormData] = useState<ContactFormData>({
     clinicName: "",
     name: "",
@@ -86,55 +100,57 @@ function ContactPage() {
     }
   };
 
+  const renderCmsBlocks = () => {
+    if (cmsLoading) {
+      return (
+        <div className="animate-pulse space-y-4 py-10 px-5 lg:px-8">
+          <div className="h-64 bg-slate-100 rounded-2xl" />
+          <div className="h-32 bg-slate-100 rounded-2xl" />
+        </div>
+      );
+    }
+    const visibleBlocks = cmsBlocks.filter(b => b.type !== "site-footer");
+    if (visibleBlocks.length === 0) return null;
+    return (
+      <div className="cms-blocks">
+        {visibleBlocks.map(block => (
+          <PageBlockRenderer key={block.id} type={block.type} props={block.props} />
+        ))}
+      </div>
+    );
+  };
+
   if (isSubmitted) {
     return (
-      <section className="bg-white py-20">
-        <div className="max-w-2xl mx-auto px-5 lg:px-8 text-center">
-          <div className="w-16 h-16 mx-auto rounded-full bg-teal/10 text-teal flex items-center justify-center mb-6">
-            <CheckCircle2 size={32} />
+      <>
+        {renderCmsBlocks()}
+        <section className="bg-white py-20">
+          <div className="max-w-2xl mx-auto px-5 lg:px-8 text-center">
+            <div className="w-16 h-16 mx-auto rounded-full bg-teal/10 text-teal flex items-center justify-center mb-6">
+              <CheckCircle2 size={32} />
+            </div>
+            <h1 className="text-3xl font-bold mb-4">Thank You for Your Enquiry</h1>
+            <p className="text-muted-grey text-lg mb-8">
+              We've received your message and will get back to you within 24 hours. For urgent matters, please call us directly.
+            </p>
+            <button 
+              onClick={() => setIsSubmitted(false)}
+              className="btn-outline-teal"
+            >
+              Send Another Message
+            </button>
           </div>
-          <h1 className="text-3xl font-bold mb-4">Thank You for Your Enquiry</h1>
-          <p className="text-muted-grey text-lg mb-8">
-            We've received your message and will get back to you within 24 hours. For urgent matters, please call us directly.
-          </p>
-          <button 
-            onClick={() => setIsSubmitted(false)}
-            className="btn-outline-teal"
-          >
-            Send Another Message
-          </button>
-        </div>
-      </section>
+        </section>
+      </>
     );
   }
 
   return (
-    <section className="bg-white py-20">
-      <div className="max-w-7xl mx-auto px-5 lg:px-8 grid lg:grid-cols-2 gap-12">
-        <Reveal>
-          <h1 className="text-4xl md:text-5xl font-bold inline-block border-b-4 border-teal pb-2">Get in Touch</h1>
-          <p className="mt-5 text-muted-grey leading-relaxed">
-            For case submissions, please use the Dentist Portal. For everything else, our team is happy to help.
-          </p>
-          <div className="mt-10 space-y-5">
-            {[
-              { i: Mail, l: "Email", v: "support@primesmilelab.com" },
-              { i: Phone, l: "Phone (UK)", v: "+44 20 1234 5678" },
-              { i: MessageCircle, l: "WhatsApp", v: "+357 99 123456" },
-            ].map(({i:I,l,v}) => (
-              <div key={l} className="flex items-start gap-4">
-                <div className="w-11 h-11 rounded-full bg-teal/10 text-teal flex items-center justify-center shrink-0"><I size={18}/></div>
-                <div>
-                  <div className="text-xs uppercase tracking-wider text-muted-grey font-medium">{l}</div>
-                  <div className="font-semibold mt-0.5">{v}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <Placeholder label="Map — UK / Cyprus" className="mt-10 h-56" />
-          <p className="mt-6 text-xs italic text-muted-grey">For case submissions, please use the Dentist Portal.</p>
-        </Reveal>
-        <Reveal delay={0.1}>
+    <>
+      {renderCmsBlocks()}
+      <section className="bg-white py-16">
+        <div className="max-w-3xl mx-auto px-5 lg:px-8">
+          <Reveal delay={0.1}>
           <form className="bg-bg-soft p-8 rounded-2xl space-y-5" onSubmit={handleSubmit}>
             <h2 className="text-xl font-semibold">Send an Enquiry</h2>
             
@@ -205,5 +221,6 @@ function ContactPage() {
         </Reveal>
       </div>
     </section>
+  </>
   );
 }

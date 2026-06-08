@@ -35,21 +35,30 @@ const IMAGE_MAP: Record<string, string> = {
   "news image":        "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=800&q=80&auto=format&fit=crop",
   "service":           "https://cdn.pixabay.com/photo/2021/11/24/20/55/tooth-6822084_1280.png?w=800&q=80&auto=format&fit=crop",
   // Default — dental lab CAD/CAM
-  "default":           "https://cdn.pixabay.com/photo/2021/11/24/20/55/tooth-6822084_1280.png?w=800&q=80&auto=format&fit=crop",
+  "default":           "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=800&q=80&auto=format&fit=crop",
 };
 
-function resolveImage(label: string): string {
+function resolveImage(label: string): string | null {
   const key = label.toLowerCase();
   for (const [k, v] of Object.entries(IMAGE_MAP)) {
+    if (k === "default") continue;
     if (key.includes(k)) return v;
   }
-  return IMAGE_MAP["default"];
+  return null;
 }
 
 export function Placeholder({ label, className = "" }: { label: string; className?: string }) {
+  const src = resolveImage(label);
+  if (!src) {
+    return (
+      <div className={`bg-slate-100 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center ${className}`}>
+        <span className="text-xs text-slate-400 font-medium uppercase tracking-wider">{label}</span>
+      </div>
+    );
+  }
   return (
     <img
-      src={resolveImage(label)}
+      src={src}
       alt={label}
       className={`object-cover w-full h-full ${className}`}
       loading="lazy"
