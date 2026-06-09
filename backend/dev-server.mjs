@@ -1,5 +1,6 @@
 import { createApiApp } from "./app.js";
 import { attachWebSocketServer } from "./services/realtime.js";
+import { startScheduler } from "./services/scheduler.js";
 import http from "node:http";
 
 const PORT = Number(process.env.API_PORT || 3001);
@@ -19,4 +20,5 @@ server.on("error", (err) => {
 
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`API server listening on http://localhost:${PORT}`);
+  startScheduler();
 });

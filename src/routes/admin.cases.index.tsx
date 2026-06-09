@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import {
   Search, ChevronDown, Printer, CalendarDays, Briefcase, Clock, CheckCircle2, AlertCircle,
-  TrendingUp, FlaskConical, ArrowRight,
+  TrendingUp, FlaskConical, ArrowRight, Trash2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/cases/")({
@@ -52,6 +52,7 @@ function AdminCasesIndex() {
   const [statusModal,setStatusModal]=useState<any>(null);
   const [newStatus,setNewStatus]=useState("");
   const [note,setNote]=useState("");
+  const [deleteModal,setDeleteModal]=useState<any>(null);
 
   async function load(){
     const params=new URLSearchParams({page:String(page),limit:"25"});
@@ -82,6 +83,17 @@ function AdminCasesIndex() {
       setStatusModal(null);setNote("");setNewStatus("");
       load();
     }finally{setUpdating(null);}
+  }
+
+  async function deleteCase(id: string) {
+    try {
+      await apiFetch(`/api/admin/cases/${id}`, { method: "DELETE" });
+      setDeleteModal(null);
+      load();
+      loadStats();
+    } catch (err: any) {
+      alert(err.message || "Failed to delete case");
+    }
   }
 
   function handlePrint(){
@@ -221,6 +233,10 @@ function AdminCasesIndex() {
                           className="inline-flex items-center gap-1 text-xs text-indigo-600 font-semibold hover:underline">
                           Update <ChevronDown size={11}/>
                         </button>
+                        <button onClick={()=>setDeleteModal(c)}
+                          className="inline-flex items-center gap-1 text-xs text-red-500 font-semibold hover:underline">
+                          <Trash2 size={11}/> Delete
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -259,6 +275,22 @@ function AdminCasesIndex() {
                 style={{background:"linear-gradient(90deg,#6366f1,#4f46e5)"}}>
                 {updating?"Saving…":"Save Status"}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirm modal */}
+      {deleteModal&&(
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={()=>setDeleteModal(null)}>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl" onClick={e=>e.stopPropagation()}>
+            <h3 className="font-bold text-slate-800 mb-2">Delete Case?</h3>
+            <p className="text-sm text-slate-500 mb-5">
+              This will permanently delete case <strong>{deleteModal.caseNumber}</strong> for patient <strong>{deleteModal.patientRef}</strong>. This cannot be undone.
+            </p>
+            <div className="flex gap-2 justify-end">
+              <button onClick={()=>setDeleteModal(null)} className="px-4 py-2 rounded-xl text-sm text-slate-500 hover:bg-slate-50">Cancel</button>
+              <button onClick={()=>deleteCase(deleteModal._id)} className="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-red-500 hover:bg-red-600">Delete</button>
             </div>
           </div>
         </div>

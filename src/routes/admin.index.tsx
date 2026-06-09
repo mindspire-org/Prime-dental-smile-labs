@@ -61,14 +61,19 @@ function AdminDashboard() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    apiFetch("/api/admin/stats").then(setStats).catch((e) => {
-      if (e.message.includes("Authentication") || e.message.includes("Unauthorized")) {
-        clearSession();
-        redirect({ to: "/login" });
-      } else {
-        setError(e.message);
-      }
-    });
+    function fetchStats() {
+      apiFetch("/api/admin/stats").then(setStats).catch((e) => {
+        if (e.message.includes("Authentication") || e.message.includes("Unauthorized")) {
+          clearSession();
+          redirect({ to: "/login" });
+        } else {
+          setError(e.message);
+        }
+      });
+    }
+    fetchStats();
+    window.addEventListener("focus", fetchStats);
+    return () => window.removeEventListener("focus", fetchStats);
   }, []);
 
   if (error) return <div className="bg-red-50 text-red-700 p-4 rounded-2xl text-sm">⚠️ {error}</div>;

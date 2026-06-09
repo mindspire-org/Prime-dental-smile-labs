@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createApiApp } from "./backend/app.js";
 import { attachWebSocketServer } from "./backend/services/realtime.js";
+import { startScheduler } from "./backend/services/scheduler.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -151,12 +152,12 @@ app.use(express.static(CLIENT_DIR, {
   },
 }));
 
-// Serve /favicon.ico from the SVG asset so browsers don't hit the SPA catch-all
+// Serve /favicon.ico from the brand logo so browsers don't hit the SPA catch-all
 app.get("/favicon.ico", async (req, res) => {
-  const svgPath = path.join(CLIENT_DIR, "favicon.svg");
+  const logoPath = path.join(CLIENT_DIR, "primesmile-logo.png");
   try {
-    const data = await readFile(svgPath);
-    res.setHeader("content-type", "image/svg+xml");
+    const data = await readFile(logoPath);
+    res.setHeader("content-type", "image/png");
     res.setHeader("cache-control", "public, max-age=86400");
     res.status(200).end(data);
   } catch {
@@ -214,6 +215,7 @@ const server = app.listen(PORT, "0.0.0.0", () => {
   console.log(`Client dir: ${CLIENT_DIR}`);
   console.log(`JS entry: ${assets.jsEntry || "(not found)"}`);
   console.log(`CSS files: ${assets.cssFiles.join(", ") || "(none)"}`);
+  startScheduler();
 });
 
 attachWebSocketServer(server);

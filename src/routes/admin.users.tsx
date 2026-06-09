@@ -97,8 +97,12 @@ function AdminUsers() {
   }
 
   async function deleteUser(id:string){
-    await apiFetch(`/api/admin/users/${id}`,{method:"DELETE"});
-    setModal(null);setTarget(null);load();
+    try {
+      await apiFetch(`/api/admin/users/${id}`,{method:"DELETE"});
+      setModal(null);setTarget(null);load();
+    } catch (err: any) {
+      alert(err.message || "Failed to delete user");
+    }
   }
 
   return(
