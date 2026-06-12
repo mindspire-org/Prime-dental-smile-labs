@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { apiFetch, getAccessToken } from "@/lib/api";
+import { apiFetch, getAccessToken, getCurrentUser } from "@/lib/api";
 import { formatBytes } from "@/lib/utils";
 import {
   Database, Download, Upload, Save, Trash2, RotateCcw,
@@ -8,7 +8,15 @@ import {
   ChevronRight, Loader2, Shield,
 } from "lucide-react";
 
-export const Route = createFileRoute("/admin/backups")({ component: BackupsPage });
+export const Route = createFileRoute("/admin/backups")({
+  // Admin-only: backup + deletion module is restricted to admins, never lab staff.
+  // (Backend also enforces requireRole("admin"); this blocks the page itself.)
+  beforeLoad: () => {
+    const user = getCurrentUser();
+    if (!user || user.role !== "admin") throw redirect({ to: "/admin/cases" as never });
+  },
+  component: BackupsPage,
+});
 
 const RETENTION_OPTIONS = [
   { value: 3, label: "3 Days" },

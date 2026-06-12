@@ -268,7 +268,7 @@ function LoginPage() {
           </p>
           {/* stats row */}
           <div className="flex items-center justify-center gap-8 mt-6">
-            {[["500+", "Clinics"], ["99.2%", "On-time"], ["24h", "Avg. turnaround"]].map(([val, lbl]) => (
+            {[["500+", "Clinics"], ["99.2%", "On-time"], ["1h", "Avg. turnaround"]].map(([val, lbl]) => (
               <div key={lbl} className="text-center">
                 <div className="text-xl font-bold text-white">{val}</div>
                 <div className="text-xs text-slate-500 mt-0.5">{lbl}</div>
