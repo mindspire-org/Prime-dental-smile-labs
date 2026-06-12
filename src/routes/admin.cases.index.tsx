@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, getCurrentUser } from "@/lib/api";
 import {
   Search, ChevronDown, Printer, CalendarDays, Briefcase, Clock, CheckCircle2, AlertCircle,
   TrendingUp, FlaskConical, ArrowRight, Trash2,
@@ -53,6 +53,8 @@ function AdminCasesIndex() {
   const [newStatus,setNewStatus]=useState("");
   const [note,setNote]=useState("");
   const [deleteModal,setDeleteModal]=useState<any>(null);
+  // Only admins may delete cases — lab staff never see the control.
+  const isAdmin = getCurrentUser()?.role === "admin";
 
   async function load(){
     const params=new URLSearchParams({page:String(page),limit:"25"});
@@ -233,10 +235,12 @@ function AdminCasesIndex() {
                           className="inline-flex items-center gap-1 text-xs text-indigo-600 font-semibold hover:underline">
                           Update <ChevronDown size={11}/>
                         </button>
-                        <button onClick={()=>setDeleteModal(c)}
-                          className="inline-flex items-center gap-1 text-xs text-red-500 font-semibold hover:underline">
-                          <Trash2 size={11}/> Delete
-                        </button>
+                        {isAdmin && (
+                          <button onClick={()=>setDeleteModal(c)}
+                            className="inline-flex items-center gap-1 text-xs text-red-500 font-semibold hover:underline">
+                            <Trash2 size={11}/> Delete
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

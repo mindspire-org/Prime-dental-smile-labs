@@ -263,6 +263,9 @@ function LoginPage() {
             <Sparkles size={16} className="text-cyan-400"/>
           </div>
           <h2 className="text-3xl font-bold text-white leading-tight">Precision Craftsmanship<br/><span className="text-cyan-400">Delivered Digitally</span></h2>
+          <p className="text-cyan-300/90 text-sm font-medium tracking-wide mt-3 italic">
+            Digital Precision · Artistic Excellence
+          </p>
           <p className="text-slate-400 text-sm mt-3 max-w-xs mx-auto leading-relaxed">
             Submit cases, track progress, and collaborate with your lab — all in one place.
           </p>
