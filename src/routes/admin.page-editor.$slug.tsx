@@ -1097,9 +1097,10 @@ function BlockPropsEditor({ type, props, onChange }: { type: string; props: any;
             <input value={s.icon} onChange={e => { const sv = [...props.services]; sv[i] = { ...sv[i], icon: e.target.value }; set("services", sv); }} placeholder="Icon name (e.g. Smile)" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
             <input value={s.title} onChange={e => { const sv = [...props.services]; sv[i] = { ...sv[i], title: e.target.value }; set("services", sv); }} placeholder="Title" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
             <textarea value={s.desc} onChange={e => { const sv = [...props.services]; sv[i] = { ...sv[i], desc: e.target.value }; set("services", sv); }} placeholder="Description" rows={2} className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none resize-none"/>
+            <input value={s.link || ""} onChange={e => { const sv = [...props.services]; sv[i] = { ...sv[i], link: e.target.value }; set("services", sv); }} placeholder="Link (e.g. /services/fixed-restorations)" className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
           </div>
         ))}
-        <button onClick={() => set("services", [...(props.services || []), { icon: "", title: "", desc: "" }])} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800">+ Add service</button>
+        <button onClick={() => set("services", [...(props.services || []), { icon: "", title: "", desc: "", link: "" }])} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800">+ Add service</button>
       </div>
     );
     case "home-specialisations": return (
@@ -1478,14 +1479,14 @@ const DEFAULT_SERVICES_BLOCKS: Block[] = [
     eyebrow:"Our Services", heading:"Comprehensive Lab Services",
     subheading:"We provide a full range of dental laboratory services. Every case is managed with a digital prescription workflow.",
     services:[
-      { icon:"Smile", title:"Fixed Restorations", desc:"Crowns, bridges, veneers, inlays & onlays in zirconia and lithium disilicate." },
-      { icon:"Wrench", title:"Implant Prosthetics", desc:"Custom abutments, screw-retained crowns, bars and full-arch restorations." },
-      { icon:"Layers", title:"Removable Prosthetics", desc:"Full and partial dentures with digital design and high-precision fit." },
-      { icon:"Frame", title:"Metal Frameworks", desc:"Cobalt-chrome frameworks via SLM metal printing for accuracy and strength." },
-      { icon:"Shield", title:"Splints & Guards", desc:"Night guards, bruxism splints and surgical guides from validated workflows." },
-      { icon:"PencilRuler", title:"Digital Design Support", desc:"STL design, smile design and treatment planning collaboration." },
+      { icon:"Smile", title:"Fixed Restorations", desc:"Crowns, bridges, veneers, inlays & onlays in zirconia and lithium disilicate.", link:"/services/fixed-restorations" },
+      { icon:"Wrench", title:"Implant Prosthetics", desc:"Custom abutments, screw-retained crowns, bars and full-arch restorations.", link:"/services/implant-prosthetics" },
+      { icon:"Layers", title:"Removable Prosthetics", desc:"Full and partial dentures with digital design and high-precision fit.", link:"/services/removable-prosthetics" },
+      { icon:"Frame", title:"Metal Frameworks", desc:"Cobalt-chrome frameworks via SLM metal printing for accuracy and strength.", link:"/services/metal-frameworks" },
+      { icon:"Shield", title:"Splints & Guards", desc:"Night guards, bruxism splints and surgical guides from validated workflows.", link:"/services/splints-guards" },
+      { icon:"PencilRuler", title:"Digital Design Support", desc:"STL design, smile design and treatment planning collaboration.", link:"/services/digital-design" },
     ],
-    linkText:"View All Services", linkHref:"/services"
+    linkText:"", linkHref:""
   }},
   { id:"sv-materials", type:"home-specialisations", order:2, props:{
     eyebrow:"Materials", heading:"Our Core Restorations",

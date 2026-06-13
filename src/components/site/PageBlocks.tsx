@@ -11,6 +11,17 @@ import { Placeholder } from "./Placeholder";
 
 type Block = { id: string; type: string; order: number; props: Record<string, any> };
 
+// Maps service card titles to their detail pages (fallback when a card has no
+// explicit link set in the page editor).
+const SERVICE_LINKS: Record<string, string> = {
+  "Fixed Restorations": "/services/fixed-restorations",
+  "Implant Prosthetics": "/services/implant-prosthetics",
+  "Removable Prosthetics": "/services/removable-prosthetics",
+  "Metal Frameworks": "/services/metal-frameworks",
+  "Splints & Guards": "/services/splints-guards",
+  "Digital Design Support": "/services/digital-design",
+};
+
 function HeroSlideshow({ gallery, eyebrow, heading, highlight, subheading, cta1, cta1Link, cta2, cta2Link }: any) {
   const slides = (gallery || []).filter((s: any) => s.src);
   const [idx, setIdx] = useState(0);
@@ -457,12 +468,20 @@ function BlockRenderer({ type, props }: { type: string; props: any }) {
             {(props.services || []).map((s: any, i: number) => {
               const iconMap: Record<string, any> = { Smile, Wrench, Layers, Frame, Shield, PencilRuler };
               const I = iconMap[s.icon] || Smile;
-              return (
-                <div key={i} className="card-service h-full flex flex-col">
+              // Per-item link wins; otherwise fall back to the matching service page.
+              const link = s.link || SERVICE_LINKS[s.title?.trim()] || "";
+              const inner = (
+                <>
                   <div className="w-12 h-12 rounded-lg bg-teal/10 text-teal flex items-center justify-center mb-4"><I size={22}/></div>
                   <h3 className="font-semibold text-lg">{s.title}</h3>
                   <p className="text-sm text-muted-grey mt-2 leading-relaxed flex-1">{s.desc}</p>
-                </div>
+                  {link && <span className="text-gold font-semibold mt-5 inline-flex items-center gap-1 text-sm">View Service <ArrowRight size={14}/></span>}
+                </>
+              );
+              return link ? (
+                <Link key={i} to={link as never} className="card-service h-full flex flex-col hover:-translate-y-0.5 transition-transform">{inner}</Link>
+              ) : (
+                <div key={i} className="card-service h-full flex flex-col">{inner}</div>
               );
             })}
           </div>

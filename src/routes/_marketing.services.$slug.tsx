@@ -91,7 +91,12 @@ type LoaderData = typeof DATA[string] & { pageBlocks: any[] };
 
 function ServiceDetail() {
   const d = Route.useLoaderData() as LoaderData;
-  const hasBlocks = d.pageBlocks && d.pageBlocks.length > 0;
+  // The page already renders its own hero below; drop any hero/header blocks
+  // from the editable CMS blocks so the service page never shows two headers.
+  const editableBlocks = (d.pageBlocks || []).filter(
+    (b: any) => !["hero", "page-header", "about-hero"].includes(b.type),
+  );
+  const hasBlocks = editableBlocks.length > 0;
 
   return (
     <div>
@@ -115,7 +120,7 @@ function ServiceDetail() {
           {/* Editable page blocks from page editor */}
           {hasBlocks && (
             <div className="mb-16">
-              <PageBlocks blocks={d.pageBlocks} />
+              <PageBlocks blocks={editableBlocks} />
             </div>
           )}
 
