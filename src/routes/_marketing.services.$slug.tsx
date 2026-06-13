@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { ArrowRight, CheckCircle, FileText, MessageCircle } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { PageBlocks } from "@/components/site/PageBlocks";
@@ -66,17 +67,7 @@ export const Route = createFileRoute("/_marketing/services/$slug")({
   loader: async ({ params }) => {
     const data = DATA[params.slug];
     if (!data) throw notFound();
-    let pageBlocks: any[] = [];
-    if (typeof window !== "undefined") {
-      try {
-        const r = await fetch(`/api/admin/pages/${params.slug}`);
-        if (r.ok) {
-          const json = await r.json();
-          pageBlocks = json.page?.blocks || [];
-        }
-      } catch {}
-    }
-    return { ...data, pageBlocks };
+    return data;
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -87,13 +78,26 @@ export const Route = createFileRoute("/_marketing/services/$slug")({
   component: ServiceDetail,
 });
 
-type LoaderData = typeof DATA[string] & { pageBlocks: any[] };
+type LoaderData = typeof DATA[string];
 
 function ServiceDetail() {
   const d = Route.useLoaderData() as LoaderData;
+  const [cmsBlocks, setCmsBlocks] = useState<any[]>([]);
+  const [cmsLoaded, setCmsLoaded] = useState(false);
+
+  useEffect(() => {
+    const slug = Object.entries(DATA).find(([, v]) => v.title === d.title)?.[0];
+    if (!slug) return;
+    fetch(`/api/admin/pages/${slug}`)
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(json => { setCmsBlocks(json.page?.blocks || []); })
+      .catch(() => {})
+      .finally(() => setCmsLoaded(true));
+  }, [d.title]);
+
   // The page already renders its own hero below; drop any hero/header blocks
   // from the editable CMS blocks so the service page never shows two headers.
-  const editableBlocks = (d.pageBlocks || []).filter(
+  const editableBlocks = (cmsBlocks || []).filter(
     (b: any) => !["hero", "page-header", "about-hero"].includes(b.type),
   );
   const hasBlocks = editableBlocks.length > 0;
@@ -116,63 +120,19 @@ function ServiceDetail() {
       </section>
 
       <div className="bg-white py-20">
-        <div className="max-w-5xl mx-auto px-5 lg:px-8">
+        <div className="max-w-6xl mx-auto px-5 lg:px-8">
           {/* Editable page blocks from page editor */}
-          {hasBlocks && (
-            <div className="mb-16">
-              <PageBlocks blocks={editableBlocks} />
+          {hasBlocks ? (
+            <PageBlocks blocks={editableBlocks} />
+          ) : cmsLoaded ? (
+            <div className="text-center text-slate-400 text-sm py-10">
+              No content blocks added yet. Edit this page in the admin panel to add content.
+            </div>
+          ) : (
+            <div className="text-center py-10">
+              <div className="w-6 h-6 border-2 border-teal border-t-transparent rounded-full animate-spin mx-auto" />
             </div>
           )}
-
-          {/* Fallback hardcoded content */}
-          <div className="grid md:grid-cols-2 gap-10">
-            <Reveal>
-              <h2 className="text-xl font-semibold mb-4">What We Make</h2>
-              <ul className="space-y-2.5">
-                {d.makes.map((m: string) => (
-                  <li key={m} className="flex items-start gap-3 text-text-slate"><CheckCircle className="text-teal mt-0.5 shrink-0" size={18}/> <span className="text-sm">{m}</span></li>
-                ))}
-              </ul>
-            </Reveal>
-            <Reveal delay={0.05}>
-              <h2 className="text-xl font-semibold mb-4">What You Need to Submit</h2>
-              <ul className="space-y-2.5">
-                {d.submit.map((s: string) => (
-                  <li key={s} className="flex items-start gap-3"><FileText className="text-teal mt-0.5 shrink-0" size={18}/> <span className="text-sm">{s}</span></li>
-                ))}
-              </ul>
-            </Reveal>
-          </div>
-
-          <Reveal className="mt-14">
-            <h2 className="text-xl font-semibold mb-4">Available Materials</h2>
-            <div className="flex flex-wrap gap-2">
-              {d.materials.map((m: string) => (
-                <span key={m} className="px-3 py-1.5 rounded-full bg-teal/10 text-teal text-sm font-medium">{m}</span>
-              ))}
-            </div>
-          </Reveal>
-
-          <Reveal className="mt-14">
-            <h2 className="text-xl font-semibold mb-4">Typical Workflow</h2>
-            <ol className="space-y-3">
-              {d.workflow.map((w: string, i: number) => (
-                <li key={w} className="flex items-start gap-4">
-                  <span className="w-8 h-8 rounded-full bg-teal text-white font-bold text-sm flex items-center justify-center shrink-0">{i + 1}</span>
-                  <span className="pt-1">{w}</span>
-                </li>
-              ))}
-            </ol>
-          </Reveal>
-
-          <div className="mt-12 border-l-4 border-teal pl-5 italic text-muted-grey bg-bg-soft py-4 rounded-r">
-            Quality Guarantee: Every restoration passes 6 quality control checkpoints. Remakes within warranty are free of charge.
-          </div>
-
-          <div className="mt-10 flex flex-wrap gap-3">
-            <Link to="/submit" className="btn-gold">Submit This Case <ArrowRight size={16}/></Link>
-            <Link to="/contact" className="btn-outline-teal"><MessageCircle size={16}/> Ask a Technical Question</Link>
-          </div>
         </div>
       </div>
     </div>

@@ -5,9 +5,10 @@ import {
   ArrowRight, CheckCircle2, Star,
   Cpu, Lock, FlaskConical, Target,
   Smile, Wrench, Layers, Frame, Shield, PencilRuler,
-  MessageCircle, BookOpen
+  MessageCircle, BookOpen, FileText
 } from "lucide-react";
 import { Placeholder } from "./Placeholder";
+import { Reveal, Stagger, StaggerItem } from "./Reveal";
 
 type Block = { id: string; type: string; order: number; props: Record<string, any> };
 
@@ -629,6 +630,92 @@ function BlockRenderer({ type, props }: { type: string; props: any }) {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+    );
+
+    case "service-details": return (
+      <section className="bg-white py-20">
+        <div className="max-w-6xl mx-auto px-5 lg:px-8">
+          <Stagger className="grid md:grid-cols-2 gap-10">
+            <StaggerItem>
+              <div className="bg-bg-soft rounded-2xl p-6 border border-border-silver h-full">
+                <h2 className="text-xl font-semibold mb-5 flex items-center gap-2">
+                  <span className="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center"><CheckCircle2 size={16}/></span>
+                  {props.makesHeading || "What We Make"}
+                </h2>
+                <ul className="space-y-3">
+                  {(props.makes || []).map((m: string, i: number) => (
+                    <li key={i} className="flex items-start gap-3 text-text-slate bg-white rounded-xl px-4 py-3 border border-border-silver shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                      <CheckCircle2 className="text-teal mt-0.5 shrink-0" size={18}/>
+                      <span className="text-sm font-medium">{m}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </StaggerItem>
+
+            <StaggerItem>
+              <div className="bg-bg-soft rounded-2xl p-6 border border-border-silver h-full">
+                <h2 className="text-xl font-semibold mb-5 flex items-center gap-2">
+                  <span className="w-8 h-8 rounded-lg bg-gold/10 text-gold flex items-center justify-center"><FileText size={16}/></span>
+                  {props.submitHeading || "What You Need to Submit"}
+                </h2>
+                <ul className="space-y-3">
+                  {(props.submit || []).map((s: string, i: number) => (
+                    <li key={i} className="flex items-start gap-3 text-text-slate bg-white rounded-xl px-4 py-3 border border-border-silver shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                      <FileText className="text-gold mt-0.5 shrink-0" size={18}/>
+                      <span className="text-sm font-medium">{s}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </StaggerItem>
+          </Stagger>
+
+          <Reveal className="mt-14">
+            <h2 className="text-xl font-semibold mb-5">{props.materialsHeading || "Available Materials"}</h2>
+            <div className="flex flex-wrap gap-3">
+              {(props.materials || []).map((m: string, i: number) => (
+                <span key={i} className="px-5 py-2.5 rounded-full bg-teal/10 text-teal text-sm font-semibold border border-teal/20 hover:bg-teal hover:text-white transition-colors cursor-default">{m}</span>
+              ))}
+            </div>
+          </Reveal>
+
+          <Reveal className="mt-14">
+            <h2 className="text-xl font-semibold mb-5">{props.workflowHeading || "Typical Workflow"}</h2>
+            <div className="space-y-4">
+              {(props.workflow || []).map((w: string, i: number) => (
+                <div key={i} className="flex items-start gap-4 bg-bg-soft rounded-xl px-5 py-4 border border-border-silver hover:border-teal/30 hover:shadow-sm transition-all">
+                  <span className="w-10 h-10 rounded-full bg-teal text-white font-bold text-sm flex items-center justify-center shrink-0 shadow-md">{i + 1}</span>
+                  <span className="pt-2 text-sm text-text-slate font-medium">{w}</span>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+
+          {props.guarantee && (
+            <Reveal className="mt-14">
+              <div className="border-l-4 border-teal pl-6 italic text-muted-grey bg-bg-soft py-5 rounded-r-xl text-sm leading-relaxed">
+                {props.guarantee}
+              </div>
+            </Reveal>
+          )}
+
+          {(props.cta1Text || props.cta2Text) && (
+            <Reveal className="mt-10 flex flex-wrap gap-3">
+              {props.cta1Text && (
+                <Link to={props.cta1Link || "/submit"} className="btn-gold inline-flex items-center gap-2">
+                  {props.cta1Text} <ArrowRight size={16}/>
+                </Link>
+              )}
+              {props.cta2Text && (
+                <Link to={props.cta2Link || "/contact"} className="btn-outline-teal inline-flex items-center gap-2">
+                  <MessageCircle size={16}/> {props.cta2Text}
+                </Link>
+              )}
+            </Reveal>
+          )}
         </div>
       </section>
     );

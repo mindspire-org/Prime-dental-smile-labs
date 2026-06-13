@@ -554,6 +554,28 @@ const BLOCK_TYPES: BlockType[] = [
       ],
     }
   },
+  {
+    id: "service-details",
+    label: "Service Details",
+    icon: CheckCircle2,
+    category: "content",
+    description: "Service page content: what we make, requirements, materials, workflow, guarantee and CTAs.",
+    defaultProps: {
+      makesHeading: "What We Make",
+      submitHeading: "What You Need to Submit",
+      materialsHeading: "Available Materials",
+      workflowHeading: "Typical Workflow",
+      makes: ["Item 1", "Item 2"],
+      submit: ["Requirement 1", "Requirement 2"],
+      materials: ["Material 1", "Material 2"],
+      workflow: ["Step 1", "Step 2"],
+      guarantee: "Quality Guarantee: Every restoration passes 6 quality control checkpoints. Remakes within warranty are free of charge.",
+      cta1Text: "Submit This Case",
+      cta1Link: "/submit",
+      cta2Text: "Ask a Technical Question",
+      cta2Link: "/contact",
+    }
+  },
 ];
 
 const BLOCK_CATEGORIES = [
@@ -1310,6 +1332,62 @@ function BlockPropsEditor({ type, props, onChange }: { type: string; props: any;
         <button onClick={() => set("legal", [...(props.legal || []), { label: "", href: "" }])} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800">+ Add legal link</button>
       </div>
     );
+
+    case "service-details": return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <TextField label="Makes Heading" value={props.makesHeading} onChange={v => set("makesHeading", v)}/>
+          <TextField label="Submit Heading" value={props.submitHeading} onChange={v => set("submitHeading", v)}/>
+        </div>
+        <div className="text-xs font-medium text-slate-600 mb-1">What We Make</div>
+        {(props.makes || []).map((m: string, i: number) => (
+          <div key={i} className="flex gap-2 items-center">
+            <input value={m} onChange={e => { const a = [...(props.makes || [])]; a[i] = e.target.value; set("makes", a); }} placeholder="Item" className="flex-1 px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+            <button onClick={() => set("makes", (props.makes || []).filter((_: any, j: number) => j !== i))} className="text-red-400"><Trash2 size={13}/></button>
+          </div>
+        ))}
+        <button onClick={() => set("makes", [...(props.makes || []), ""])} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800">+ Add item</button>
+
+        <div className="text-xs font-medium text-slate-600 mb-1 pt-2">What You Need to Submit</div>
+        {(props.submit || []).map((s: string, i: number) => (
+          <div key={i} className="flex gap-2 items-center">
+            <input value={s} onChange={e => { const a = [...(props.submit || [])]; a[i] = e.target.value; set("submit", a); }} placeholder="Requirement" className="flex-1 px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+            <button onClick={() => set("submit", (props.submit || []).filter((_: any, j: number) => j !== i))} className="text-red-400"><Trash2 size={13}/></button>
+          </div>
+        ))}
+        <button onClick={() => set("submit", [...(props.submit || []), ""])} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800">+ Add requirement</button>
+
+        <TextField label="Materials Heading" value={props.materialsHeading} onChange={v => set("materialsHeading", v)}/>
+        <div className="text-xs font-medium text-slate-600 mb-1">Materials</div>
+        {(props.materials || []).map((m: string, i: number) => (
+          <div key={i} className="flex gap-2 items-center">
+            <input value={m} onChange={e => { const a = [...(props.materials || [])]; a[i] = e.target.value; set("materials", a); }} placeholder="Material" className="flex-1 px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+            <button onClick={() => set("materials", (props.materials || []).filter((_: any, j: number) => j !== i))} className="text-red-400"><Trash2 size={13}/></button>
+          </div>
+        ))}
+        <button onClick={() => set("materials", [...(props.materials || []), ""])} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800">+ Add material</button>
+
+        <TextField label="Workflow Heading" value={props.workflowHeading} onChange={v => set("workflowHeading", v)}/>
+        <div className="text-xs font-medium text-slate-600 mb-1">Workflow Steps</div>
+        {(props.workflow || []).map((w: string, i: number) => (
+          <div key={i} className="flex gap-2 items-center">
+            <span className="w-6 h-6 rounded-full bg-teal text-white text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+            <input value={w} onChange={e => { const a = [...(props.workflow || [])]; a[i] = e.target.value; set("workflow", a); }} placeholder="Step" className="flex-1 px-2 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none"/>
+            <button onClick={() => set("workflow", (props.workflow || []).filter((_: any, j: number) => j !== i))} className="text-red-400"><Trash2 size={13}/></button>
+          </div>
+        ))}
+        <button onClick={() => set("workflow", [...(props.workflow || []), ""])} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800">+ Add step</button>
+
+        <TextArea label="Guarantee Text" value={props.guarantee} onChange={v => set("guarantee", v)}/>
+        <div className="grid grid-cols-2 gap-3 pt-2">
+          <TextField label="CTA 1 Text" value={props.cta1Text} onChange={v => set("cta1Text", v)}/>
+          <TextField label="CTA 1 Link" value={props.cta1Link} onChange={v => set("cta1Link", v)}/>
+          <TextField label="CTA 2 Text" value={props.cta2Text} onChange={v => set("cta2Text", v)}/>
+          <TextField label="CTA 2 Link" value={props.cta2Link} onChange={v => set("cta2Link", v)}/>
+        </div>
+      </div>
+    );
+
     default: return <div className="text-xs text-slate-400 text-center py-4">No props for this block type</div>;
   }
 }
@@ -1614,38 +1692,44 @@ const DEFAULT_CONTACT_BLOCKS: Block[] = [
 
 const DEFAULT_FIXED_RESTORATIONS_BLOCKS: Block[] = [
   { id: "fr-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Fixed Restorations", highlight: "", subheading: "Crowns, bridges, veneers, inlays and onlays in zirconia and lithium disilicate â€” crafted with digital precision.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
-  { id: "fr-text", type: "image-text", order: 1, props: { heading: "Precision Fit & Aesthetics", text: "Every fixed restoration is designed in CAD software, milled on 5-axis equipment and finished under magnification. We validate marginal fit before dispatch.", image: "", imageLeft: true, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
-  { id: "fr-cta", type: "cta", order: 2, props: { heading: "Request a consultation", text: "Not sure which material suits your case? Our technicians can advise.", buttonText: "Contact Us", buttonLink: "/contact", bgColor: "#0aabbd", textAlign: "center" } },
+  { id: "fr-text", type: "image-text", order: 1, props: { heading: "Precision Fit & Aesthetic Control", text: "Every fixed restoration is produced according to the dentist's prescription, digital scan or impression, and case requirements. Our workflow supports single crowns, short-span bridges, long-span restorations, veneers, inlays, onlays and provisional restorations using validated CAD/CAM, milling, pressing, ceramic layering, staining and glazing protocols. We check marginal fit, contact points, occlusion, shade requirements and surface finish before dispatch.", image: "/images/fixed-restorations.jpg", imageLeft: true, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
+  { id: "fr-details", type: "service-details", order: 2, props: { makesHeading: "What We Make", submitHeading: "What You Need to Submit", materialsHeading: "Available Materials", workflowHeading: "Typical Workflow", makes: ["Single crowns (anterior & posterior)","3-unit and long-span bridges","Veneers (minimal-prep & traditional)","Inlays / Onlays","Temporary PMMA restorations","Maryland bridges"], submit: ["Intra-oral or impression scan (STL/PLY/OBJ)","Bite registration","Shade selection (with photos)","Tooth chart with role tags","Special instructions (margin design, contact preferences)"], materials: ["Zirconia (3M Lava, Katana)","Lithium Disilicate (e.max)","PFM","PMMA","Composite hybrids"], workflow: ["Case received & digitally checked","Design & approval (optional)","Milling / pressing","Sintering / firing","Finishing & polishing","QC + dispatch"], guarantee: "Quality Guarantee: Every restoration passes 6 quality control checkpoints. Remakes within warranty are free of charge.", cta1Text: "Submit This Case", cta1Link: "/submit", cta2Text: "Ask a Technical Question", cta2Link: "/contact" } },
+  { id: "fr-cta", type: "cta", order: 3, props: { heading: "Request a consultation", text: "Not sure which material suits your case? Our technicians can advise.", buttonText: "Contact Us", buttonLink: "/contact", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
 const DEFAULT_IMPLANT_BLOCKS: Block[] = [
   { id: "ip-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Implant Prosthetics", highlight: "", subheading: "Custom abutments, screw-retained crowns, bars and full-arch restorations with validated implant workflows.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
-  { id: "ip-text", type: "image-text", order: 1, props: { heading: "Integrated Digital Workflow", text: "We accept implant scans, design abutments in CAD and validate connections on model before production. Every case is tracked from scan to dispatch.", image: "", imageLeft: true, cta: "Our Workflow", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
-  { id: "ip-cta", type: "cta", order: 2, props: { heading: "Have an implant case?", text: "Send us your scan and prescription for a free feasibility review.", buttonText: "Get Started", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
+  { id: "ip-text", type: "image-text", order: 1, props: { heading: "Integrated Digital Workflow", text: "We accept implant scans, design abutments in CAD and validate connections on model before production. Every case is tracked from scan to dispatch.", image: "/images/implant-prosthetics.jpg", imageLeft: false, cta: "Our Workflow", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
+  { id: "ip-details", type: "service-details", order: 2, props: { makesHeading: "What We Make", submitHeading: "What You Need to Submit", materialsHeading: "Available Materials", workflowHeading: "Typical Workflow", makes: ["Custom titanium abutments","Screw-retained crowns","Cement-retained crowns","Implant bars (milled)","Hybrid full-arch prostheses","All-on-4 / All-on-6"], submit: ["Implant brand, system & platform","Scanbody type & lot","Connection type (internal/external/conical)","Retention preference","Soft tissue scan or impression","CBCT / DICOM (if available)"], materials: ["Titanium Grade 5","Zirconia abutments","PEEK","Cobalt-chrome bars"], workflow: ["Implant verification","Library matching","Abutment design & approval","Milling & finishing","Crown fabrication","QC + dispatch"], guarantee: "Quality Guarantee: Every restoration passes 6 quality control checkpoints. Remakes within warranty are free of charge.", cta1Text: "Submit This Case", cta1Link: "/submit", cta2Text: "Ask a Technical Question", cta2Link: "/contact" } },
+  { id: "ip-cta", type: "cta", order: 3, props: { heading: "Have an implant case?", text: "Send us your scan and prescription for a free feasibility review.", buttonText: "Get Started", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
 const DEFAULT_REMOVABLE_BLOCKS: Block[] = [
   { id: "rp-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Removable Prosthetics", highlight: "", subheading: "Full and partial dentures with digital design and high-precision fit for optimal comfort and function.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
-  { id: "rp-text", type: "image-text", order: 1, props: { heading: "Digital Denture Design", text: "Our removable prosthetics are designed digitally from validated scans, ensuring consistent base fit and tooth arrangement. Every denture goes through a trial stage when required.", image: "", imageLeft: true, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
-  { id: "rp-cta", type: "cta", order: 2, props: { heading: "Need a denture quote?", text: "Upload your scan and we will assess the case at no charge.", buttonText: "Submit Case", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
+  { id: "rp-text", type: "image-text", order: 1, props: { heading: "Digital Denture Design", text: "Our removable prosthetics are designed digitally from validated scans, ensuring consistent base fit and tooth arrangement. Every denture goes through a trial stage when required.", image: "/images/removable-prosthetics.jpg", imageLeft: true, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
+  { id: "rp-details", type: "service-details", order: 2, props: { makesHeading: "What We Make", submitHeading: "What You Need to Submit", materialsHeading: "Available Materials", workflowHeading: "Typical Workflow", makes: ["Complete upper & lower dentures","Partial dentures (acrylic, Co-Cr, flexible)","Immediate dentures","Implant overdentures","Repairs & relines","Try-ins (digital)"], submit: ["Primary or secondary impressions","Bite blocks / centric registration","Tooth selection (mould & shade)","Patient photos (smile line)","Special design notes"], materials: ["Heat-cured acrylic","Cobalt-chrome","Valplast / Deflex","Nylon flexibles"], workflow: ["Digital design","Try-in fabrication","Approval","Final processing","Polishing","QC + dispatch"], guarantee: "Quality Guarantee: Every restoration passes 6 quality control checkpoints. Remakes within warranty are free of charge.", cta1Text: "Submit This Case", cta1Link: "/submit", cta2Text: "Ask a Technical Question", cta2Link: "/contact" } },
+  { id: "rp-cta", type: "cta", order: 3, props: { heading: "Need a denture quote?", text: "Upload your scan and we will assess the case at no charge.", buttonText: "Submit Case", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
 const DEFAULT_METAL_BLOCKS: Block[] = [
   { id: "mf-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Metal Frameworks", highlight: "", subheading: "Cobalt-chrome frameworks via SLM metal printing for unmatched accuracy, strength and passive fit.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
-  { id: "mf-text", type: "image-text", order: 1, props: { heading: "SLM Metal Printing", text: "Our VENEA SLM printer produces cobalt-chrome frameworks with layer accuracy down to 30 microns. Every framework is inspected for distortion and fit before ceramic application.", image: "", imageLeft: true, cta: "Learn More", ctaLink: "/technology", backgroundColor: "#ffffff", padding: "large" } },
-  { id: "mf-cta", type: "cta", order: 2, props: { heading: "Need a metal framework?", text: "Upload your scan and prescription for a free assessment.", buttonText: "Submit Case", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
+  { id: "mf-text", type: "image-text", order: 1, props: { heading: "SLM Metal Printing", text: "Our VENEA SLM printer produces cobalt-chrome frameworks with layer accuracy down to 30 microns. Every framework is inspected for distortion and fit before ceramic application.", image: "/images/metal-frameworks.jpg", imageLeft: false, cta: "Learn More", ctaLink: "/technology", backgroundColor: "#ffffff", padding: "large" } },
+  { id: "mf-details", type: "service-details", order: 2, props: { makesHeading: "What We Make", submitHeading: "What You Need to Submit", materialsHeading: "Available Materials", workflowHeading: "Typical Workflow", makes: ["Partial denture frameworks","Implant bar frameworks","Telescopic crowns","Combination cases"], submit: ["Working scan or model","Framework design preferences","Major/minor connector locations","Clasp design notes"], materials: ["Cobalt-chrome (CE-certified)"], workflow: ["CAD design","SLM metal printing","Heat treatment","Fitting & finishing","Polishing","QC + dispatch"], guarantee: "Quality Guarantee: Every restoration passes 6 quality control checkpoints. Remakes within warranty are free of charge.", cta1Text: "Submit This Case", cta1Link: "/submit", cta2Text: "Ask a Technical Question", cta2Link: "/contact" } },
+  { id: "mf-cta", type: "cta", order: 3, props: { heading: "Need a metal framework?", text: "Upload your scan and prescription for a free assessment.", buttonText: "Submit Case", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
 const DEFAULT_SPLINTS_BLOCKS: Block[] = [
   { id: "sg-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Splints & Guards", highlight: "", subheading: "Night guards, bruxism splints and surgical guides from validated digital workflows.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
-  { id: "sg-text", type: "image-text", order: 1, props: { heading: "Validated Guard Production", text: "Splints are designed from intraoral scans with calibrated bite data, then 3D printed or milled depending on material selection. Thickness and occlusion are checked on articulator.", image: "", imageLeft: true, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
-  { id: "sg-cta", type: "cta", order: 2, props: { heading: "Order a splint or guard?", text: "Send us your scan and we will confirm material options and turnaround.", buttonText: "Submit Case", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
+  { id: "sg-text", type: "image-text", order: 1, props: { heading: "Validated Guard Production", text: "Splints are designed from intraoral scans with calibrated bite data, then 3D printed or milled depending on material selection. Thickness and occlusion are checked on articulator.", image: "/images/splints-guards.jpg", imageLeft: true, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
+  { id: "sg-details", type: "service-details", order: 2, props: { makesHeading: "What We Make", submitHeading: "What You Need to Submit", materialsHeading: "Available Materials", workflowHeading: "Typical Workflow", makes: ["Bruxism / night guards (hard & soft)","Michigan splints","Anterior repositioning splints","Surgical guides","Sports guards","Orthodontic retainers"], submit: ["Intra-oral scan (upper & lower)","Bite registration","Splint type & thickness","Coverage requirements"], materials: ["Asiga DentaGUIDE","Asiga DentaCLEAR","Polypropylene","PETG"], workflow: ["Digital design","3D printing","Post-curing","Polishing","QC + dispatch"], guarantee: "Quality Guarantee: Every restoration passes 6 quality control checkpoints. Remakes within warranty are free of charge.", cta1Text: "Submit This Case", cta1Link: "/submit", cta2Text: "Ask a Technical Question", cta2Link: "/contact" } },
+  { id: "sg-cta", type: "cta", order: 3, props: { heading: "Order a splint or guard?", text: "Send us your scan and we will confirm material options and turnaround.", buttonText: "Submit Case", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
 const DEFAULT_DIGITAL_DESIGN_BLOCKS: Block[] = [
   { id: "dd-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Digital Design Support", highlight: "", subheading: "STL design, smile design and treatment planning collaboration for complex cases.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
-  { id: "dd-text", type: "image-text", order: 1, props: { heading: "Collaborative Design", text: "Our technicians work directly with your scan data to produce validated designs before production. We support smile design, full-arch planning and implant restorative design.", image: "", imageLeft: true, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
-  { id: "dd-cta", type: "cta", order: 2, props: { heading: "Need design support?", text: "Upload your case and our team will review and advise on the best approach.", buttonText: "Get Started", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
+  { id: "dd-text", type: "image-text", order: 1, props: { heading: "Collaborative Design", text: "Our technicians work directly with your scan data to produce validated designs before production. We support smile design, full-arch planning and implant restorative design.", image: "/images/digital-design.jpg", imageLeft: false, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
+  { id: "dd-details", type: "service-details", order: 2, props: { makesHeading: "What We Make", submitHeading: "What You Need to Submit", materialsHeading: "Available Materials", workflowHeading: "Typical Workflow", makes: ["STL crown / bridge design","Smile design mockups","Wax-up files","Surgical guide planning","Implant planning"], submit: ["Patient scan (STL)","Photographs","Treatment objectives","Existing CBCT (if applicable)"], materials: ["Design output: STL / PLY / OBJ"], workflow: ["Case briefing","Initial design","Review & feedback","Final STL delivery"], guarantee: "Quality Guarantee: Every restoration passes 6 quality control checkpoints. Remakes within warranty are free of charge.", cta1Text: "Submit This Case", cta1Link: "/submit", cta2Text: "Ask a Technical Question", cta2Link: "/contact" } },
+  { id: "dd-cta", type: "cta", order: 3, props: { heading: "Need design support?", text: "Upload your case and our team will review and advise on the best approach.", buttonText: "Get Started", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
 /* â”€â”€â”€ Shared footer block (appended to every page layout) â”€â”€ */

@@ -6,7 +6,7 @@ import {
   Layers, ArrowUpRight, ArrowRight,
   Wrench, Cpu, Frame, BookOpen, Smile, FlaskConical, Target,
   Shield, PencilRuler, MessageCircle,
-  Mail, Phone, MapPin, Lock,
+  Mail, Phone, MapPin, Lock, FileText,
 } from "lucide-react";
 
 export type BlockItem = {
@@ -660,6 +660,50 @@ export function PageBlockRenderer({ type, props }: { type: string; props: any })
     case "site-footer": return (
       <div className="overflow-hidden rounded-xl border border-slate-200">
         <SiteFooterView {...props}/>
+      </div>
+    );
+
+    case "service-details": return (
+      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="grid grid-cols-2 gap-3 p-4">
+          <div className="bg-slate-50 rounded-lg p-3">
+            <div className="text-[10px] font-semibold text-teal-600 uppercase mb-2">{props.makesHeading || "What We Make"}</div>
+            <div className="space-y-1.5">
+              {(props.makes || []).slice(0, 3).map((m: string, i: number) => (
+                <div key={i} className="flex items-center gap-1.5 text-[11px] text-slate-600 bg-white rounded px-2 py-1 border border-slate-100"><CheckCircle2 size={10} className="text-teal-500 shrink-0"/> {m}</div>
+              ))}
+              {(props.makes || []).length > 3 && <div className="text-[10px] text-slate-400 pl-1">+{(props.makes || []).length - 3} more</div>}
+            </div>
+          </div>
+          <div className="bg-slate-50 rounded-lg p-3">
+            <div className="text-[10px] font-semibold text-amber-600 uppercase mb-2">{props.submitHeading || "Submit"}</div>
+            <div className="space-y-1.5">
+              {(props.submit || []).slice(0, 3).map((s: string, i: number) => (
+                <div key={i} className="flex items-center gap-1.5 text-[11px] text-slate-600 bg-white rounded px-2 py-1 border border-slate-100"><FileText size={10} className="text-amber-500 shrink-0"/> {s}</div>
+              ))}
+              {(props.submit || []).length > 3 && <div className="text-[10px] text-slate-400 pl-1">+{(props.submit || []).length - 3} more</div>}
+            </div>
+          </div>
+        </div>
+        <div className="px-4 pb-3">
+          <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">{props.materialsHeading || "Materials"}</div>
+          <div className="flex flex-wrap gap-1">
+            {(props.materials || []).slice(0, 5).map((m: string, i: number) => (
+              <span key={i} className="px-2 py-0.5 rounded-full bg-teal-50 text-teal-600 text-[10px] font-medium border border-teal-100">{m}</span>
+            ))}
+          </div>
+        </div>
+        <div className="px-4 pb-3">
+          <div className="text-[10px] font-semibold text-slate-500 uppercase mb-1.5">{props.workflowHeading || "Workflow"}</div>
+          <div className="space-y-1">
+            {(props.workflow || []).slice(0, 4).map((w: string, i: number) => (
+              <div key={i} className="flex items-center gap-2 text-[11px] text-slate-600 bg-slate-50 rounded px-2 py-1">
+                <span className="w-4 h-4 rounded-full bg-teal text-white text-[8px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                {w}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
 
