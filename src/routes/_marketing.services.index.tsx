@@ -58,11 +58,14 @@ function ServicesPage() {
   }, []);
 
   const hasSavedBlocks = cmsLoaded && cmsBlocks.length > 0;
+  const pageBlocks = cmsBlocks.map((b: any) =>
+    b.type === "home-services" ? { ...b, linkText: undefined, linkHref: undefined } : b
+  );
 
   return (
     <div>
       {hasSavedBlocks ? (
-        <PageBlocks blocks={cmsBlocks} />
+        <PageBlocks blocks={pageBlocks} />
       ) : (
     <>
       {/* Hero */}
