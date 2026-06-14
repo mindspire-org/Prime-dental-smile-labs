@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, CheckCircle, FileText, MessageCircle } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { PageBlocks } from "@/components/site/PageBlocks";
+import { ServiceDetailHeroView } from "@/components/site/ServiceHero";
 
 const DATA: Record<string, {
   title: string; intro: string; image: string; makes: string[]; submit: string[]; materials: string[]; workflow: string[];
@@ -95,29 +96,27 @@ function ServiceDetail() {
       .finally(() => setCmsLoaded(true));
   }, [d.title]);
 
-  // The page already renders its own hero below; drop any hero/header blocks
-  // from the editable CMS blocks so the service page never shows two headers.
+  // The header is rendered once below (from the editable "Service Page Hero"
+  // block if present, else from the page data); drop all header-type blocks
+  // from the body so the service page never shows two headers.
   const editableBlocks = (cmsBlocks || []).filter(
-    (b: any) => !["hero", "page-header", "about-hero"].includes(b.type),
+    (b: any) => !["hero", "page-header", "about-hero", "service-page-hero"].includes(b.type),
   );
   const hasBlocks = editableBlocks.length > 0;
 
+  // Header content: a saved "service-page-hero" block overrides the page data.
+  const headerProps = (cmsBlocks || []).find((b: any) => b.type === "service-page-hero")?.props || {};
+
   return (
     <div>
-      {/* Hero image */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={d.image} alt={d.title} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-linear-to-b from-navy/60 via-navy/50 to-navy/80" />
-        </div>
-        <div className="relative max-w-5xl mx-auto px-5 lg:px-8 py-24">
-          <Reveal>
-            <Link to="/services" className="text-teal text-sm font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all">← All Services</Link>
-            <h1 className="mt-4 text-4xl md:text-5xl font-bold text-white">{d.title}</h1>
-            <p className="mt-6 text-lg text-white/80 leading-relaxed max-w-3xl">{d.intro}</p>
-          </Reveal>
-        </div>
-      </section>
+      {/* Hero — identical layout to before, now editable via the page editor */}
+      <ServiceDetailHeroView
+        heading={headerProps.heading || d.title}
+        subheading={headerProps.subheading || d.intro}
+        image={headerProps.image || d.image}
+        backHref="/services"
+        backLabel="All Services"
+      />
 
       <div className="bg-white py-20">
         <div className="max-w-6xl mx-auto px-5 lg:px-8">

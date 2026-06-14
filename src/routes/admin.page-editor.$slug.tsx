@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { SiteFooterView, FOOTER_DEFAULTS } from "@/components/site/SiteFooter";
+import { ServiceHeroView, SERVICE_HERO_DEFAULTS, SERVICE_DETAIL_HERO_DEFAULTS } from "@/components/site/ServiceHero";
 import { PageBlockRenderer } from "@/components/site/PageBlockRenderer";
 import {
   ChevronLeft, Plus, Trash2, GripVertical, Settings2, Eye,
@@ -63,6 +64,22 @@ const BLOCK_TYPES: BlockType[] = [
       showAccent: true,
       padding: "large",
     }
+  },
+  {
+    id: "services-hero",
+    label: "Services Hero",
+    icon: Zap,
+    category: "Header",
+    description: "Navy services page header (image + eyebrow + heading + subheading)",
+    defaultProps: { ...SERVICE_HERO_DEFAULTS },
+  },
+  {
+    id: "service-page-hero",
+    label: "Service Page Hero",
+    icon: Zap,
+    category: "Header",
+    description: "Service detail header (back-link + image + title + intro)",
+    defaultProps: { ...SERVICE_DETAIL_HERO_DEFAULTS },
   },
 
   // Content Blocks
@@ -1388,6 +1405,23 @@ function BlockPropsEditor({ type, props, onChange }: { type: string; props: any;
       </div>
     );
 
+    case "services-hero": return (
+      <div className="space-y-3">
+        <TextField label="Eyebrow" value={props.eyebrow} onChange={v => set("eyebrow", v)}/>
+        <TextField label="Heading" value={props.heading} onChange={v => set("heading", v)}/>
+        <TextArea label="Subheading" value={props.subheading} onChange={v => set("subheading", v)}/>
+        <ImageField label="Background Image" value={props.image} onChange={v => set("image", v)}/>
+      </div>
+    );
+    case "service-page-hero": return (
+      <div className="space-y-3">
+        <TextField label="Heading" value={props.heading} onChange={v => set("heading", v)}/>
+        <TextArea label="Intro / Subheading" value={props.subheading} onChange={v => set("subheading", v)}/>
+        <ImageField label="Background Image" value={props.image} onChange={v => set("image", v)}/>
+        <TextField label="Back link label" value={props.backLabel} onChange={v => set("backLabel", v)}/>
+        <TextField label="Back link href" value={props.backHref} onChange={v => set("backHref", v)}/>
+      </div>
+    );
     default: return <div className="text-xs text-slate-400 text-center py-4">No props for this block type</div>;
   }
 }
@@ -1547,11 +1581,10 @@ const DEFAULT_ABOUT_BLOCKS: Block[] = [
 ];
 
 const DEFAULT_SERVICES_BLOCKS: Block[] = [
-  { id:"sv-hero", type:"hero", order:0, props:{
-    eyebrow:"Our Services", heading:"Comprehensive Lab Services", highlight:"",
+  { id:"sv-hero", type:"services-hero", order:0, props:{
+    eyebrow:"Our Services", heading:"Comprehensive Lab Services",
     subheading:"Every service is delivered through a digital prescription workflow with full traceability, multi-step QC and CE-certified materials.",
-    image:"https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=1600&q=80&auto=format&fit=crop",
-    bgColor:"#0d1e2c", cta1:"", cta1Link:"", cta2:"", cta2Link:""
+    image:"https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=1600&q=80&auto=format&fit=crop"
   }},
   { id:"sv-grid", type:"home-services", order:1, props:{
     eyebrow:"Our Services", heading:"Comprehensive Lab Services",
@@ -1691,42 +1724,42 @@ const DEFAULT_CONTACT_BLOCKS: Block[] = [
 ];
 
 const DEFAULT_FIXED_RESTORATIONS_BLOCKS: Block[] = [
-  { id: "fr-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Fixed Restorations", highlight: "", subheading: "Crowns, bridges, veneers, inlays and onlays in zirconia and lithium disilicate â€” crafted with digital precision.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
+  { id: "fr-hero", type: "service-page-hero", order: 0, props: { heading: "Fixed Restorations", subheading: "Precision-milled and pressed restorations engineered for long-term function and aesthetics.", image: "https://cdn.pixabay.com/photo/2020/08/27/18/31/teeth-5522653_1280.jpg?w=1200&q=80&auto=format&fit=crop", backHref: "/services", backLabel: "All Services" } },
   { id: "fr-text", type: "image-text", order: 1, props: { heading: "Precision Fit & Aesthetic Control", text: "Every fixed restoration is produced according to the dentist's prescription, digital scan or impression, and case requirements. Our workflow supports single crowns, short-span bridges, long-span restorations, veneers, inlays, onlays and provisional restorations using validated CAD/CAM, milling, pressing, ceramic layering, staining and glazing protocols. We check marginal fit, contact points, occlusion, shade requirements and surface finish before dispatch.", image: "/images/fixed-restorations.jpg", imageLeft: true, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
   { id: "fr-details", type: "service-details", order: 2, props: { makesHeading: "What We Make", submitHeading: "What You Need to Submit", materialsHeading: "Available Materials", workflowHeading: "Typical Workflow", makes: ["Single crowns (anterior & posterior)","3-unit and long-span bridges","Veneers (minimal-prep & traditional)","Inlays / Onlays","Temporary PMMA restorations","Maryland bridges"], submit: ["Intra-oral or impression scan (STL/PLY/OBJ)","Bite registration","Shade selection (with photos)","Tooth chart with role tags","Special instructions (margin design, contact preferences)"], materials: ["Zirconia (3M Lava, Katana)","Lithium Disilicate (e.max)","PFM","PMMA","Composite hybrids"], workflow: ["Case received & digitally checked","Design & approval (optional)","Milling / pressing","Sintering / firing","Finishing & polishing","QC + dispatch"], guarantee: "Quality Guarantee: Every restoration passes 6 quality control checkpoints. Remakes within warranty are free of charge.", cta1Text: "Submit This Case", cta1Link: "/submit", cta2Text: "Ask a Technical Question", cta2Link: "/contact" } },
   { id: "fr-cta", type: "cta", order: 3, props: { heading: "Request a consultation", text: "Not sure which material suits your case? Our technicians can advise.", buttonText: "Contact Us", buttonLink: "/contact", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
 const DEFAULT_IMPLANT_BLOCKS: Block[] = [
-  { id: "ip-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Implant Prosthetics", highlight: "", subheading: "Custom abutments, screw-retained crowns, bars and full-arch restorations with validated implant workflows.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
+  { id: "ip-hero", type: "service-page-hero", order: 0, props: { heading: "Implant Prosthetics", subheading: "Full implant prosthetic solutions using validated scanbody libraries and original components.", image: "https://images.pexels.com/photos/30874064/pexels-photo-30874064.jpeg?w=1200&q=80&auto=format&fit=crop", backHref: "/services", backLabel: "All Services" } },
   { id: "ip-text", type: "image-text", order: 1, props: { heading: "Integrated Digital Workflow", text: "We accept implant scans, design abutments in CAD and validate connections on model before production. Every case is tracked from scan to dispatch.", image: "/images/implant-prosthetics.jpg", imageLeft: false, cta: "Our Workflow", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
   { id: "ip-details", type: "service-details", order: 2, props: { makesHeading: "What We Make", submitHeading: "What You Need to Submit", materialsHeading: "Available Materials", workflowHeading: "Typical Workflow", makes: ["Custom titanium abutments","Screw-retained crowns","Cement-retained crowns","Implant bars (milled)","Hybrid full-arch prostheses","All-on-4 / All-on-6"], submit: ["Implant brand, system & platform","Scanbody type & lot","Connection type (internal/external/conical)","Retention preference","Soft tissue scan or impression","CBCT / DICOM (if available)"], materials: ["Titanium Grade 5","Zirconia abutments","PEEK","Cobalt-chrome bars"], workflow: ["Implant verification","Library matching","Abutment design & approval","Milling & finishing","Crown fabrication","QC + dispatch"], guarantee: "Quality Guarantee: Every restoration passes 6 quality control checkpoints. Remakes within warranty are free of charge.", cta1Text: "Submit This Case", cta1Link: "/submit", cta2Text: "Ask a Technical Question", cta2Link: "/contact" } },
   { id: "ip-cta", type: "cta", order: 3, props: { heading: "Have an implant case?", text: "Send us your scan and prescription for a free feasibility review.", buttonText: "Get Started", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
 const DEFAULT_REMOVABLE_BLOCKS: Block[] = [
-  { id: "rp-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Removable Prosthetics", highlight: "", subheading: "Full and partial dentures with digital design and high-precision fit for optimal comfort and function.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
+  { id: "rp-hero", type: "service-page-hero", order: 0, props: { heading: "Removable Prosthetics", subheading: "Full and partial dentures designed and produced for comfort, retention and natural aesthetics.", image: "https://images.pexels.com/photos/6502031/pexels-photo-6502031.jpeg?w=1200&q=80&auto=format&fit=crop", backHref: "/services", backLabel: "All Services" } },
   { id: "rp-text", type: "image-text", order: 1, props: { heading: "Digital Denture Design", text: "Our removable prosthetics are designed digitally from validated scans, ensuring consistent base fit and tooth arrangement. Every denture goes through a trial stage when required.", image: "/images/removable-prosthetics.jpg", imageLeft: true, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
   { id: "rp-details", type: "service-details", order: 2, props: { makesHeading: "What We Make", submitHeading: "What You Need to Submit", materialsHeading: "Available Materials", workflowHeading: "Typical Workflow", makes: ["Complete upper & lower dentures","Partial dentures (acrylic, Co-Cr, flexible)","Immediate dentures","Implant overdentures","Repairs & relines","Try-ins (digital)"], submit: ["Primary or secondary impressions","Bite blocks / centric registration","Tooth selection (mould & shade)","Patient photos (smile line)","Special design notes"], materials: ["Heat-cured acrylic","Cobalt-chrome","Valplast / Deflex","Nylon flexibles"], workflow: ["Digital design","Try-in fabrication","Approval","Final processing","Polishing","QC + dispatch"], guarantee: "Quality Guarantee: Every restoration passes 6 quality control checkpoints. Remakes within warranty are free of charge.", cta1Text: "Submit This Case", cta1Link: "/submit", cta2Text: "Ask a Technical Question", cta2Link: "/contact" } },
   { id: "rp-cta", type: "cta", order: 3, props: { heading: "Need a denture quote?", text: "Upload your scan and we will assess the case at no charge.", buttonText: "Submit Case", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
 const DEFAULT_METAL_BLOCKS: Block[] = [
-  { id: "mf-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Metal Frameworks", highlight: "", subheading: "Cobalt-chrome frameworks via SLM metal printing for unmatched accuracy, strength and passive fit.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
+  { id: "mf-hero", type: "service-page-hero", order: 0, props: { heading: "Metal Frameworks", subheading: "Cobalt-chrome frameworks 3D-printed via SLM technology for unrivaled accuracy.", image: "https://images.pexels.com/photos/6627596/pexels-photo-6627596.jpeg?w=1200&q=80&auto=format&fit=crop", backHref: "/services", backLabel: "All Services" } },
   { id: "mf-text", type: "image-text", order: 1, props: { heading: "SLM Metal Printing", text: "Our VENEA SLM printer produces cobalt-chrome frameworks with layer accuracy down to 30 microns. Every framework is inspected for distortion and fit before ceramic application.", image: "/images/metal-frameworks.jpg", imageLeft: false, cta: "Learn More", ctaLink: "/technology", backgroundColor: "#ffffff", padding: "large" } },
   { id: "mf-details", type: "service-details", order: 2, props: { makesHeading: "What We Make", submitHeading: "What You Need to Submit", materialsHeading: "Available Materials", workflowHeading: "Typical Workflow", makes: ["Partial denture frameworks","Implant bar frameworks","Telescopic crowns","Combination cases"], submit: ["Working scan or model","Framework design preferences","Major/minor connector locations","Clasp design notes"], materials: ["Cobalt-chrome (CE-certified)"], workflow: ["CAD design","SLM metal printing","Heat treatment","Fitting & finishing","Polishing","QC + dispatch"], guarantee: "Quality Guarantee: Every restoration passes 6 quality control checkpoints. Remakes within warranty are free of charge.", cta1Text: "Submit This Case", cta1Link: "/submit", cta2Text: "Ask a Technical Question", cta2Link: "/contact" } },
   { id: "mf-cta", type: "cta", order: 3, props: { heading: "Need a metal framework?", text: "Upload your scan and prescription for a free assessment.", buttonText: "Submit Case", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
 const DEFAULT_SPLINTS_BLOCKS: Block[] = [
-  { id: "sg-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Splints & Guards", highlight: "", subheading: "Night guards, bruxism splints and surgical guides from validated digital workflows.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
+  { id: "sg-hero", type: "service-page-hero", order: 0, props: { heading: "Splints & Guards", subheading: "Validated splints and guards from 3D-printed and milled materials.", image: "https://images.pexels.com/photos/6812500/pexels-photo-6812500.jpeg?w=1200&q=80&auto=format&fit=crop", backHref: "/services", backLabel: "All Services" } },
   { id: "sg-text", type: "image-text", order: 1, props: { heading: "Validated Guard Production", text: "Splints are designed from intraoral scans with calibrated bite data, then 3D printed or milled depending on material selection. Thickness and occlusion are checked on articulator.", image: "/images/splints-guards.jpg", imageLeft: true, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
   { id: "sg-details", type: "service-details", order: 2, props: { makesHeading: "What We Make", submitHeading: "What You Need to Submit", materialsHeading: "Available Materials", workflowHeading: "Typical Workflow", makes: ["Bruxism / night guards (hard & soft)","Michigan splints","Anterior repositioning splints","Surgical guides","Sports guards","Orthodontic retainers"], submit: ["Intra-oral scan (upper & lower)","Bite registration","Splint type & thickness","Coverage requirements"], materials: ["Asiga DentaGUIDE","Asiga DentaCLEAR","Polypropylene","PETG"], workflow: ["Digital design","3D printing","Post-curing","Polishing","QC + dispatch"], guarantee: "Quality Guarantee: Every restoration passes 6 quality control checkpoints. Remakes within warranty are free of charge.", cta1Text: "Submit This Case", cta1Link: "/submit", cta2Text: "Ask a Technical Question", cta2Link: "/contact" } },
   { id: "sg-cta", type: "cta", order: 3, props: { heading: "Order a splint or guard?", text: "Send us your scan and we will confirm material options and turnaround.", buttonText: "Submit Case", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
 const DEFAULT_DIGITAL_DESIGN_BLOCKS: Block[] = [
-  { id: "dd-hero", type: "hero", order: 0, props: { eyebrow: "Service", heading: "Digital Design Support", highlight: "", subheading: "STL design, smile design and treatment planning collaboration for complex cases.", cta: "Submit a Case", ctaLink: "/submit", bgColor: "#0d1e2c", align: "center" } },
+  { id: "dd-hero", type: "service-page-hero", order: 0, props: { heading: "Digital Design Support", subheading: "STL design, smile design and treatment planning collaboration for your in-house workflow.", image: "https://images.pexels.com/photos/6529103/pexels-photo-6529103.jpeg?w=1200&q=80&auto=format&fit=crop", backHref: "/services", backLabel: "All Services" } },
   { id: "dd-text", type: "image-text", order: 1, props: { heading: "Collaborative Design", text: "Our technicians work directly with your scan data to produce validated designs before production. We support smile design, full-arch planning and implant restorative design.", image: "/images/digital-design.jpg", imageLeft: false, cta: "Learn More", ctaLink: "/workflow", backgroundColor: "#ffffff", padding: "large" } },
   { id: "dd-details", type: "service-details", order: 2, props: { makesHeading: "What We Make", submitHeading: "What You Need to Submit", materialsHeading: "Available Materials", workflowHeading: "Typical Workflow", makes: ["STL crown / bridge design","Smile design mockups","Wax-up files","Surgical guide planning","Implant planning"], submit: ["Patient scan (STL)","Photographs","Treatment objectives","Existing CBCT (if applicable)"], materials: ["Design output: STL / PLY / OBJ"], workflow: ["Case briefing","Initial design","Review & feedback","Final STL delivery"], guarantee: "Quality Guarantee: Every restoration passes 6 quality control checkpoints. Remakes within warranty are free of charge.", cta1Text: "Submit This Case", cta1Link: "/submit", cta2Text: "Ask a Technical Question", cta2Link: "/contact" } },
   { id: "dd-cta", type: "cta", order: 3, props: { heading: "Need design support?", text: "Upload your case and our team will review and advise on the best approach.", buttonText: "Get Started", buttonLink: "/submit", bgColor: "#0aabbd", textAlign: "center" } },
@@ -1766,6 +1799,42 @@ const PAGE_DEFAULTS: Record<string, Block[]> = {
   // not appended to other pages â€” otherwise it would render twice.
   footer: [DEFAULT_FOOTER_BLOCK],
 };
+
+// Background images for the service detail headers (used when upgrading a
+// legacy generic "hero" block that has no image of its own).
+const SERVICE_DETAIL_IMAGES: Record<string, string> = {
+  "fixed-restorations": "https://cdn.pixabay.com/photo/2020/08/27/18/31/teeth-5522653_1280.jpg?w=1200&q=80&auto=format&fit=crop",
+  "implant-prosthetics": "https://images.pexels.com/photos/30874064/pexels-photo-30874064.jpeg?w=1200&q=80&auto=format&fit=crop",
+  "removable-prosthetics": "https://images.pexels.com/photos/6502031/pexels-photo-6502031.jpeg?w=1200&q=80&auto=format&fit=crop",
+  "metal-frameworks": "https://images.pexels.com/photos/6627596/pexels-photo-6627596.jpeg?w=1200&q=80&auto=format&fit=crop",
+  "splints-guards": "https://images.pexels.com/photos/6812500/pexels-photo-6812500.jpeg?w=1200&q=80&auto=format&fit=crop",
+  "digital-design": "https://images.pexels.com/photos/6529103/pexels-photo-6529103.jpeg?w=1200&q=80&auto=format&fit=crop",
+};
+
+// Converts a legacy generic "hero" block on a services page into the correct
+// editable header block so the editor matches the live (hardcoded) layout.
+function upgradeServiceHeader(slug: string, blocks: Block[]): Block[] {
+  const isDetail = slug in SERVICE_DETAIL_IMAGES;
+  const isIndex = slug === "services";
+  if (!isDetail && !isIndex) return blocks;
+  return blocks.map((b) => {
+    if (b.type !== "hero") return b;
+    if (isDetail) {
+      return { ...b, type: "service-page-hero", props: {
+        heading: b.props?.heading || "",
+        subheading: b.props?.subheading || "",
+        image: b.props?.image || SERVICE_DETAIL_IMAGES[slug],
+        backHref: "/services", backLabel: "All Services",
+      } };
+    }
+    return { ...b, type: "services-hero", props: {
+      eyebrow: b.props?.eyebrow || "Our Services",
+      heading: b.props?.heading || "Comprehensive Lab Services",
+      subheading: b.props?.subheading || "",
+      image: b.props?.image || "",
+    } };
+  });
+}
 
 /* â”€â”€â”€ Main editor component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 type Block = { id: string; type: string; order: number; props: Record<string, any> };
@@ -1840,9 +1909,13 @@ function PageEditor() {
       const loaded = [...(r.page.blocks || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
       const defaults = PAGE_DEFAULTS[slug];
       const onlyGeneric = loaded.length > 0 && loaded.every((b: any) => ["text","image","video","divider"].includes(b.type));
-      const initial = defaults && (loaded.length === 0 || onlyGeneric)
+      const initialRaw = defaults && (loaded.length === 0 || onlyGeneric)
         ? defaults.map((b, i) => ({ ...b, order: i }))
         : loaded;
+      // Upgrade legacy generic "hero" blocks on services pages to the correct
+      // editable header block so the editor matches the live layout even for
+      // pages already saved with the old hero.
+      const initial = upgradeServiceHeader(slug, initialRaw);
       setBlocks(initial);
       historyRef.current = [JSON.parse(JSON.stringify(initial))];
       historyIdxRef.current = 0;

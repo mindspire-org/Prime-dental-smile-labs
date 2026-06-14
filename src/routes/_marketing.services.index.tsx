@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Smile, Wrench, Layers, Frame, Shield, PencilRuler } from "lucide-react";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/Reveal";
 import { PageBlocks } from "@/components/site/PageBlocks";
+import { ServiceHeroView } from "@/components/site/ServiceHero";
 
 export const Route = createFileRoute("/_marketing/services/")({
   head: () => ({
@@ -68,22 +69,8 @@ function ServicesPage() {
         <PageBlocks blocks={pageBlocks} />
       ) : (
     <>
-      {/* Hero */}
-      <section className="relative bg-navy text-white overflow-hidden">
-        <div className="absolute inset-0">
-          <img src="https://images.unsplash.com/photo-1684607631747-045ecfeeb4c7?w=1600&q=80&auto=format&fit=crop" alt="Dental laboratory" className="w-full h-full object-cover opacity-30" loading="lazy"/>
-          <div className="absolute inset-0 bg-linear-to-b from-navy/70 to-navy/90"/>
-        </div>
-        <div className="relative max-w-7xl mx-auto px-5 lg:px-8 py-24">
-          <Reveal>
-            <span className="eyebrow text-teal!">Our Services</span>
-            <h1 className="mt-3 text-4xl md:text-5xl font-bold max-w-3xl">Comprehensive Lab Services</h1>
-            <p className="mt-6 text-white/70 max-w-2xl text-lg">
-              Every service is delivered through a digital prescription workflow with full traceability, multi-step QC and CE-certified materials.
-            </p>
-          </Reveal>
-        </div>
-      </section>
+      {/* Hero (shared with the editable "Services Hero" page-editor block) */}
+      <ServiceHeroView />
 
       {/* Services grid */}
       <section className="bg-white py-20">

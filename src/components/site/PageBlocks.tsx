@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Placeholder } from "./Placeholder";
 import { Reveal, Stagger, StaggerItem } from "./Reveal";
+import { ServiceHeroView, ServiceDetailHeroView } from "./ServiceHero";
 
 type Block = { id: string; type: string; order: number; props: Record<string, any> };
 
@@ -719,6 +720,12 @@ function BlockRenderer({ type, props }: { type: string; props: any }) {
         </div>
       </section>
     );
+
+    case "services-hero":
+      return <ServiceHeroView {...(props || {})} />;
+
+    case "service-page-hero":
+      return <ServiceDetailHeroView {...(props || {})} />;
 
     default:
       return <div className="p-4 rounded-xl bg-gray-50 text-sm text-gray-400">[{type}] block</div>;

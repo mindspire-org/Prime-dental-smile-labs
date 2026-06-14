@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { SiteFooterView } from "@/components/site/SiteFooter";
+import { ServiceHeroView, ServiceDetailHeroView } from "@/components/site/ServiceHero";
 import {
   ChevronDown, CheckCircle2, Type, Image, LayoutGrid, MessageSquare,
   Star, Zap, Minus, PlayCircle, Users, Search,
@@ -706,6 +707,10 @@ export function PageBlockRenderer({ type, props }: { type: string; props: any })
         </div>
       </div>
     );
+
+    case "services-hero": return <ServiceHeroView {...(props || {})} />;
+
+    case "service-page-hero": return <ServiceDetailHeroView {...(props || {})} />;
 
     default: return (
       <div className="p-6 bg-linear-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200 text-center">
