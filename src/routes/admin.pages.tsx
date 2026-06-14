@@ -7,6 +7,18 @@ export const Route = createFileRoute("/admin/pages")({ component: AdminPages });
 
 type PageMeta = { slug: string; title: string; published: boolean; updatedAt?: string; blocks?: any[] };
 
+const SERVICE_DETAIL_SLUGS = ["fixed-restorations","implant-prosthetics","removable-prosthetics","metal-frameworks","splints-guards","digital-design"];
+
+// Maps a CMS page slug to its actual public URL (service & technology detail
+// pages live under nested routes, so /<slug> would 404).
+function pagePublicPath(slug: string): string {
+  if (slug === "home") return "/";
+  if (slug === "footer") return "/";
+  if (SERVICE_DETAIL_SLUGS.includes(slug)) return `/services/${slug}`;
+  if (slug.startsWith("technology-")) return `/technology/${slug.slice("technology-".length)}`;
+  return `/${slug}`;
+}
+
 function AdminPages() {
   const [pages, setPages] = useState<PageMeta[]>([]);
 
@@ -44,7 +56,7 @@ function AdminPages() {
                   style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)" }}>
                   <Edit3 size={12}/> Edit Page
                 </Link>
-                <a href={`/${p.slug === "home" ? "" : p.slug}`} target="_blank" rel="noopener"
+                <a href={pagePublicPath(p.slug)} target="_blank" rel="noopener"
                   className="px-3 py-2 rounded-xl text-xs font-semibold border border-slate-200 text-slate-600 hover:bg-slate-50 flex items-center gap-1">
                   <Eye size={12}/> View
                 </a>
