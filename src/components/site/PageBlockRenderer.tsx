@@ -8,6 +8,8 @@ import {
   Wrench, Cpu, Frame, BookOpen, Smile, FlaskConical, Target,
   Shield, PencilRuler, MessageCircle,
   Mail, Phone, MapPin, Lock, FileText,
+  ScanLine, Printer, Box, Flame, Sparkles, CheckCircle, Wind,
+  Package, TrendingUp, Eye, Truck, Globe, Upload,
 } from "lucide-react";
 
 export type BlockItem = {
@@ -277,7 +279,7 @@ export function PageBlockRenderer({ type, props }: { type: string; props: any })
 
     case "cards": {
       const accentMap: Record<string, string> = { teal: "border-l-teal-400", gold: "border-l-amber-400", indigo: "border-l-indigo-400", slate: "border-l-slate-400" };
-      const iconMap: Record<string, any> = { BookOpen, Target, CheckCircle2, Cpu, Lock, FlaskConical, Smile, Wrench, Layers, Frame, Shield, PencilRuler };
+      const iconMap: Record<string, any> = { BookOpen, Target, CheckCircle2, Cpu, Lock, FlaskConical, Smile, Wrench, Layers, Frame, Shield, PencilRuler, ScanLine, Printer, Box, Flame, Sparkles, CheckCircle, Wind, Zap, Package, TrendingUp, Eye, Truck, Globe, Upload, FileText };
       return (
         <div className="py-10 px-5 lg:px-8 rounded-2xl" style={{ backgroundColor: props.backgroundColor || "#f9fafb" }}>
           {props.heading && <h3 className="text-xl font-bold text-slate-800 text-center mb-6">{props.heading}</h3>}

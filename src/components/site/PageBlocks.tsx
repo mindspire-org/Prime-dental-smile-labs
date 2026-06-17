@@ -5,7 +5,9 @@ import {
   ArrowRight, CheckCircle2, Star,
   Cpu, Lock, FlaskConical, Target,
   Smile, Wrench, Layers, Frame, Shield, PencilRuler,
-  MessageCircle, BookOpen, FileText
+  MessageCircle, BookOpen, FileText,
+  ScanLine, Printer, Box, Flame, Sparkles, CheckCircle, Wind,
+  Zap, Package, TrendingUp, Eye, Truck, Globe, Upload
 } from "lucide-react";
 import { Placeholder } from "./Placeholder";
 import { Reveal, Stagger, StaggerItem } from "./Reveal";
@@ -94,7 +96,9 @@ function resolveIcon(name: string) {
   const map: Record<string, any> = {
     ArrowUpRight, Users, PlayCircle, Image, ArrowRight, CheckCircle2, Star,
     Cpu, Lock, FlaskConical, Target, Smile, Wrench, Layers, Frame, Shield,
-    PencilRuler, MessageCircle, BookOpen,
+    PencilRuler, MessageCircle, BookOpen, ScanLine, Printer, Box, Flame,
+    Sparkles, CheckCircle, Wind, Zap, Package, TrendingUp, Eye, Truck, Globe,
+    Upload, FileText,
   };
   return map[name] || null;
 }

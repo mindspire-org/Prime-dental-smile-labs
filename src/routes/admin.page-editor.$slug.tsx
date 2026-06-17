@@ -964,6 +964,43 @@ function BlockPropsEditor({ type, props, onChange }: { type: string; props: any;
         </div>
       </div>
     );
+    case "page-header": return (
+      <div className="space-y-3">
+        <TextField label="Eyebrow" value={props.eyebrow} onChange={v => set("eyebrow", v)}/>
+        <TextField label="Heading" value={props.heading} onChange={v => set("heading", v)}/>
+        <TextField label="Highlight Word" value={props.highlight} onChange={v => set("highlight", v)}/>
+        <TextArea label="Subheading" value={props.subheading} onChange={v => set("subheading", v)}/>
+        <div>
+          <label className="text-xs font-medium text-slate-600 block mb-1">Align</label>
+          <div className="flex gap-2">
+            {["left","center"].map(a => (
+              <button key={a} onClick={() => set("align", a)}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-medium border capitalize ${props.align === a ? "bg-indigo-500 text-white border-indigo-500" : "border-slate-200 text-slate-600"}`}>{a}</button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <label className="text-xs font-medium text-slate-600 block mb-1">Padding</label>
+          <div className="flex gap-2">
+            {["small","medium","large"].map(a => (
+              <button key={a} onClick={() => set("padding", a)}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-medium border capitalize ${props.padding === a ? "bg-indigo-500 text-white border-indigo-500" : "border-slate-200 text-slate-600"}`}>{a}</button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <label className="text-xs font-medium text-slate-600 block mb-1">Background Color</label>
+          <div className="flex gap-2">
+            <input type="color" value={props.backgroundColor || "#ffffff"} onChange={e => set("backgroundColor", e.target.value)} className="w-10 h-10 rounded-lg border border-slate-200 p-0.5"/>
+            <input type="text" value={props.backgroundColor || ""} onChange={e => set("backgroundColor", e.target.value)} className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-sm font-mono focus:outline-none focus:border-indigo-400"/>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <input id="ph-accent" type="checkbox" checked={!!props.showAccent} onChange={e => set("showAccent", e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-indigo-600"/>
+          <label htmlFor="ph-accent" className="text-xs font-medium text-slate-600">Show accent bar</label>
+        </div>
+      </div>
+    );
     case "stats": return (
       <div className="space-y-3">
         <div className="text-xs font-medium text-slate-600 mb-1">Stats</div>
@@ -1783,17 +1820,20 @@ const DEFAULT_FOOTER_BLOCK: Block = {
 
 const DEFAULT_ABOUT_OUR_LAB_BLOCKS: Block[] = [
   { id: "ol-header", type: "page-header", order: 0, props: { eyebrow: "Facility", heading: "Our Laboratory", highlight: "", subheading: "Prime Smile is a purpose-built, fully digital facility focused on precision, traceability and validated workflows. Every case is processed through documented production departments with six quality control checkpoints.", align: "left", backgroundColor: "#ffffff", showAccent: true, padding: "large" } },
-  { id: "ol-cta", type: "cta", order: 1, props: { heading: "Ready to experience our laboratory?", text: "Request a facility tour or submit your first case today.", buttonText: "Request a Tour", buttonLink: "/contact", bgColor: "#0aabbd", textAlign: "center" } },
+  { id: "ol-depts", type: "cards", order: 1, props: { heading: "Production Departments", columns: 4, backgroundColor: "#f8fafc", cardStyle: "default", cards: [ { title: "Digital Scanning & Design", text: "Intraoral scan integration, STL processing, digital prescription workflow.", icon: "ScanLine" }, { title: "CAD/CAM Milling", text: "5-axis simultaneous milling for crowns, bridges, inlays and frameworks.", icon: "Cpu" }, { title: "SLM Metal Printing", text: "Selective laser melting for cobalt-chrome frameworks and abutments.", icon: "Printer" }, { title: "Resin 3D Printing", text: "DLP printing for surgical guides, models, splints and temporary restorations.", icon: "Box" }, { title: "Ceramic Processing", text: "Sintering and high-temperature firing for zirconia and lithium disilicate.", icon: "Flame" }, { title: "Finishing & Polishing", text: "Final surface preparation, staining, glaze and quality surface finish.", icon: "Sparkles" }, { title: "Quality Control", text: "Six-point QC protocol: design, material, production, fit, aesthetics, documentation.", icon: "CheckCircle" }, { title: "Packaging & Dispatch", text: "Protective packaging, case documentation, courier-ready tracking preparation.", icon: "Wind" } ] } },
+  { id: "ol-cta", type: "cta", order: 2, props: { heading: "Ready to experience our laboratory?", text: "Request a facility tour or submit your first case today.", buttonText: "Request a Tour", buttonLink: "/contact", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
 const DEFAULT_ABOUT_WHY_PRIME_BLOCKS: Block[] = [
   { id: "wp-header", type: "page-header", order: 0, props: { eyebrow: "Why Prime Smile", heading: "Why Dentists Choose Prime Smile", highlight: "", subheading: "Precision, traceability and reliable turnaround — every case handled through a fully digital, accountable workflow.", align: "left", backgroundColor: "#ffffff", showAccent: true, padding: "large" } },
-  { id: "wp-cta", type: "cta", order: 1, props: { heading: "Partner with Prime Smile", text: "Create your dentist account and submit your first case today.", buttonText: "Get Started", buttonLink: "/portal", bgColor: "#0aabbd", textAlign: "center" } },
+  { id: "wp-reasons", type: "cards", order: 1, props: { heading: "Why Dentists Choose Us", columns: 3, backgroundColor: "#f8fafc", cardStyle: "borderLeft", accent: "teal", cards: [ { title: "Digital-First Collaboration", text: "Dentists submit digital prescriptions online, upload intraoral scans, and track case progress in real-time. No paper. Complete traceability from submission to dispatch.", icon: "Zap", accent: "teal" }, { title: "Broad Production Capability", text: "We deliver fixed restorations, implant prosthetics, metal frameworks, removable prosthetics, surgical guides, splints, and design-only services — all in one lab.", icon: "Package", accent: "gold" }, { title: "Modern Technology Base", text: "5-axis CAD/CAM milling, SLM metal printing, DLP 3D printing, digital scanning, ceramic sintering, and advanced finishing systems — all validated and integrated.", icon: "TrendingUp", accent: "teal" }, { title: "Material Traceability", text: "Every material lot is logged against your case ID. Full traceability sheets dispatched with every restoration. CE-certified consumables only.", icon: "Eye", accent: "teal" }, { title: "Export Ready", text: "We serve dentists in the UK and Cyprus with digital-first case intake, multiple courier options and protective packaging with full documentation.", icon: "Truck", accent: "gold" }, { title: "UK & Cyprus Coverage", text: "Dual-location digital lab capability with consistent workflows, materials and QC standards across both markets.", icon: "Globe", accent: "teal" } ] } },
+  { id: "wp-cta", type: "cta", order: 2, props: { heading: "Partner with Prime Smile", text: "Create your dentist account and submit your first case today.", buttonText: "Get Started", buttonLink: "/portal", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
 const DEFAULT_ABOUT_EXPORT_BLOCKS: Block[] = [
-  { id: "ec-header", type: "page-header", order: 0, props: { eyebrow: "Export Capability", heading: "International Export & Logistics", highlight: "", subheading: "We ship digitally-managed cases internationally with full documentation, tracking and customs-ready paperwork.", align: "left", backgroundColor: "#ffffff", showAccent: true, padding: "large" } },
-  { id: "ec-cta", type: "cta", order: 1, props: { heading: "Ship your cases with confidence", text: "Talk to us about international case logistics and turnaround.", buttonText: "Contact Us", buttonLink: "/contact", bgColor: "#0aabbd", textAlign: "center" } },
+  { id: "ec-hero", type: "hero", order: 0, props: { eyebrow: "Export", heading: "International Export & Logistics", highlight: "", subheading: "We ship digitally-managed cases internationally with full documentation, tracking and customs-ready paperwork.", image: "https://images.pexels.com/photos/33800642/pexels-photo-33800642.jpeg?w=1600&q=80&auto=format&fit=crop", bgColor: "#0d1e2c", cta1: "", cta1Link: "", cta2: "", cta2Link: "", align: "center", overlayOpacity: 0.5 } },
+  { id: "ec-features", type: "cards", order: 1, props: { heading: "Export Services", columns: 3, backgroundColor: "#f8fafc", cardStyle: "default", cards: [ { title: "Global Reach", text: "We serve dentists across the UK, Cyprus and broader EU with consistent digital workflows and turnaround.", icon: "Globe" }, { title: "Digital Case Intake", text: "Upload scans, prescriptions and files directly through our dentist portal. No physical impressions required.", icon: "Upload" }, { title: "Courier Options", text: "DHL and UPS express shipping with full tracking. Protective packaging designed for dental restorations.", icon: "Truck" }, { title: "Protective Packaging", text: "Every case is packed with shock-absorbing materials and clearly labelled documentation for customs clearance.", icon: "Package" }, { title: "Customs Documentation", text: "Full commercial invoices, material declarations and traceability sheets included with every international shipment.", icon: "FileText" }, { title: "Quality Guaranteed", text: "Every case passes six QC checkpoints before dispatch. Remakes within warranty are free of charge.", icon: "CheckCircle2" } ] } },
+  { id: "ec-cta", type: "cta", order: 2, props: { heading: "Ship your cases with confidence", text: "Talk to us about international case logistics and turnaround.", buttonText: "Contact Us", buttonLink: "/contact", bgColor: "#0aabbd", textAlign: "center" } },
 ];
 
 const PAGE_DEFAULTS: Record<string, Block[]> = {
