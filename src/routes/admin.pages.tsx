@@ -16,6 +16,7 @@ function pagePublicPath(slug: string): string {
   if (slug === "footer") return "/";
   if (SERVICE_DETAIL_SLUGS.includes(slug)) return `/services/${slug}`;
   if (slug.startsWith("technology-")) return `/technology/${slug.slice("technology-".length)}`;
+  if (slug.startsWith("about-")) return `/about/${slug.slice("about-".length)}`;
   return `/${slug}`;
 }
 

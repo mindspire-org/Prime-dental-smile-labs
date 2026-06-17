@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Reveal } from "@/components/site/Reveal";
 import { Globe, Upload, Truck, Package, FileText, ArrowRight, CheckCircle2 } from "lucide-react";
+import { PageBlocks } from "@/components/site/PageBlocks";
 
 export const Route = createFileRoute("/_marketing/about/export-capability")({
   head: () => ({
@@ -14,6 +16,17 @@ export const Route = createFileRoute("/_marketing/about/export-capability")({
 });
 
 function ExportCapabilityPage() {
+  const [cms, setCms] = useState<any[]>([]);
+  const [cmsLoaded, setCmsLoaded] = useState(false);
+  useEffect(() => {
+    fetch("/api/admin/pages/about-export-capability")
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(j => setCms(j.page?.blocks || []))
+      .catch(() => {})
+      .finally(() => setCmsLoaded(true));
+  }, []);
+  if (cmsLoaded && cms.length > 0) return <div><PageBlocks blocks={cms} /></div>;
+
   return (
     <div>
       <section className="relative overflow-hidden">

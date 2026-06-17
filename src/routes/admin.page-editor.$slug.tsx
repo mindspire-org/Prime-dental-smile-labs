@@ -335,7 +335,7 @@ const BLOCK_TYPES: BlockType[] = [
         { src: "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1600&q=80&auto=format&fit=crop", alt: "Zirconia restoration" },
       ],
       cta1: "Submit a Case",
-      cta1Link: "/submit",
+      cta1Link: "/portal/cases/new",
       cta2: "Request Free Consultation",
       cta2Link: "/contact",
     }
@@ -1438,7 +1438,7 @@ const DEFAULT_HOME_BLOCKS: Block[] = [
       { src: "https://images.unsplash.com/photo-1776406987595-ba14f3510c07?w=1600&q=80&auto=format&fit=crop", alt: "CAD/CAM workflow" },
       { src: "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1600&q=80&auto=format&fit=crop", alt: "Zirconia restoration" },
     ],
-    cta1: "Submit a Case", cta1Link: "/submit",
+    cta1: "Submit a Case", cta1Link: "/portal/cases/new",
     cta2: "Request Free Consultation", cta2Link: "/contact",
   }},
   { id: "home-trust-1", type: "home-trust-strip", order: 1, props: {
@@ -1781,6 +1781,21 @@ const DEFAULT_FOOTER_BLOCK: Block = {
   },
 };
 
+const DEFAULT_ABOUT_OUR_LAB_BLOCKS: Block[] = [
+  { id: "ol-header", type: "page-header", order: 0, props: { eyebrow: "Facility", heading: "Our Laboratory", highlight: "", subheading: "Prime Smile is a purpose-built, fully digital facility focused on precision, traceability and validated workflows. Every case is processed through documented production departments with six quality control checkpoints.", align: "left", backgroundColor: "#ffffff", showAccent: true, padding: "large" } },
+  { id: "ol-cta", type: "cta", order: 1, props: { heading: "Ready to experience our laboratory?", text: "Request a facility tour or submit your first case today.", buttonText: "Request a Tour", buttonLink: "/contact", bgColor: "#0aabbd", textAlign: "center" } },
+];
+
+const DEFAULT_ABOUT_WHY_PRIME_BLOCKS: Block[] = [
+  { id: "wp-header", type: "page-header", order: 0, props: { eyebrow: "Why Prime Smile", heading: "Why Dentists Choose Prime Smile", highlight: "", subheading: "Precision, traceability and reliable turnaround — every case handled through a fully digital, accountable workflow.", align: "left", backgroundColor: "#ffffff", showAccent: true, padding: "large" } },
+  { id: "wp-cta", type: "cta", order: 1, props: { heading: "Partner with Prime Smile", text: "Create your dentist account and submit your first case today.", buttonText: "Get Started", buttonLink: "/portal", bgColor: "#0aabbd", textAlign: "center" } },
+];
+
+const DEFAULT_ABOUT_EXPORT_BLOCKS: Block[] = [
+  { id: "ec-header", type: "page-header", order: 0, props: { eyebrow: "Export Capability", heading: "International Export & Logistics", highlight: "", subheading: "We ship digitally-managed cases internationally with full documentation, tracking and customs-ready paperwork.", align: "left", backgroundColor: "#ffffff", showAccent: true, padding: "large" } },
+  { id: "ec-cta", type: "cta", order: 1, props: { heading: "Ship your cases with confidence", text: "Talk to us about international case logistics and turnaround.", buttonText: "Contact Us", buttonLink: "/contact", bgColor: "#0aabbd", textAlign: "center" } },
+];
+
 const PAGE_DEFAULTS: Record<string, Block[]> = {
   home: DEFAULT_HOME_BLOCKS,
   about: DEFAULT_ABOUT_BLOCKS,
@@ -1798,6 +1813,11 @@ const PAGE_DEFAULTS: Record<string, Block[]> = {
   // Footer is its own editable page (rendered globally by <SiteFooter/>),
   // not appended to other pages â€” otherwise it would render twice.
   footer: [DEFAULT_FOOTER_BLOCK],
+  // About sub-pages: starter blocks (the live page keeps its rich hardcoded
+  // content until these are saved, then renders the editor blocks instead).
+  "about-our-laboratory": DEFAULT_ABOUT_OUR_LAB_BLOCKS,
+  "about-why-prime": DEFAULT_ABOUT_WHY_PRIME_BLOCKS,
+  "about-export-capability": DEFAULT_ABOUT_EXPORT_BLOCKS,
 };
 
 // Background images for the service detail headers (used when upgrading a

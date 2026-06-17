@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/Reveal";
 import { ArrowRight, Globe, Zap, Package, TrendingUp, Eye, Truck } from "lucide-react";
+import { PageBlocks } from "@/components/site/PageBlocks";
 
 export const Route = createFileRoute("/_marketing/about/why-prime")({
   head: () => ({
@@ -52,6 +54,17 @@ const REASONS = [
 ];
 
 function WhyPrimePage() {
+  const [cms, setCms] = useState<any[]>([]);
+  const [cmsLoaded, setCmsLoaded] = useState(false);
+  useEffect(() => {
+    fetch("/api/admin/pages/about-why-prime")
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(j => setCms(j.page?.blocks || []))
+      .catch(() => {})
+      .finally(() => setCmsLoaded(true));
+  }, []);
+  if (cmsLoaded && cms.length > 0) return <div><PageBlocks blocks={cms} /></div>;
+
   return (
     <div>
       {/* HERO */}
