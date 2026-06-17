@@ -164,7 +164,7 @@ function HomePage() {
               CAD/CAM milling · SLM metal printing · Zirconia · Lithium disilicate · Implant prosthetics · Digital prescription workflow.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link to="/submit" className="btn-teal">Submit a Case <ArrowRight size={16}/></Link>
+              <Link to="/portal/cases/new" className="btn-teal">Submit a Case <ArrowRight size={16}/></Link>
               <Link to="/contact" className="btn-outline-white">Request Free Consultation</Link>
             </div>
           </motion.div>
