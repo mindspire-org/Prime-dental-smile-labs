@@ -159,7 +159,7 @@ function ExportCapabilityPage() {
             <p className="text-muted-grey mt-2 max-w-lg mx-auto">Create your dentist account today and experience digital-first lab collaboration with tracked delivery.</p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Link to="/portal" className="btn-teal">Create Dentist Account <ArrowRight size={16} /></Link>
-              <Link to="/submit" className="btn-outline-teal">Submit a Case <ArrowRight size={16} /></Link>
+              <Link to="/portal/cases/new" className="btn-outline-teal">Submit a Case <ArrowRight size={16} /></Link>
             </div>
           </Reveal>
         </div>

@@ -196,7 +196,7 @@ function PortalDashboard() {
                 ? `You have ${data.stats.awaitingAction} case${data.stats.awaitingAction > 1 ? "s" : ""} awaiting your attention.`
                 : "All cases are up to date. Great work!"}
             </p>
-            <Link to="/submit" className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all hover:scale-[1.03]"
+            <Link to="/portal/cases/new" className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all hover:scale-[1.03]"
               style={{ background: "linear-gradient(90deg, #0aabbd, #078a99)" }}>
               <Plus size={15}/> Submit New Case
             </Link>
@@ -297,7 +297,7 @@ function PortalDashboard() {
             <div className="font-semibold text-slate-800 text-sm">Crown & Bridge</div>
             <div className="text-xs text-slate-400 mt-0.5">Premium ceramic restorations</div>
           </div>
-          <Link to="/submit" className="text-xs text-teal font-semibold hover:underline inline-flex items-center gap-1">Order now <ArrowRight size={11}/></Link>
+          <Link to="/portal/cases/new" className="text-xs text-teal font-semibold hover:underline inline-flex items-center gap-1">Order now <ArrowRight size={11}/></Link>
         </div>
         <div className="bg-white rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.05)] flex flex-col items-center text-center gap-3">
           <div className="w-16 h-20"><ImplantIllustration /></div>
@@ -305,7 +305,7 @@ function PortalDashboard() {
             <div className="font-semibold text-slate-800 text-sm">Implant Solutions</div>
             <div className="text-xs text-slate-400 mt-0.5">Titanium & zirconia abutments</div>
           </div>
-          <Link to="/submit" className="text-xs text-teal font-semibold hover:underline inline-flex items-center gap-1">Order now <ArrowRight size={11}/></Link>
+          <Link to="/portal/cases/new" className="text-xs text-teal font-semibold hover:underline inline-flex items-center gap-1">Order now <ArrowRight size={11}/></Link>
         </div>
         <div className="bg-white rounded-2xl p-5 shadow-[0_2px_16px_rgba(0,0,0,0.05)] flex flex-col justify-between">
           <div>
@@ -343,7 +343,7 @@ function PortalDashboard() {
             <div className="w-28 mx-auto mb-4 opacity-40"><ToothSetIllustration /></div>
             <div className="text-slate-500 font-medium">No cases yet</div>
             <div className="text-slate-400 text-sm mt-1">Submit your first case to get started.</div>
-            <Link to="/submit" className="btn-teal mt-4 inline-flex">Submit a Case</Link>
+            <Link to="/portal/cases/new" className="btn-teal mt-4 inline-flex">Submit a Case</Link>
           </div>
         ) : (
           <div className="space-y-3">

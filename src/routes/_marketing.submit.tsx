@@ -28,24 +28,8 @@ import { formatBytes } from "@/lib/utils";
 
 export const Route = createFileRoute("/_marketing/submit")({
   beforeLoad: async () => {
-    if (typeof window === "undefined") return;
-    if (!getCurrentUser()) {
-      try {
-        const res = await fetch("/api/auth/refresh", {
-          method: "POST", credentials: "include",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({}),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.accessToken && data?.user) {
-            const { setSession } = await import("@/lib/api");
-            setSession({ accessToken: data.accessToken, user: data.user });
-            return;
-          }
-        }
-      } catch {}
-      throw redirect({ to: "/login" as any, search: { redirect: "/submit" } });
+    if (typeof window !== "undefined") {
+      throw redirect({ to: "/portal/cases/new" as any });
     }
   },
   head: () => ({

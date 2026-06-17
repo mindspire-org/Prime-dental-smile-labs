@@ -108,7 +108,7 @@ function OurLabPage() {
             <p className="mt-4 text-muted-grey max-w-2xl mx-auto">Every case follows a documented, traceable workflow from intake to dispatch.</p>
           </Reveal>
           <div className="relative">
-            <div className="hidden md:block absolute top-12 left-[5%] right-[5%] h-[2px] bg-gradient-to-r from-teal/30 via-teal/70 to-teal/30"/>
+            <div className="hidden md:block absolute top-12 left-[5%] right-[5%] h-[2px] bg-linear-to-r from-teal/30 via-teal/70 to-teal/30"/>
             <Stagger className="grid grid-cols-2 md:grid-cols-6 gap-6 relative">
               {WORKFLOW_STEPS.map((w, i) => (
                 <StaggerItem key={w.step}>
@@ -158,7 +158,7 @@ function OurLabPage() {
           <p className="mt-4 text-white/85 max-w-2xl mx-auto">Request a facility tour or submit your first case today.</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/contact" className="inline-flex items-center gap-2 bg-white text-teal font-semibold px-6 py-3 rounded-lg hover:scale-[1.02] transition">Request a Tour <ArrowRight size={16}/></Link>
-            <Link to="/submit" className="inline-flex items-center gap-2 bg-white/15 backdrop-blur text-white font-semibold px-6 py-3 rounded-lg border border-white/30 hover:bg-white/25 transition">Submit a Case <ArrowRight size={16}/></Link>
+            <Link to="/portal/cases/new" className="inline-flex items-center gap-2 bg-white/15 backdrop-blur text-white font-semibold px-6 py-3 rounded-lg border border-white/30 hover:bg-white/25 transition">Submit a Case <ArrowRight size={16}/></Link>
           </div>
         </div>
       </section>

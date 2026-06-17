@@ -152,12 +152,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden lg:flex items-center gap-3">
-          <Link to="/submit" className="btn-gold py-2! px-4! text-sm">Submit Case</Link>
+          <Link to="/portal/cases/new" className="btn-gold py-2! px-4! text-sm">Submit Case</Link>
           <Link to="/portal" className="btn-outline-teal py-2! px-4! text-sm">Dentist Portal</Link>
         </div>
 
         <div className="lg:hidden flex items-center gap-2">
-          <Link to="/submit" className="btn-gold py-1.5! px-3! text-xs">Submit</Link>
+          <Link to="/portal/cases/new" className="btn-gold py-1.5! px-3! text-xs">Submit</Link>
           <button
             className="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-slate-100 text-slate-700 active:scale-95 transition"
             onClick={() => setMobileOpen(true)}
@@ -283,7 +283,7 @@ function MobileMenuContent({ onClose }: { onClose: () => void }) {
           Dentist Portal
         </Link>
         <Link
-          to="/submit"
+          to="/portal/cases/new"
           onClick={onClose}
           className="btn-gold w-full flex items-center justify-center gap-2"
         >

@@ -136,11 +136,19 @@ function HomePage() {
 
   const hasSavedBlocks = cmsLoaded && cmsBlocks.length > 0;
 
+  // Ensure the hero "Submit a Case" button points at the new-case form, even
+  // for home pages saved with the older "/submit" link.
+  const normalizedBlocks = cmsBlocks.map((b: any) =>
+    b.type === "home-hero" && b.props?.cta1Link === "/submit"
+      ? { ...b, props: { ...b.props, cta1Link: "/portal/cases/new" } }
+      : b
+  );
+
   return (
     <div>
       {hasSavedBlocks ? (
         <>
-          <PageBlocks blocks={cmsBlocks} />
+          <PageBlocks blocks={normalizedBlocks} />
           <TestimonialsSection />
         </>
       ) : (

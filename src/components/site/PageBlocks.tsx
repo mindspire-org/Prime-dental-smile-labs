@@ -706,7 +706,7 @@ function BlockRenderer({ type, props }: { type: string; props: any }) {
           {(props.cta1Text || props.cta2Text) && (
             <Reveal className="mt-10 flex flex-wrap gap-3">
               {props.cta1Text && (
-                <Link to={props.cta1Link || "/submit"} className="btn-gold inline-flex items-center gap-2">
+                <Link to={props.cta1Link || "/portal/cases/new"} className="btn-gold inline-flex items-center gap-2">
                   {props.cta1Text} <ArrowRight size={16}/>
                 </Link>
               )}

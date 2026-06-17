@@ -127,8 +127,8 @@ function Page() {
           </Reveal>
 
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link to="/services/digital-design" className="btn-teal">Digital Design Support <ArrowRight size={16} /></Link>
-            <Link to="/submit" className="btn-outline-teal">Submit a Case <ArrowRight size={16} /></Link>
+            <Link to="/services/$slug" params={{ slug: "digital-design" }} className="btn-teal">Digital Design Support <ArrowRight size={16} /></Link>
+            <Link to="/portal/cases/new" className="btn-outline-teal">Submit a Case <ArrowRight size={16} /></Link>
           </div>
         </div>
       </section>

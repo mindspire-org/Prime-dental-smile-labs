@@ -77,7 +77,7 @@ function WhyPrimePage() {
               Dentists across the UK and Cyprus choose Prime Smile for our digital-first workflow, comprehensive lab services, modern technology, and commitment to traceability and quality.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/submit" className="btn-teal">Submit Your First Case <ArrowRight size={16}/></Link>
+              <Link to="/portal/cases/new" className="btn-teal">Submit Your First Case <ArrowRight size={16}/></Link>
               <Link to="/contact" className="btn-outline-teal">Get in Touch <ArrowRight size={16}/></Link>
             </div>
           </Reveal>
@@ -175,7 +175,7 @@ function WhyPrimePage() {
           <p className="mt-4 text-white/85 max-w-2xl mx-auto">Create your account today and experience digital-first lab collaboration.</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/portal" className="inline-flex items-center gap-2 bg-white text-teal font-semibold px-6 py-3 rounded-lg hover:scale-[1.02] transition">Create Dentist Account <ArrowRight size={16}/></Link>
-            <Link to="/submit" className="inline-flex items-center gap-2 bg-white/15 backdrop-blur text-white font-semibold px-6 py-3 rounded-lg border border-white/30 hover:bg-white/25 transition">Submit a Case <ArrowRight size={16}/></Link>
+            <Link to="/portal/cases/new" className="inline-flex items-center gap-2 bg-white/15 backdrop-blur text-white font-semibold px-6 py-3 rounded-lg border border-white/30 hover:bg-white/25 transition">Submit a Case <ArrowRight size={16}/></Link>
           </div>
         </div>
       </section>
