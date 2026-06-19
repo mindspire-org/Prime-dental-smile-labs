@@ -113,8 +113,9 @@ function NewCasePage() {
   });
 
   const [services, setServices] = useState<string[]>([]);
-  type ToothDetail = { role: ToothRole; material?: string; shade?: { body?: string; cervical?: string; incisal?: string } };
+  type ToothDetail = { role: ToothRole; service?: string; material?: string; shade?: { body?: string; cervical?: string; incisal?: string } };
   const [teeth, setTeeth] = useState<Record<number, ToothDetail>>({});
+  const [activeToothTab, setActiveToothTab] = useState<number | null>(null);
   const [implant, setImplant] = useState({ brand: "", system: "", platform: "", connection: "Internal", scanbody: "", retention: "Screw-retained", notes: "" });
   const [shipping, setShipping] = useState({ method: "DHL Express (1-2)", returnAddress: "Same as clinic address", notes: "" });
   const [files, setFiles] = useState<File[]>([]);
@@ -166,6 +167,7 @@ function NewCasePage() {
   const handleTeethChange = (newRoles: Record<number, ToothRole>) => {
     setTeeth(prev => {
       const next: Record<number, ToothDetail> = {};
+      let newlyAdded: number | null = null;
       for (const [toothStr, role] of Object.entries(newRoles)) {
         const toothNum = Number(toothStr);
         const existing = prev[toothNum];
@@ -174,15 +176,21 @@ function NewCasePage() {
         } else {
           // New tooth: inherit the most recently used material/shade as default
           const lastTooth = Object.values(prev).slice(-1)[0];
+          const matchedService = SERVICES.find(s => s.name === role)?.name;
           next[toothNum] = {
             role,
+            service: matchedService,
             material: lastTooth?.material || "",
             shade: lastTooth?.shade ? { ...lastTooth.shade } : { body: "", cervical: "", incisal: "" },
           };
+          newlyAdded = toothNum;
         }
       }
       return next;
     });
+    // Auto-select the newly added tooth tab
+    const added = Object.keys(newRoles).map(Number).filter(n => !teeth[n]);
+    if (added.length > 0) setActiveToothTab(added[added.length - 1]);
   };
 
   const updateToothDetail = (toothNum: number, key: "material", value: string) => {
@@ -215,6 +223,21 @@ function NewCasePage() {
       const next = { ...prev };
       for (const key of Object.keys(next)) next[Number(key)] = { ...next[Number(key)], shade: { ...firstWithShade.shade } };
       return next;
+    });
+  };
+
+  const updateToothService = (toothNum: number, serviceName: string) => {
+    setTeeth(prev => ({ ...prev, [toothNum]: { ...prev[toothNum], service: serviceName || undefined } }));
+    setServices(prev => {
+      const s = new Set(prev);
+      // Remove any old service for this tooth from global if no other tooth uses it
+      const oldService = teeth[toothNum]?.service;
+      if (oldService && oldService !== serviceName) {
+        const stillUsed = Object.values(teeth).some(t => t !== teeth[toothNum] && t.service === oldService);
+        if (!stillUsed) s.delete(oldService);
+      }
+      if (serviceName) s.add(serviceName);
+      return Array.from(s);
     });
   };
 
@@ -475,9 +498,105 @@ function NewCasePage() {
         </div>
       </div>
 
-      {/* ── Section 3: Services ── */}
+      {/* ── Section 3: Tooth Chart & Per-Tooth Service / Material / Shade ── */}
       <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.05)] p-6">
-        <SectionHeader icon={Package} title="Services Required" subtitle="Select all that apply" />
+        <SectionHeader icon={Sparkles} title="Tooth Chart" subtitle="Click teeth to select them, assign roles via the legend" />
+        <ToothChart selected={selectedRoles} onChange={handleTeethChange} />
+
+        {/* Per-tooth tabbed panel */}
+        {Object.keys(teeth).length > 0 && (
+          <div className="mt-6 pt-5 border-t border-slate-100">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Configure Selected Teeth</div>
+              <div className="flex gap-2">
+                <button type="button" onClick={applyMaterialToAll}
+                  className="text-[10px] px-2.5 py-1.5 rounded-md bg-teal/10 text-teal font-semibold hover:bg-teal/20 transition">
+                  Apply Material to All
+                </button>
+                <button type="button" onClick={applyShadeToAll}
+                  className="text-[10px] px-2.5 py-1.5 rounded-md bg-teal/10 text-teal font-semibold hover:bg-teal/20 transition">
+                  Apply Shade to All
+                </button>
+              </div>
+            </div>
+
+            {/* Tooth number tabs */}
+            <div className="flex gap-1.5 overflow-x-auto pb-2 mb-3">
+              {Object.entries(teeth).sort(([a], [b]) => Number(a) - Number(b)).map(([toothNum, detail]) => {
+                const num = Number(toothNum);
+                const complete = !!detail.material && !!detail.shade?.body;
+                const active = activeToothTab === num;
+                return (
+                  <button
+                    key={toothNum}
+                    type="button"
+                    onClick={() => setActiveToothTab(num)}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition whitespace-nowrap ${
+                      active
+                        ? "bg-teal text-white border-teal"
+                        : complete
+                        ? "bg-teal/5 text-teal border-teal/30"
+                        : "bg-slate-50 text-slate-600 border-slate-200"
+                    }`}
+                  >
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${active ? "bg-white/20" : "bg-white"}`}>{num}</span>
+                    <span>{detail.role}</span>
+                    {!complete && !active && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Active tooth detail panel */}
+            {activeToothTab && teeth[activeToothTab] && (() => {
+              const detail = teeth[activeToothTab];
+              const complete = !!detail.material && !!detail.shade?.body;
+              return (
+                <div className={`bg-slate-50 rounded-xl p-4 border ${complete ? "border-teal/20" : "border-slate-200"} transition`}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="w-7 h-7 rounded-lg bg-teal text-white text-xs font-bold flex items-center justify-center">{activeToothTab}</span>
+                    <span className="text-sm font-semibold text-slate-700">{detail.role}</span>
+                    {!complete && <span className="ml-auto text-[10px] text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded-full">Needs Material & Shade</span>}
+                    {complete && <span className="ml-auto text-[10px] text-teal font-medium bg-teal/10 px-2 py-0.5 rounded-full">Complete</span>}
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block mb-1">Service</label>
+                      <select className={`${inp} text-xs`} value={detail.service || ""} onChange={e => updateToothService(activeToothTab, e.target.value)}>
+                        <option value="">Select service…</option>
+                        {SERVICES.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block mb-1">Material <span className="text-red-400">*</span></label>
+                      <select className={`${inp} text-xs`} value={detail.material || ""} onChange={e => updateToothDetail(activeToothTab, "material", e.target.value)}>
+                        <option value="">Select material…</option>
+                        {MATERIALS.map(m => <option key={m.name} value={m.name}>{m.name}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block mb-1">Body Shade <span className="text-red-400">*</span></label>
+                      <input className={`${inp} text-xs`} value={detail.shade?.body || ""} onChange={e => updateToothShade(activeToothTab, "body", e.target.value)} placeholder="e.g. A2" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block mb-1">Cervical</label>
+                      <input className={`${inp} text-xs`} value={detail.shade?.cervical || ""} onChange={e => updateToothShade(activeToothTab, "cervical", e.target.value)} placeholder="e.g. A3" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block mb-1">Incisal</label>
+                      <input className={`${inp} text-xs`} value={detail.shade?.incisal || ""} onChange={e => updateToothShade(activeToothTab, "incisal", e.target.value)} placeholder="e.g. A1" />
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+      </div>
+
+      {/* ── Section 4: Services Required ── */}
+      <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.05)] p-6">
+        <SectionHeader icon={Package} title="Services Required" subtitle="Selected from tooth chart above; you can also add extras here" />
         {["Restorative", "Implant", "Cosmetic", "Removable", "Framework", "Appliance", "Digital"].map(cat => (
           <div key={cat} className="mb-4 last:mb-0">
             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{cat}</div>
@@ -507,68 +626,7 @@ function NewCasePage() {
         )}
       </div>
 
-      {/* ── Section 4: Tooth Chart & Per-Tooth Material / Shade ── */}
-      <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.05)] p-6">
-        <SectionHeader icon={Sparkles} title="Tooth Chart" subtitle="Click teeth to select them, assign roles via the legend" />
-        <ToothChart selected={selectedRoles} onChange={handleTeethChange} />
-
-        {/* Per-tooth material & shade panel */}
-        {Object.keys(teeth).length > 0 && (
-          <div className="mt-6 pt-5 border-t border-slate-100">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Material & Shade per Tooth</div>
-              <div className="flex gap-2">
-                <button type="button" onClick={applyMaterialToAll}
-                  className="text-[10px] px-2.5 py-1.5 rounded-md bg-teal/10 text-teal font-semibold hover:bg-teal/20 transition">
-                  Apply Material to All
-                </button>
-                <button type="button" onClick={applyShadeToAll}
-                  className="text-[10px] px-2.5 py-1.5 rounded-md bg-teal/10 text-teal font-semibold hover:bg-teal/20 transition">
-                  Apply Shade to All
-                </button>
-              </div>
-            </div>
-            <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
-              {Object.entries(teeth).sort(([a], [b]) => Number(a) - Number(b)).map(([toothNum, detail]) => {
-                const complete = !!detail.material && !!detail.shade?.body;
-                return (
-                  <div key={toothNum} className={`bg-slate-50 rounded-xl p-4 border ${complete ? "border-teal/20" : "border-slate-200"} transition`}>
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="w-7 h-7 rounded-lg bg-teal text-white text-xs font-bold flex items-center justify-center">{toothNum}</span>
-                      <span className="text-sm font-semibold text-slate-700">{detail.role}</span>
-                      {!complete && <span className="ml-auto text-[10px] text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded-full">Needs Material & Shade</span>}
-                      {complete && <span className="ml-auto text-[10px] text-teal font-medium bg-teal/10 px-2 py-0.5 rounded-full">Complete</span>}
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      <div>
-                        <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block mb-1">Material <span className="text-red-400">*</span></label>
-                        <select className={`${inp} text-xs`} value={detail.material || ""} onChange={e => updateToothDetail(Number(toothNum), "material", e.target.value)}>
-                          <option value="">Select material…</option>
-                          {MATERIALS.map(m => <option key={m.name} value={m.name}>{m.name}</option>)}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block mb-1">Body Shade <span className="text-red-400">*</span></label>
-                        <input className={`${inp} text-xs`} value={detail.shade?.body || ""} onChange={e => updateToothShade(Number(toothNum), "body", e.target.value)} placeholder="e.g. A2" />
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block mb-1">Cervical</label>
-                        <input className={`${inp} text-xs`} value={detail.shade?.cervical || ""} onChange={e => updateToothShade(Number(toothNum), "cervical", e.target.value)} placeholder="e.g. A3" />
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block mb-1">Incisal</label>
-                        <input className={`${inp} text-xs`} value={detail.shade?.incisal || ""} onChange={e => updateToothShade(Number(toothNum), "incisal", e.target.value)} placeholder="e.g. A1" />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ── Section 6: Implant Details ── */}
+      {/* ── Section 5: Implant Details ── */}
       <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.05)] p-6">
         <SectionHeader icon={Zap} title="Implant Details" subtitle="Only complete if this is an implant case" />
         <div className="grid grid-cols-2 gap-4">
@@ -602,7 +660,7 @@ function NewCasePage() {
         </div>
       </div>
 
-      {/* ── Section 7: File Upload ── */}
+      {/* ── Section 6: File Upload ── */}
       <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.05)] p-6">
         <SectionHeader icon={Upload} title="Files & Scans" subtitle={`STL, PLY, OBJ, DICOM, ZIP, JPG, PNG, PDF — max ${formatBytes(MAX_FILE_SIZE)} each`} />
         <div onDragOver={e => { e.preventDefault(); setDrag(true); }}
@@ -634,7 +692,7 @@ function NewCasePage() {
         )}
       </div>
 
-      {/* ── Section 8: Shipping ── */}
+      {/* ── Section 7: Shipping ── */}
       <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.05)] p-6">
         <SectionHeader icon={Truck} title="Shipping & Delivery" />
         <div className="grid grid-cols-2 gap-4">
@@ -680,7 +738,7 @@ function NewCasePage() {
         </div>
       </div>
 
-      {/* ── Section 9: Declaration & Submit ── */}
+      {/* ── Section 8: Declaration & Submit ── */}
       <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.05)] p-6">
         <SectionHeader icon={FileCheck} title="Declaration & Submission" subtitle="Please confirm all three statements before submitting" />
         <div className="space-y-3 mb-6">
