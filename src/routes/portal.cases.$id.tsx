@@ -264,6 +264,31 @@ function CaseDetail() {
                 </div>
               ))}
             </div>
+            {/* Per-tooth details when available */}
+            {dentalCase.teeth && Object.keys(dentalCase.teeth).length > 0 && (
+              <div className="mt-5 pt-4 border-t border-slate-100">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Tooth Details</div>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {Object.entries(dentalCase.teeth || {}).sort(([a], [b]) => Number(a) - Number(b)).map(([num, detail]) => {
+                    const role = typeof detail === "string" ? detail : (detail as any)?.role;
+                    const material = typeof detail === "object" ? (detail as any)?.material : dentalCase.material;
+                    const shade = typeof detail === "object" ? (detail as any)?.shade : dentalCase.shade;
+                    return (
+                      <div key={num} className="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="w-6 h-6 rounded-md bg-teal text-white text-[10px] font-bold flex items-center justify-center">{num}</span>
+                          <span className="text-xs font-semibold text-slate-700">{role}</span>
+                        </div>
+                        <div className="text-[11px] text-slate-500 space-y-0.5">
+                          <div><span className="text-slate-400">Material:</span> {material || "—"}</div>
+                          <div><span className="text-slate-400">Shade:</span> {shade?.body ? `${shade.body}${shade.cervical ? "/" + shade.cervical : ""}${shade.incisal ? "/" + shade.incisal : ""}` : "—"}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </section>
 
           {/* Files */}

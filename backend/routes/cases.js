@@ -22,7 +22,7 @@ const submitSchema = z.object({
     patientGender: z.string().optional(),
     patientAge: z.number().optional(),
     services: z.array(z.string()).default([]),
-    teeth: z.record(z.string(), z.string()).optional(),
+    teeth: z.record(z.string(), z.any()).optional(),
     material: z.string().optional(),
     shade: z.any().optional(),
     implant: z.any().optional(),

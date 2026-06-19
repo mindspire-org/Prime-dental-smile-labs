@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { apiFetch, getCurrentUser } from "@/lib/api";
 import {
   CheckCircle2, FileText, User, Calendar, Package,
@@ -113,11 +113,10 @@ function NewCasePage() {
   });
 
   const [services, setServices] = useState<string[]>([]);
-  const [teeth, setTeeth] = useState<Record<number, ToothRole>>({});
-  const [material, setMaterial] = useState("");
-  const [shade, setShade] = useState({ system: "VITA Classical", body: "", cervical: "", incisal: "" });
+  type ToothDetail = { role: ToothRole; material?: string; shade?: { body?: string; cervical?: string; incisal?: string } };
+  const [teeth, setTeeth] = useState<Record<number, ToothDetail>>({});
   const [implant, setImplant] = useState({ brand: "", system: "", platform: "", connection: "Internal", scanbody: "", retention: "Screw-retained", notes: "" });
-  const [shipping, setShipping] = useState({ method: "DHL Express (1-2 days)", returnAddress: "Same as clinic address", notes: "" });
+  const [shipping, setShipping] = useState({ method: "DHL Express (1-2)", returnAddress: "Same as clinic address", notes: "" });
   const [files, setFiles] = useState<File[]>([]);
   const [drag, setDrag] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadFile[]>([]);
@@ -158,10 +157,79 @@ function NewCasePage() {
     setFiles((f) => [...f, ...incoming]);
   };
 
+  // Derived plain roles for the ToothChart component
+  const selectedRoles = useMemo(() =>
+    Object.fromEntries(Object.entries(teeth).map(([k, v]) => [Number(k), v.role])),
+    [teeth]
+  );
+
+  const handleTeethChange = (newRoles: Record<number, ToothRole>) => {
+    setTeeth(prev => {
+      const next: Record<number, ToothDetail> = {};
+      for (const [toothStr, role] of Object.entries(newRoles)) {
+        const toothNum = Number(toothStr);
+        const existing = prev[toothNum];
+        if (existing) {
+          next[toothNum] = { ...existing, role };
+        } else {
+          // New tooth: inherit the most recently used material/shade as default
+          const lastTooth = Object.values(prev).slice(-1)[0];
+          next[toothNum] = {
+            role,
+            material: lastTooth?.material || "",
+            shade: lastTooth?.shade ? { ...lastTooth.shade } : { body: "", cervical: "", incisal: "" },
+          };
+        }
+      }
+      return next;
+    });
+  };
+
+  const updateToothDetail = (toothNum: number, key: "material", value: string) => {
+    setTeeth(prev => ({ ...prev, [toothNum]: { ...prev[toothNum], [key]: value } }));
+  };
+
+  const updateToothShade = (toothNum: number, key: "body" | "cervical" | "incisal", value: string) => {
+    setTeeth(prev => ({
+      ...prev,
+      [toothNum]: { ...prev[toothNum], shade: { ...prev[toothNum].shade, [key]: value } },
+    }));
+  };
+
+  const applyMaterialToAll = () => {
+    const firstWithMaterial = Object.values(teeth).find(t => t.material);
+    if (!firstWithMaterial?.material) { setError("Please select a material for at least one tooth first."); return; }
+    setError("");
+    setTeeth(prev => {
+      const next = { ...prev };
+      for (const key of Object.keys(next)) next[Number(key)] = { ...next[Number(key)], material: firstWithMaterial.material };
+      return next;
+    });
+  };
+
+  const applyShadeToAll = () => {
+    const firstWithShade = Object.values(teeth).find(t => t.shade?.body);
+    if (!firstWithShade?.shade?.body) { setError("Please enter a body shade for at least one tooth first."); return; }
+    setError("");
+    setTeeth(prev => {
+      const next = { ...prev };
+      for (const key of Object.keys(next)) next[Number(key)] = { ...next[Number(key)], shade: { ...firstWithShade.shade } };
+      return next;
+    });
+  };
+
   async function handleSubmit() {
     if (!patientForm.patientRef.trim()) { setError("Patient Reference is required."); return; }
     if (!patientForm.requestedCompletion) { setError("Requested Completion Date is required."); return; }
     if (!decl.a || !decl.b || !decl.c) { setError("Please confirm all three declarations."); return; }
+    if (Object.keys(teeth).length > 0) {
+      const incomplete = Object.entries(teeth).filter(([_, d]) => !d.material || !d.shade?.body);
+      if (incomplete.length > 0) {
+        const nums = incomplete.map(([n]) => n).join(", ");
+        setError(`Please select material and body shade for tooth${incomplete.length > 1 ? "s" : ""} ${nums}.`);
+        return;
+      }
+    }
     setSubmitting(true);
     setError("");
     xhrRefs.current = [];
@@ -181,6 +249,11 @@ function NewCasePage() {
     }
 
     try {
+      // Derive primary material/shade from first tooth for backward compatibility
+      const firstTooth = Object.values(teeth)[0];
+      const primaryMaterial = firstTooth?.material || "";
+      const primaryShade = firstTooth?.shade;
+
       const result = await apiFetch<any>("/api/cases", {
         method: "POST",
         body: JSON.stringify({
@@ -190,8 +263,8 @@ function NewCasePage() {
           patientAge: patientForm.patientAge ? Number(patientForm.patientAge) : undefined,
           services,
           teeth: Object.fromEntries(Object.entries(teeth).map(([k, v]) => [String(k), v])),
-          material: material || undefined,
-          shade: shade.body || shade.cervical || shade.incisal ? shade : undefined,
+          material: primaryMaterial || undefined,
+          shade: primaryShade?.body || primaryShade?.cervical || primaryShade?.incisal ? { system: "VITA Classical", ...primaryShade } : undefined,
           implant: implant.brand ? implant : undefined,
           shipping: { method: shipping.method, address: shipping.returnAddress, instructions: shipping.notes },
           urgency: patientForm.urgency as "Standard" | "Express" | "Urgent",
@@ -293,7 +366,7 @@ function NewCasePage() {
               View My Cases
             </button>
             <button onClick={() => {
-              setDone(null); setServices([]); setTeeth({}); setMaterial("");
+              setDone(null); setServices([]); setTeeth({});
               setDecl({ a: false, b: false, c: false });
               setPatientForm(p => ({ ...p, patientRef: "", clinicReference: "", notes: "", requestedCompletion: "" }));
             }}
@@ -390,8 +463,8 @@ function NewCasePage() {
           <Field label="Urgency">
             <select className={inp} value={patientForm.urgency} onChange={e => setPatientForm(f => ({ ...f, urgency: e.target.value }))}>
               <option value="Standard">Standard</option>
-              <option value="Express">Express (+1 day)</option>
-              <option value="Urgent">Urgent (same day)</option>
+              <option value="Express">Express</option>
+              <option value="Urgent">Urgent</option>
             </select>
           </Field>
           <div className="col-span-2">
@@ -434,54 +507,65 @@ function NewCasePage() {
         )}
       </div>
 
-      {/* ── Section 4: Tooth Chart ── */}
+      {/* ── Section 4: Tooth Chart & Per-Tooth Material / Shade ── */}
       <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.05)] p-6">
         <SectionHeader icon={Sparkles} title="Tooth Chart" subtitle="Click teeth to select them, assign roles via the legend" />
-        <ToothChart selected={teeth} onChange={setTeeth} />
-      </div>
+        <ToothChart selected={selectedRoles} onChange={handleTeethChange} />
 
-      {/* ── Section 5: Material & Shade ── */}
-      <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.05)] p-6">
-        <SectionHeader icon={Wrench} title="Material & Shade" />
-        <div className="mb-5">
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Restoration Material</div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {MATERIALS.map(m => (
-              <button key={m.name} type="button" onClick={() => setMaterial(material === m.name ? "" : m.name)}
-                className={`text-left px-3 py-3 rounded-xl border-2 text-xs transition-all ${material === m.name ? "border-teal bg-teal/5 text-teal font-semibold shadow-sm" : "border-slate-200 text-slate-600 hover:border-teal/40"}`}>
-                <div className="flex items-center gap-2">
-                  <div className={`w-3.5 h-3.5 rounded border-2 flex items-center justify-center shrink-0 ${material === m.name ? "bg-teal border-teal" : "border-slate-300"}`}>
-                    {material === m.name && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+        {/* Per-tooth material & shade panel */}
+        {Object.keys(teeth).length > 0 && (
+          <div className="mt-6 pt-5 border-t border-slate-100">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Material & Shade per Tooth</div>
+              <div className="flex gap-2">
+                <button type="button" onClick={applyMaterialToAll}
+                  className="text-[10px] px-2.5 py-1.5 rounded-md bg-teal/10 text-teal font-semibold hover:bg-teal/20 transition">
+                  Apply Material to All
+                </button>
+                <button type="button" onClick={applyShadeToAll}
+                  className="text-[10px] px-2.5 py-1.5 rounded-md bg-teal/10 text-teal font-semibold hover:bg-teal/20 transition">
+                  Apply Shade to All
+                </button>
+              </div>
+            </div>
+            <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
+              {Object.entries(teeth).sort(([a], [b]) => Number(a) - Number(b)).map(([toothNum, detail]) => {
+                const complete = !!detail.material && !!detail.shade?.body;
+                return (
+                  <div key={toothNum} className={`bg-slate-50 rounded-xl p-4 border ${complete ? "border-teal/20" : "border-slate-200"} transition`}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="w-7 h-7 rounded-lg bg-teal text-white text-xs font-bold flex items-center justify-center">{toothNum}</span>
+                      <span className="text-sm font-semibold text-slate-700">{detail.role}</span>
+                      {!complete && <span className="ml-auto text-[10px] text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded-full">Needs Material & Shade</span>}
+                      {complete && <span className="ml-auto text-[10px] text-teal font-medium bg-teal/10 px-2 py-0.5 rounded-full">Complete</span>}
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div>
+                        <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block mb-1">Material <span className="text-red-400">*</span></label>
+                        <select className={`${inp} text-xs`} value={detail.material || ""} onChange={e => updateToothDetail(Number(toothNum), "material", e.target.value)}>
+                          <option value="">Select material…</option>
+                          {MATERIALS.map(m => <option key={m.name} value={m.name}>{m.name}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block mb-1">Body Shade <span className="text-red-400">*</span></label>
+                        <input className={`${inp} text-xs`} value={detail.shade?.body || ""} onChange={e => updateToothShade(Number(toothNum), "body", e.target.value)} placeholder="e.g. A2" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block mb-1">Cervical</label>
+                        <input className={`${inp} text-xs`} value={detail.shade?.cervical || ""} onChange={e => updateToothShade(Number(toothNum), "cervical", e.target.value)} placeholder="e.g. A3" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block mb-1">Incisal</label>
+                        <input className={`${inp} text-xs`} value={detail.shade?.incisal || ""} onChange={e => updateToothShade(Number(toothNum), "incisal", e.target.value)} placeholder="e.g. A1" />
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium truncate">{m.name}</div>
-                    <div className="text-slate-400 text-[10px]">{m.type}</div>
-                  </div>
-                  {m.premium && <Sparkles size={10} className="text-amber-400 shrink-0" />}
-                </div>
-              </button>
-            ))}
+                );
+              })}
+            </div>
           </div>
-        </div>
-        <div className="border-t border-slate-100 pt-5">
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Shade Matching</div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <Field label="Shade System">
-              <select className={inp} value={shade.system} onChange={e => setShade(s => ({ ...s, system: e.target.value }))}>
-                <option>VITA Classical</option><option>VITA 3D Master</option><option>Bleach</option>
-              </select>
-            </Field>
-            <Field label="Body Shade">
-              <input className={inp} value={shade.body} onChange={e => setShade(s => ({ ...s, body: e.target.value }))} placeholder="e.g. A2" />
-            </Field>
-            <Field label="Cervical Shade">
-              <input className={inp} value={shade.cervical} onChange={e => setShade(s => ({ ...s, cervical: e.target.value }))} placeholder="e.g. A3" />
-            </Field>
-            <Field label="Incisal Shade">
-              <input className={inp} value={shade.incisal} onChange={e => setShade(s => ({ ...s, incisal: e.target.value }))} placeholder="e.g. A1" />
-            </Field>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* ── Section 6: Implant Details ── */}
@@ -489,7 +573,7 @@ function NewCasePage() {
         <SectionHeader icon={Zap} title="Implant Details" subtitle="Only complete if this is an implant case" />
         <div className="grid grid-cols-2 gap-4">
           <Field label="Implant Brand">
-            <input className={inp} value={implant.brand} onChange={e => setImplant(i => ({ ...i, brand: e.target.value }))} placeholder="e.g. Straumann, Nobel, Zimmer" />
+            <input className={inp} value={implant.brand} onChange={e => setImplant(i => ({ ...i, brand: e.target.value }))} placeholder="Current Implant brand of patient" />
           </Field>
           <Field label="Implant System">
             <input className={inp} value={implant.system} onChange={e => setImplant(i => ({ ...i, system: e.target.value }))} placeholder="e.g. BLT, BL, Active" />
@@ -557,9 +641,9 @@ function NewCasePage() {
           <Field label="Delivery Method">
             <div className="grid grid-cols-3 gap-3">
               {[
-                { name: "DHL Express", sub: "1-2 days", img: "https://upload.wikimedia.org/wikipedia/commons/a/ac/DHL_Logo.svg" },
-                { name: "UPS Standard", sub: "3-5 days", img: "https://upload.wikimedia.org/wikipedia/commons/6/6b/United_Parcel_Service_logo_2014.svg" },
-                { name: "Local Courier", sub: "Same day", img: null },
+                { name: "DHL Express", sub: "1-2", img: "https://upload.wikimedia.org/wikipedia/commons/a/ac/DHL_Logo.svg" },
+                { name: "UPS Standard", sub: "3-5", img: "https://upload.wikimedia.org/wikipedia/commons/6/6b/United_Parcel_Service_logo_2014.svg" },
+                { name: "Local Courier", sub: "Same", img: null },
               ].map((opt) => {
                 const selected = shipping.method.startsWith(opt.name);
                 return (

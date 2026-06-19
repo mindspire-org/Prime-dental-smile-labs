@@ -309,12 +309,41 @@ function AdminCaseDetail() {
                 Dental Chart
               </h2>
               <ToothChart
-                selected={Object.entries(dentalCase.teeth as Record<string, string> || {}).reduce((acc, [k, v]) => {
-                  acc[Number(k)] = v as any;
+                selected={Object.entries(dentalCase.teeth || {}).reduce((acc, [k, v]) => {
+                  acc[Number(k)] = typeof v === "string" ? v : (v as any)?.role;
                   return acc;
                 }, {} as Record<number, any>)}
                 readOnly
               />
+            </section>
+          )}
+
+          {/* Per-Tooth Details */}
+          {dentalCase.teeth && Object.keys(dentalCase.teeth).length > 0 && (
+            <section className="bg-white rounded-2xl p-6 shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
+              <h2 className="font-bold text-slate-800 mb-5 flex items-center gap-2">
+                <span className="w-1 h-5 rounded-full bg-indigo-500 inline-block"/>
+                Tooth Details
+              </h2>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {Object.entries(dentalCase.teeth || {}).sort(([a], [b]) => Number(a) - Number(b)).map(([num, detail]) => {
+                  const role = typeof detail === "string" ? detail : (detail as any)?.role;
+                  const material = typeof detail === "object" ? (detail as any)?.material : dentalCase.material;
+                  const shade = typeof detail === "object" ? (detail as any)?.shade : dentalCase.shade;
+                  return (
+                    <div key={num} className="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="w-6 h-6 rounded-md bg-indigo-500 text-white text-[10px] font-bold flex items-center justify-center">{num}</span>
+                        <span className="text-xs font-semibold text-slate-700">{role}</span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 space-y-0.5">
+                        <div><span className="text-slate-400">Material:</span> {material || "—"}</div>
+                        <div><span className="text-slate-400">Shade:</span> {shade?.body ? `${shade.body}${shade.cervical ? "/" + shade.cervical : ""}${shade.incisal ? "/" + shade.incisal : ""}` : "—"}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </section>
           )}
 
