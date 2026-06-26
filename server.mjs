@@ -186,6 +186,15 @@ function injectLoader(html) {
   return html;
 }
 
+function injectCanonical(html, canonicalUrl) {
+  // Remove any existing canonical link so we don't end up with duplicates
+  html = html.replace(/<link\s+[^>]*\srel=["']canonical["'][^>]*>/gi, "");
+  html = html.replace(/<link\s+rel=["']canonical["'][^>]*>/gi, "");
+  // Insert the self-referential canonical for this route
+  html = html.replace(/<\/head>/i, `    <link rel="canonical" href="${canonicalUrl}" />\n  </head>`);
+  return html;
+}
+
 async function loadShell() {
   try {
     let html = await readFile(SHELL_FILE, "utf8");
@@ -322,6 +331,12 @@ app.use(async (req, res) => {
   } catch {
     shellHtml = fallbackHtml();
   }
+
+  // Inject a self-referential canonical link for the current route so every
+  // page tells search engines its own URL instead of the homepage shell.
+  const canonicalPath = pathname === "/" ? "/" : pathname.replace(/\/$/, "");
+  const canonicalUrl = `https://primesmiles.eu${canonicalPath}`;
+  shellHtml = injectCanonical(shellHtml, canonicalUrl);
 
   res.status(200).set({
     "content-type": "text/html; charset=utf-8",
