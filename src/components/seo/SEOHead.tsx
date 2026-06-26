@@ -136,8 +136,8 @@ export const structuredData = {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "Prime Smile Dental Laboratory",
-    "url": "https://primesmilelab.com",
-    "logo": "https://primesmilelab.com/logo.png",
+    "url": "https://primesmiles.eu",
+    "logo": "https://primesmiles.eu/logo.png",
     "description": "Advanced digital dental laboratory serving UK and Cyprus dentists with precision restorations and prosthetics.",
     "address": {
       "@type": "PostalAddress",

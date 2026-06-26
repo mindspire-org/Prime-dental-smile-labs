@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_marketing/technology/finishing-equipment
       { title: "Finishing Equipment — Prime Smile Dental Laboratory" },
       { name: "description", content: "Surface finishing, polishing, sandblasting and laser welding for dental restorations and frameworks." },
     ],
-    links: [{ rel: "canonical", href: "https://primesmilelab.com/technology/finishing-equipment" }],
+    links: [{ rel: "canonical", href: "https://primesmiles.eu/technology/finishing-equipment" }],
   }),
   component: Page,
 });

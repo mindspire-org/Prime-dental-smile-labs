@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_marketing/technology/scanning-design")({
       { title: "Scanning & Design — Prime Smile Dental Laboratory" },
       { name: "description", content: "Lab-grade scanning and CAD design workflow for model digitization and complex implant bridge cases." },
     ],
-    links: [{ rel: "canonical", href: "https://primesmilelab.com/technology/scanning-design" }],
+    links: [{ rel: "canonical", href: "https://primesmiles.eu/technology/scanning-design" }],
   }),
   component: Page,
 });

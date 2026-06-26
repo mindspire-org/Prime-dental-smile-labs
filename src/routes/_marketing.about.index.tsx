@@ -14,10 +14,10 @@ export const Route = createFileRoute("/_marketing/about/")({
       { property: "og:title", content: "About Us — Prime Smile Dental Laboratory" },
       { property: "og:description", content: "Learn about our state-of-the-art digital dental laboratory serving UK & Cyprus dentists." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://primesmilelab.com/about" },
+      { property: "og:url", content: "https://primesmiles.eu/about" },
     ],
     links: [
-      { rel: "canonical", href: "https://primesmilelab.com/about" },
+      { rel: "canonical", href: "https://primesmiles.eu/about" },
     ],
   }),
   component: AboutPage,

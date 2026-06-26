@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_marketing/data-notice")({
       { title: "Data Notice — Prime Smile Dental Laboratory" },
       { name: "description", content: "How Prime Smile handles patient data, scan files and digital case records." },
     ],
-    links: [{ rel: "canonical", href: "https://primesmilelab.com/data-notice" }],
+    links: [{ rel: "canonical", href: "https://primesmiles.eu/data-notice" }],
   }),
   component: DataNoticePage,
 });

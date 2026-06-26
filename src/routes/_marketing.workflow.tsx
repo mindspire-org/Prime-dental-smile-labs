@@ -13,10 +13,10 @@ export const Route = createFileRoute("/_marketing/workflow")({
       { property: "og:title", content: "Digital Workflow — Prime Smile Dental Laboratory" },
       { property: "og:description", content: "Submit cases digitally with full tracking from prescription to dispatch." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://primesmilelab.com/workflow" },
+      { property: "og:url", content: "https://primesmiles.eu/workflow" },
     ],
     links: [
-      { rel: "canonical", href: "https://primesmilelab.com/workflow" },
+      { rel: "canonical", href: "https://primesmiles.eu/workflow" },
     ],
   }),
   component: WorkflowPage,

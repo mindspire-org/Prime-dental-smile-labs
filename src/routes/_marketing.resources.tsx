@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_marketing/resources")({
       { title: "Resources — Prime Smile Dental Laboratory" },
       { name: "description", content: "Prescription guides, material selection, shade taking tips, implant case requirements, file upload instructions and FAQs for dentists." },
     ],
-    links: [{ rel: "canonical", href: "https://primesmilelab.com/resources" }],
+    links: [{ rel: "canonical", href: "https://primesmiles.eu/resources" }],
   }),
   component: ResourcesPage,
 });

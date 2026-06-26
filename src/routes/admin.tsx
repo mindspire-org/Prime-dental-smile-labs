@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, Building2, Briefcase, FileText,
   Search, BarChart3, Activity, LogOut, ChevronRight, Settings, Shield,
   Image, Globe, Bell, Star, Wrench, BarChart2, Layout, BookOpen, Mail,
-  ShieldCheck, MessageSquare, Database,
+  ShieldCheck, MessageSquare, Database, Inbox,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { clearSession, getCurrentUser, type AuthUser } from "@/lib/api";
@@ -52,6 +52,7 @@ const NAV_GROUPS = [
     items: [
       { to: "/admin/cases",    label: "Cases",            icon: Briefcase,      exact: false },
       { to: "/admin/messages", label: "Messages",         icon: MessageSquare,  exact: false },
+      { to: "/admin/contact",  label: "Contact Enquiries", icon: Inbox,         exact: false, adminOnly: true },
       { to: "/admin/users",   label: "Users & Dentists", icon: Users,          exact: false, adminOnly: true },
       { to: "/admin/clinics", label: "Clinics",          icon: Building2,      exact: false, adminOnly: true },
       { to: "/admin/finance", label: "Finance Reports",  icon: BarChart3,      exact: false, adminOnly: true },
@@ -86,7 +87,7 @@ const NAV_GROUPS = [
   },
 ];
 
-const ADMIN_ONLY_PATHS = ["/admin/analytics", "/admin/activity", "/admin/users", "/admin/clinics", "/admin/finance", "/admin/pages", "/admin/posts", "/admin/media", "/admin/content", "/admin/seo", "/admin/services", "/admin/testimonials", "/admin/notifications", "/admin/settings", "/admin/roles", "/admin/email-templates", "/admin/backups"];
+const ADMIN_ONLY_PATHS = ["/admin/analytics", "/admin/activity", "/admin/users", "/admin/clinics", "/admin/finance", "/admin/contact", "/admin/pages", "/admin/posts", "/admin/media", "/admin/content", "/admin/seo", "/admin/services", "/admin/testimonials", "/admin/notifications", "/admin/settings", "/admin/roles", "/admin/email-templates", "/admin/backups"];
 
 function AdminLayout() {
   const path = useRouterState({ select: (s) => s.location.pathname });

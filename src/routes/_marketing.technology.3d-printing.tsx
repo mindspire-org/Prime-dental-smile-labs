@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_marketing/technology/3d-printing")({
       { title: "3D Printing — Prime Smile Dental Laboratory" },
       { name: "description", content: "DLP 3D printing for splints, surgical guides, models and biocompatible resin workflows." },
     ],
-    links: [{ rel: "canonical", href: "https://primesmilelab.com/technology/3d-printing" }],
+    links: [{ rel: "canonical", href: "https://primesmiles.eu/technology/3d-printing" }],
   }),
   component: Page,
 });

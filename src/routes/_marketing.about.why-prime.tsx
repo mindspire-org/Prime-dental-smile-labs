@@ -13,9 +13,9 @@ export const Route = createFileRoute("/_marketing/about/why-prime")({
       { property: "og:title", content: "Why Prime Smile — Prime Smile Dental Laboratory" },
       { property: "og:description", content: "Discover what sets Prime Smile apart: digital workflows, broad lab services, UK & Cyprus coverage, and CE-certified consumables." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://primesmilelab.com/about/why-prime" },
+      { property: "og:url", content: "https://primesmiles.eu/about/why-prime" },
     ],
-    links: [{ rel: "canonical", href: "https://primesmilelab.com/about/why-prime" }],
+    links: [{ rel: "canonical", href: "https://primesmiles.eu/about/why-prime" }],
   }),
   component: WhyPrimePage,
 });

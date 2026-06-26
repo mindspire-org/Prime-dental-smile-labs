@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_marketing/technology/slm-metal-printing"
       { title: "SLM Metal Printing — Prime Smile Dental Laboratory" },
       { name: "description", content: "Selective laser melting for cobalt-chrome frameworks, implant bars and RPD frameworks with unrivaled accuracy." },
     ],
-    links: [{ rel: "canonical", href: "https://primesmilelab.com/technology/slm-metal-printing" }],
+    links: [{ rel: "canonical", href: "https://primesmiles.eu/technology/slm-metal-printing" }],
   }),
   component: Page,
 });

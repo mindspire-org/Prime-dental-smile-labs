@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_marketing/privacy-policy")({
       { title: "Privacy Policy — Prime Smile Dental Laboratory" },
       { name: "description", content: "How Prime Smile Dental Laboratory collects, uses and protects your personal data." },
     ],
-    links: [{ rel: "canonical", href: "https://primesmilelab.com/privacy-policy" }],
+    links: [{ rel: "canonical", href: "https://primesmiles.eu/privacy-policy" }],
   }),
   component: PrivacyPolicyPage,
 });

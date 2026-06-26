@@ -15,13 +15,13 @@ export const Route = createFileRoute("/_marketing/contact")({
       { property: "og:title", content: "Contact — Prime Smile Dental Laboratory" },
       { property: "og:description", content: "Reach our UK & Cyprus dental lab team. Fast response guaranteed." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://primesmilelab.com/contact" },
+      { property: "og:url", content: "https://primesmiles.eu/contact" },
     ],
     links: [
-      { rel: "canonical", href: "https://primesmilelab.com/contact" },
+      { rel: "canonical", href: "https://primesmiles.eu/contact" },
     ],
     scripts: [
-      { type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "LocalBusiness", "name": "Prime Smile Dental Laboratory", "description": "Advanced digital dental laboratory serving UK and Cyprus dentists.", "url": "https://primesmilelab.com", "telephone": "+44 20 1234 5678", "email": "support@primesmilelab.com", "address": { "@type": "PostalAddress", "addressCountry": "GB" }, "openingHours": "Mo-Fr 09:00-17:00", "priceRange": "££", "currenciesAccepted": "GBP" }) },
+      { type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "LocalBusiness", "name": "Prime Smile Dental Laboratory", "description": "Advanced digital dental laboratory serving UK and Cyprus dentists.", "url": "https://primesmiles.eu", "telephone": "+44 20 1234 5678", "email": "support@primesmilelab.com", "address": { "@type": "PostalAddress", "addressCountry": "GB" }, "openingHours": "Mo-Fr 09:00-17:00", "priceRange": "££", "currenciesAccepted": "GBP" }) },
     ],
   }),
   component: ContactPage,

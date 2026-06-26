@@ -13,10 +13,10 @@ export const Route = createFileRoute("/_marketing/quality")({
       { property: "og:title", content: "Quality & Compliance — Prime Smile Dental Laboratory" },
       { property: "og:description", content: "CE-certified consumables, full traceability, UK MDR compliant." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://primesmilelab.com/quality" },
+      { property: "og:url", content: "https://primesmiles.eu/quality" },
     ],
     links: [
-      { rel: "canonical", href: "https://primesmilelab.com/quality" },
+      { rel: "canonical", href: "https://primesmiles.eu/quality" },
     ],
     scripts: [
       { type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [ { "@type": "Question", "name": "Is Prime Smile Dental Laboratory ISO certified?", "acceptedAnswer": { "@type": "Answer", "text": "Not yet certified — we operate documented quality practices and use CE-certified consumables for all restorations." } }, { "@type": "Question", "name": "Does Prime Smile comply with UK MDR 2002?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. All custom-made dental devices are manufactured in compliance with the UK Medical Devices Regulations 2002 (SI 2002/618) and carry full material traceability." } }, { "@type": "Question", "name": "What materials does the lab use?", "acceptedAnswer": { "@type": "Answer", "text": "We use exclusively CE-certified materials including zirconia, lithium disilicate, cobalt-chrome (SLM), PMMA, and resin composites, all with full lot-number traceability." } } ] }) },

@@ -15,9 +15,9 @@ export const Route = createFileRoute("/_marketing/technology/")({
       { property: "og:title", content: "Technology — Prime Smile Dental Laboratory" },
       { property: "og:description", content: "CAD/CAM milling, SLM metal printing, 3D printing — full digital production for UK dentists." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://primesmilelab.com/technology" },
+      { property: "og:url", content: "https://primesmiles.eu/technology" },
     ],
-    links: [{ rel: "canonical", href: "https://primesmilelab.com/technology" }],
+    links: [{ rel: "canonical", href: "https://primesmiles.eu/technology" }],
   }),
   component: TechPage,
 });

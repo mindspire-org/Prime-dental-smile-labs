@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_marketing/technology/cad-cam-milling")({
       { title: "CAD/CAM Milling — Prime Smile Dental Laboratory" },
       { name: "description", content: "5-axis simultaneous milling for zirconia, PMMA, titanium, CoCr and lithium disilicate restorations." },
     ],
-    links: [{ rel: "canonical", href: "https://primesmilelab.com/technology/cad-cam-milling" }],
+    links: [{ rel: "canonical", href: "https://primesmiles.eu/technology/cad-cam-milling" }],
   }),
   component: Page,
 });

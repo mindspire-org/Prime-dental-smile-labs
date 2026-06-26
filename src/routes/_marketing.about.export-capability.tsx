@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_marketing/about/export-capability")({
       { title: "Export Capability — Prime Smile Dental Laboratory" },
       { name: "description", content: "Prime Smile serves dentists in the UK and Cyprus with digital-first case intake, multiple courier options and protective packaging." },
     ],
-    links: [{ rel: "canonical", href: "https://primesmilelab.com/about/export-capability" }],
+    links: [{ rel: "canonical", href: "https://primesmiles.eu/about/export-capability" }],
   }),
   component: ExportCapabilityPage,
 });

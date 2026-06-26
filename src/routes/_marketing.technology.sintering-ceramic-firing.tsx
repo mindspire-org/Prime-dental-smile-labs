@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_marketing/technology/sintering-ceramic-f
       { title: "Sintering & Ceramic Firing — Prime Smile Dental Laboratory" },
       { name: "description", content: "Zirconia sintering, e.max firing and ceramic glazing with validated temperature protocols." },
     ],
-    links: [{ rel: "canonical", href: "https://primesmilelab.com/technology/sintering-ceramic-firing" }],
+    links: [{ rel: "canonical", href: "https://primesmiles.eu/technology/sintering-ceramic-firing" }],
   }),
   component: Page,
 });

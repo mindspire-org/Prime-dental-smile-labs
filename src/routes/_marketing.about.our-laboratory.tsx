@@ -14,9 +14,9 @@ export const Route = createFileRoute("/_marketing/about/our-laboratory")({
       { property: "og:title", content: "Our Laboratory — Prime Smile Dental Laboratory" },
       { property: "og:description", content: "A behind-the-scenes look at our digital laboratory, equipment, and validated production workflows." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://primesmilelab.com/about/our-laboratory" },
+      { property: "og:url", content: "https://primesmiles.eu/about/our-laboratory" },
     ],
-    links: [{ rel: "canonical", href: "https://primesmilelab.com/about/our-laboratory" }],
+    links: [{ rel: "canonical", href: "https://primesmiles.eu/about/our-laboratory" }],
   }),
   component: OurLabPage,
 });

@@ -14,13 +14,13 @@ export const Route = createFileRoute("/_marketing/services/")({
       { property: "og:title", content: "Lab Services — Prime Smile Dental Laboratory" },
       { property: "og:description", content: "Full digital dental lab services for UK & Cyprus dentists." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://primesmilelab.com/services" },
+      { property: "og:url", content: "https://primesmiles.eu/services" },
     ],
     links: [
-      { rel: "canonical", href: "https://primesmilelab.com/services" },
+      { rel: "canonical", href: "https://primesmiles.eu/services" },
     ],
     scripts: [
-      { type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "ItemList", "name": "Dental Lab Services — Prime Smile", "itemListElement": [ { "@type": "ListItem", "position": 1, "name": "Fixed Restorations", "url": "https://primesmilelab.com/services/fixed-restorations" }, { "@type": "ListItem", "position": 2, "name": "Implant Prosthetics", "url": "https://primesmilelab.com/services/implant-prosthetics" }, { "@type": "ListItem", "position": 3, "name": "Removable Prosthetics", "url": "https://primesmilelab.com/services/removable-prosthetics" }, { "@type": "ListItem", "position": 4, "name": "Metal Frameworks", "url": "https://primesmilelab.com/services/metal-frameworks" }, { "@type": "ListItem", "position": 5, "name": "Splints & Appliances", "url": "https://primesmilelab.com/services/splints-appliances" }, { "@type": "ListItem", "position": 6, "name": "Design Support", "url": "https://primesmilelab.com/services/design-support" } ] }) },
+      { type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "ItemList", "name": "Dental Lab Services — Prime Smile", "itemListElement": [ { "@type": "ListItem", "position": 1, "name": "Fixed Restorations", "url": "https://primesmiles.eu/services/fixed-restorations" }, { "@type": "ListItem", "position": 2, "name": "Implant Prosthetics", "url": "https://primesmiles.eu/services/implant-prosthetics" }, { "@type": "ListItem", "position": 3, "name": "Removable Prosthetics", "url": "https://primesmiles.eu/services/removable-prosthetics" }, { "@type": "ListItem", "position": 4, "name": "Metal Frameworks", "url": "https://primesmiles.eu/services/metal-frameworks" }, { "@type": "ListItem", "position": 5, "name": "Splints & Appliances", "url": "https://primesmiles.eu/services/splints-appliances" }, { "@type": "ListItem", "position": 6, "name": "Design Support", "url": "https://primesmiles.eu/services/design-support" } ] }) },
     ],
   }),
   component: ServicesPage,

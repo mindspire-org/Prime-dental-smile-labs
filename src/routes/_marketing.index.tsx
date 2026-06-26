@@ -19,14 +19,14 @@ export const Route = createFileRoute("/_marketing/")({
       { property: "og:title", content: "Prime Smile Dental Laboratory — Digital Lab for UK & Cyprus Dentists" },
       { property: "og:description", content: "Premium digital dental laboratory serving UK & Cyprus dentists with precision CAD/CAM restorations." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://primesmilelab.com/" },
+      { property: "og:url", content: "https://primesmiles.eu/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
-      { rel: "canonical", href: "https://primesmilelab.com/" },
+      { rel: "canonical", href: "https://primesmiles.eu/" },
     ],
     scripts: [
-      { type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "Organization", "name": "Prime Smile Dental Laboratory", "url": "https://primesmilelab.com", "description": "Advanced digital dental laboratory serving UK and Cyprus dentists with precision restorations and prosthetics.", "address": { "@type": "PostalAddress", "addressCountry": "GB" }, "contactPoint": { "@type": "ContactPoint", "contactType": "customer service", "availableLanguage": ["English"] } }) },
+      { type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "Organization", "name": "Prime Smile Dental Laboratory", "url": "https://primesmiles.eu", "description": "Advanced digital dental laboratory serving UK and Cyprus dentists with precision restorations and prosthetics.", "address": { "@type": "PostalAddress", "addressCountry": "GB" }, "contactPoint": { "@type": "ContactPoint", "contactType": "customer service", "availableLanguage": ["English"] } }) },
     ],
   }),
   component: HomePage,

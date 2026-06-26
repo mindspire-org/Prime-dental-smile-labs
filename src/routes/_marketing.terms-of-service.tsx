@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_marketing/terms-of-service")({
       { title: "Terms of Service — Prime Smile Dental Laboratory" },
       { name: "description", content: "Terms and conditions for using Prime Smile Dental Laboratory services." },
     ],
-    links: [{ rel: "canonical", href: "https://primesmilelab.com/terms-of-service" }],
+    links: [{ rel: "canonical", href: "https://primesmiles.eu/terms-of-service" }],
   }),
   component: TermsOfServicePage,
 });
