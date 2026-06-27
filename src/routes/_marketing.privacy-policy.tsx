@@ -76,12 +76,12 @@ function PrivacyPolicyPage() {
 
           <Reveal>
             <h2 className="text-xl font-semibold text-text-slate mb-3">7. Your Rights</h2>
-            <p className="text-muted-grey leading-relaxed">You have the right to access, correct, delete or restrict processing of your personal data. To exercise these rights, contact us at <a href="mailto:privacy@primesmilelab.com" className="text-teal hover:underline">privacy@primesmilelab.com</a>.</p>
+            <p className="text-muted-grey leading-relaxed">You have the right to access, correct, delete or restrict processing of your personal data. To exercise these rights, contact us at <a href="mailto:privacy@primesmiles.eu" className="text-teal hover:underline">privacy@primesmiles.eu</a>.</p>
           </Reveal>
 
           <Reveal>
             <h2 className="text-xl font-semibold text-text-slate mb-3">8. Contact Us</h2>
-            <p className="text-muted-grey leading-relaxed">If you have any questions about this Privacy Policy, please contact us at <a href="mailto:privacy@primesmilelab.com" className="text-teal hover:underline">privacy@primesmilelab.com</a> or through the <Link to="/contact" className="text-teal hover:underline">Contact</Link> page.</p>
+            <p className="text-muted-grey leading-relaxed">If you have any questions about this Privacy Policy, please contact us at <a href="mailto:privacy@primesmiles.eu" className="text-teal hover:underline">privacy@primesmiles.eu</a> or through the <Link to="/contact" className="text-teal hover:underline">Contact</Link> page.</p>
           </Reveal>
         </div>
       </section>

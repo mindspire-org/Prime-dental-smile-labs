@@ -100,7 +100,7 @@ function TermsOfServicePage() {
 
           <Reveal>
             <h2 className="text-xl font-semibold text-text-slate mb-3">11. Contact</h2>
-            <p className="text-muted-grey leading-relaxed">For questions about these Terms, contact us at <a href="mailto:legal@primesmilelab.com" className="text-teal hover:underline">legal@primesmilelab.com</a> or through the <Link to="/contact" className="text-teal hover:underline">Contact</Link> page.</p>
+            <p className="text-muted-grey leading-relaxed">For questions about these Terms, contact us at <a href="mailto:legal@primesmiles.eu" className="text-teal hover:underline">legal@primesmiles.eu</a> or through the <Link to="/contact" className="text-teal hover:underline">Contact</Link> page.</p>
           </Reveal>
         </div>
       </section>

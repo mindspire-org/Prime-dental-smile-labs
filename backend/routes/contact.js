@@ -31,7 +31,7 @@ contactRouter.post("/", validateRecaptcha, async (req, res) => {
     });
 
     await sendEmail({
-      to: process.env.CONTACT_EMAIL || "support@primesmilelab.com",
+      to: process.env.CONTACT_EMAIL || "support@primesmiles.eu",
       subject: `New Contact Enquiry from ${validatedData.clinicName}`,
       html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
         <div style="background:#0aabbd;color:#fff;padding:20px;text-align:center">

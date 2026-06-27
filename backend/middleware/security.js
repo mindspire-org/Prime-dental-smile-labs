@@ -178,8 +178,8 @@ export const corsOptions = {
     const allowedOrigins = process.env.CORS_ORIGIN?.split(",") || [
       "http://localhost:3000",
       "http://localhost:5173",
-      "https://primesmilelab.com",
-      "https://www.primesmilelab.com",
+      "https://primesmiles.eu",
+      "https://www.primesmiles.eu",
     ];
 
     // Allow requests with no origin (mobile apps, curl, etc.)

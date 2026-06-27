@@ -105,7 +105,7 @@ function DataNoticePage() {
 
           <Reveal>
             <h2 className="text-xl font-semibold text-text-slate mb-3">9. Contact</h2>
-            <p className="text-muted-grey leading-relaxed">For any questions about this Data Notice or to exercise your data rights, please contact our Data Protection Officer at <a href="mailto:dpo@primesmilelab.com" className="text-teal hover:underline">dpo@primesmilelab.com</a> or through the <Link to="/contact" className="text-teal hover:underline">Contact</Link> page.</p>
+            <p className="text-muted-grey leading-relaxed">For any questions about this Data Notice or to exercise your data rights, please contact our Data Protection Officer at <a href="mailto:dpo@primesmiles.eu" className="text-teal hover:underline">dpo@primesmiles.eu</a> or through the <Link to="/contact" className="text-teal hover:underline">Contact</Link> page.</p>
           </Reveal>
         </div>
       </section>
